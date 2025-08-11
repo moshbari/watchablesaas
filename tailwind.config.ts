@@ -73,11 +73,13 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-controls': 'var(--gradient-controls)',
-				'gradient-overlay': 'var(--gradient-overlay)'
+				'gradient-overlay': 'var(--gradient-overlay)',
+				'gradient-primary': 'var(--gradient-primary)'
 			},
 			boxShadow: {
 				'player': 'var(--shadow-player)',
-				'controls': 'var(--shadow-controls)'
+				'controls': 'var(--shadow-controls)',
+				'glow': 'var(--shadow-glow)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',

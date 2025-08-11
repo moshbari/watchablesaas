@@ -37,6 +37,11 @@ All colors MUST be HSL.
     --input: 220 13% 15%;
     --ring: 142 76% 36%;
 
+    /* Brand enhancements */
+    --primary-variant: 142 70% 45%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
+    --shadow-glow: 0 0 32px hsl(var(--primary) / 0.35);
+
     /* Video Player Specific */
     --player-bg: 220 13% 9%;
     --player-controls: 220 13% 11%;
@@ -112,6 +117,8 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Brand enhancements */
+    --primary-variant: 210 40% 90%;
   }
 }
 

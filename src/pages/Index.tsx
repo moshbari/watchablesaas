@@ -183,7 +183,7 @@ const Index = () => {
         </div>
       )}
       <Dialog open={showRestrictedDialog} onOpenChange={setShowRestrictedDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border border-border shadow-player">
           <DialogHeader>
             {restrictionType === 'unauthenticated' ? (
               <>
@@ -202,15 +202,15 @@ const Index = () => {
             )}
           </DialogHeader>
           <DialogFooter className="sm:justify-between">
-            <Button variant="secondary" onClick={() => setShowRestrictedDialog(false)}>
+            <Button variant="outline" onClick={() => setShowRestrictedDialog(false)}>
               Close
             </Button>
             {restrictionType === 'unauthenticated' ? (
-              <Button onClick={() => navigate('/register')}>
+              <Button variant="hero" onClick={() => navigate('/register')}>
                 Create free account
               </Button>
             ) : (
-              <Button onClick={() => window.open('https://www.instagram.com/askmoshbari/', '_blank', 'noopener,noreferrer')}>
+              <Button variant="hero" onClick={() => window.open('https://www.instagram.com/askmoshbari/', '_blank', 'noopener,noreferrer')}>
                 <Instagram className="mr-2 h-4 w-4" aria-hidden="true" />
                 Contact on Instagram
               </Button>
