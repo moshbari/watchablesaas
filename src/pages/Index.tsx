@@ -11,6 +11,7 @@ import { VideoOverlayButton, type OverlayButtonConfig } from '@/components/Video
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthProvider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
@@ -31,8 +32,10 @@ const Index = () => {
     fontSize: '16px'
   });
   const { toast } = useToast();
-  const { role } = useAuth();
+  const { role, session } = useAuth();
   const [showRestrictedDialog, setShowRestrictedDialog] = useState(false);
+  const [restrictionType, setRestrictionType] = useState<'unauthenticated' | 'interested' | null>(null);
+  const navigate = useNavigate();
 
   // Check for video parameter in URL on component mount
   useEffect(() => {
@@ -53,7 +56,13 @@ const Index = () => {
   }, []);
 
   const handleVideoSubmit = async (url: string) => {
+    if (!session) {
+      setRestrictionType('unauthenticated');
+      setShowRestrictedDialog(true);
+      return;
+    }
     if (role === 'interested') {
+      setRestrictionType('interested');
       setShowRestrictedDialog(true);
       return;
     }
@@ -176,19 +185,36 @@ const Index = () => {
       <Dialog open={showRestrictedDialog} onOpenChange={setShowRestrictedDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Feature available to users only</DialogTitle>
-            <DialogDescription>
-              To load and customize videos, please upgrade to a user account. For full access, contact us on Instagram.
-            </DialogDescription>
+            {restrictionType === 'unauthenticated' ? (
+              <>
+                <DialogTitle>Create a free account to continue</DialogTitle>
+                <DialogDescription>
+                  Please create a free account to load and customize videos.
+                </DialogDescription>
+              </>
+            ) : (
+              <>
+                <DialogTitle>Feature available to users only</DialogTitle>
+                <DialogDescription>
+                  To load and customize videos, please upgrade to a user account. For full access, contact us on Instagram.
+                </DialogDescription>
+              </>
+            )}
           </DialogHeader>
           <DialogFooter className="sm:justify-between">
             <Button variant="secondary" onClick={() => setShowRestrictedDialog(false)}>
               Close
             </Button>
-            <Button onClick={() => window.open('https://www.instagram.com/askmoshbari/', '_blank', 'noopener,noreferrer')}>
-              <Instagram className="mr-2 h-4 w-4" aria-hidden="true" />
-              Contact on Instagram
-            </Button>
+            {restrictionType === 'unauthenticated' ? (
+              <Button onClick={() => navigate('/register')}>
+                Create free account
+              </Button>
+            ) : (
+              <Button onClick={() => window.open('https://www.instagram.com/askmoshbari/', '_blank', 'noopener,noreferrer')}>
+                <Instagram className="mr-2 h-4 w-4" aria-hidden="true" />
+                Contact on Instagram
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
