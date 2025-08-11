@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { VideoUrlInput } from '@/components/VideoUrlInput';
@@ -9,6 +9,8 @@ import { PlayButtonCustomizer } from '@/components/PlayButtonCustomizer';
 import { ExternalVideoScript } from '@/components/ExternalVideoScript';
 import { VideoOverlayButton, type OverlayButtonConfig } from '@/components/VideoOverlayButton';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthProvider';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const Index = () => {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
@@ -29,6 +31,8 @@ const Index = () => {
     fontSize: '16px'
   });
   const { toast } = useToast();
+  const { role } = useAuth();
+  const [showRestrictedDialog, setShowRestrictedDialog] = useState(false);
 
   // Check for video parameter in URL on component mount
   useEffect(() => {
@@ -49,6 +53,11 @@ const Index = () => {
   }, []);
 
   const handleVideoSubmit = async (url: string) => {
+    if (role === 'interested') {
+      setShowRestrictedDialog(true);
+      return;
+    }
+
     setIsLoading(true);
     
     // Simulate loading delay for better UX
@@ -164,6 +173,25 @@ const Index = () => {
           />
         </div>
       )}
+      <Dialog open={showRestrictedDialog} onOpenChange={setShowRestrictedDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Feature available to users only</DialogTitle>
+            <DialogDescription>
+              To load and customize videos, please upgrade to a user account. For full access, contact us on Instagram.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-between">
+            <Button variant="secondary" onClick={() => setShowRestrictedDialog(false)}>
+              Close
+            </Button>
+            <Button onClick={() => window.open('https://www.instagram.com/askmoshbari/', '_blank', 'noopener,noreferrer')}>
+              <Instagram className="mr-2 h-4 w-4" aria-hidden="true" />
+              Contact on Instagram
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
