@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { VideoControls } from './VideoControls';
 import { useVideoState } from './useVideoState';
 import { useVideoEvents } from './useVideoEvents';
-import { YouTubePlayer } from '../YouTubePlayer';
+import { IsolatedYouTubePlayer } from './IsolatedYouTubePlayer';
 import { ResumeModal } from '../ResumeModal';
 import { OverlayButton, type OverlayButtonConfig } from '../VideoOverlayButton';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
@@ -234,26 +234,13 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       >
         {/* Video Element */}
         {isYoutube && youtubeId ? (
-          <YouTubePlayer
+          <IsolatedYouTubePlayer
             videoId={youtubeId}
-            onStateChange={handleYouTubeStateChange}
-            onVolumeChange={handleYouTubeVolumeChange}
-            onError={handleYouTubeError}
-            savedProgress={savedProgress || undefined}
-            onProgressUpdate={(currentTime: number) => {
-              console.log('YouTube progress update:', currentTime);
-              // Check if we've reached the end time for YouTube videos
-              if (endTime && currentTime >= endTime) {
-                console.log('End time reached for YouTube video');
-              }
-              saveProgress(currentTime);
-            }}
-            showControls={true}
-            onFullscreen={handleFullscreen}
+            onError={onError}
             playButtonColor={playButtonColor}
             playButtonSize={playButtonSize}
-            shouldSeekTo={startTime && !hasInitialized ? startTime : undefined}
-            onSeekComplete={() => setShouldSeekTo(undefined)}
+            startTime={startTime}
+            onProgressUpdate={saveProgress}
           />
         ) : (
           <>
