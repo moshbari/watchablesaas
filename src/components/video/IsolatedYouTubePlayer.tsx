@@ -9,6 +9,7 @@ interface IsolatedYouTubePlayerProps {
   playButtonColor?: string;
   playButtonSize?: number;
   startTime?: number;
+  endTime?: number;
   onProgressUpdate?: (currentTime: number) => void;
 }
 
@@ -25,6 +26,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   playButtonColor = '#ff0000',
   playButtonSize = 96,
   startTime,
+  endTime,
   onProgressUpdate
 }) => {
   const playerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +66,8 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
             playsinline: 1,
             enablejsapi: 1,
             origin: window.location.origin,
-            start: startTime ? Math.floor(startTime) : 0
+            start: startTime ? Math.floor(startTime) : 0,
+            end: endTime ? Math.floor(endTime) : undefined
           },
           events: {
             onReady: () => {
@@ -149,11 +152,18 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
         try {
           const currentTime = ytPlayerRef.current.getCurrentTime();
           onProgressUpdate?.(currentTime);
+          
+          // Check if we've reached the end time
+          if (endTime && currentTime >= endTime) {
+            console.log('YouTube end time reached, pausing video');
+            ytPlayerRef.current.pauseVideo();
+            stopProgressTracking();
+          }
         } catch (error) {
           console.log('Error getting current time:', error);
         }
       }
-    }, 2000);
+    }, 1000);
   };
 
   const stopProgressTracking = () => {

@@ -240,6 +240,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             playButtonColor={playButtonColor}
             playButtonSize={playButtonSize}
             startTime={startTime}
+            endTime={endTime}
             onProgressUpdate={saveProgress}
           />
         ) : (
