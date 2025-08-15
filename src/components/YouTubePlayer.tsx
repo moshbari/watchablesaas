@@ -48,6 +48,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   const [isMuted, setIsMuted] = useState(false);
   const progressIntervalRef = useRef<NodeJS.Timeout>();
   const [hasResumed, setHasResumed] = useState(false);
+  const stateChangeTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Load YouTube API
   useEffect(() => {
@@ -115,17 +116,23 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
                 const isCurrentlyPlaying = event.data === window.YT.PlayerState.PLAYING;
                 console.log('YouTube raw state:', event.data, 'isPlaying:', isCurrentlyPlaying);
                 
-                // Prevent rapid state changes by debouncing
-                if (isCurrentlyPlaying !== isPlaying) {
-                  setIsPlaying(isCurrentlyPlaying);
-                  onStateChange?.(isCurrentlyPlaying);
-
-                  if (isCurrentlyPlaying) {
-                    startProgressTracking();
-                  } else {
-                    stopProgressTracking();
-                  }
+                // Debounce state changes to prevent rapid toggling
+                if (stateChangeTimeoutRef.current) {
+                  clearTimeout(stateChangeTimeoutRef.current);
                 }
+                
+                stateChangeTimeoutRef.current = setTimeout(() => {
+                  if (isCurrentlyPlaying !== isPlaying) {
+                    setIsPlaying(isCurrentlyPlaying);
+                    onStateChange?.(isCurrentlyPlaying);
+
+                    if (isCurrentlyPlaying) {
+                      startProgressTracking();
+                    } else {
+                      stopProgressTracking();
+                    }
+                  }
+                }, 100); // 100ms debounce
               },
               onError: (event: any) => {
                 console.error('YouTube player error:', event.data);
@@ -169,6 +176,9 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     return () => {
       isComponentMounted = false;
       stopProgressTracking();
+      if (stateChangeTimeoutRef.current) {
+        clearTimeout(stateChangeTimeoutRef.current);
+      }
       if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
         console.log('Cleanup: Destroying YouTube player');
         ytPlayerRef.current.destroy();
