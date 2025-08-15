@@ -60,10 +60,16 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       if (state.isPlaying) {
         videoRef.current.pause();
       } else {
+        // If video has ended or is near the end, restart from start time
+        if (videoRef.current.ended || 
+            (endTime && videoRef.current.currentTime >= endTime) ||
+            videoRef.current.currentTime >= videoRef.current.duration - 1) {
+          videoRef.current.currentTime = startTime || 0;
+        }
         videoRef.current.play();
       }
     }
-  }, [state.isPlaying, isYoutube]);
+  }, [state.isPlaying, isYoutube, startTime, endTime]);
 
   const handleVolumeToggle = useCallback(() => {
     if (isYoutube) return; // YouTube handles its own volume

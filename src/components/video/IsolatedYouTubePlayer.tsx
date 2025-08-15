@@ -180,6 +180,18 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
       if (isPlaying) {
         ytPlayerRef.current.pauseVideo();
       } else {
+        // Check if we need to seek to start time
+        const currentTime = ytPlayerRef.current.getCurrentTime();
+        const duration = ytPlayerRef.current.getDuration();
+        
+        // If video is at the beginning (0-5 seconds) or has ended, seek to start time
+        if ((currentTime < 5 || 
+             (endTime && currentTime >= endTime) ||
+             currentTime >= duration - 2) && 
+            startTime) {
+          ytPlayerRef.current.seekTo(startTime, true);
+        }
+        
         ytPlayerRef.current.playVideo();
       }
     } catch (error) {
