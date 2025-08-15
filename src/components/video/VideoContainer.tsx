@@ -105,11 +105,11 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     }
   }, [savedProgress, isYoutube, setShouldSeekTo, setShowResumeModal]);
 
-  // YouTube player event handlers
+  // YouTube player event handlers - simplified to prevent feedback loops
   const handleYouTubeStateChange = useCallback((isPlaying: boolean) => {
     console.log('YouTube state change:', isPlaying);
-    setPlaying(isPlaying);
-  }, [setPlaying]);
+    // Don't update our internal state for YouTube - let YouTube handle it
+  }, []);
 
   const handleYouTubeVolumeChange = useCallback((volume: number, isMuted: boolean) => {
     setVolume(volume, isMuted);
@@ -248,11 +248,11 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
               }
               saveProgress(currentTime);
             }}
-            showControls={state.showControls || !state.isPlaying}
+            showControls={true}
             onFullscreen={handleFullscreen}
             playButtonColor={playButtonColor}
             playButtonSize={playButtonSize}
-            shouldSeekTo={state.shouldSeekTo || (startTime && !hasInitialized ? startTime : undefined)}
+            shouldSeekTo={startTime && !hasInitialized ? startTime : undefined}
             onSeekComplete={() => setShouldSeekTo(undefined)}
           />
         ) : (
