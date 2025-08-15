@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -44,9 +44,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
   
   // Extract the actual video URL (handles URLs with video parameters)
-  const actualVideoUrl = extractVideoUrl(src);
-  console.log('Original URL:', src);
-  console.log('Extracted URL:', actualVideoUrl);
+  const actualVideoUrl = useMemo(() => extractVideoUrl(src), [src]);
   
   const { savedProgress, saveProgress, clearProgress, showResumeModal, setShowResumeModal } = useVideoProgress(actualVideoUrl);
   
@@ -62,11 +60,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [hasInitialized, setHasInitialized] = useState(false);
 
   // Detect if source is YouTube using the extracted URL
-  const isYoutube = isYouTubeUrl(actualVideoUrl);
-  const youtubeId = isYoutube ? getYouTubeId(actualVideoUrl) : null;
+  const isYoutube = useMemo(() => isYouTubeUrl(actualVideoUrl), [actualVideoUrl]);
+  const youtubeId = useMemo(() => isYoutube ? getYouTubeId(actualVideoUrl) : null, [isYoutube, actualVideoUrl]);
 
   // Video event handlers for regular HTML5 videos
-  const handlePlay = () => {
+  const handlePlay = useCallback(() => {
     if (videoRef.current) {
       if (state.isPlaying) {
         videoRef.current.pause();
@@ -74,17 +72,17 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         videoRef.current.play();
       }
     }
-  };
+  }, [state.isPlaying]);
 
-  const handleVolumeToggle = () => {
+  const handleVolumeToggle = useCallback(() => {
     if (videoRef.current) {
       const newMuted = !state.isMuted;
       videoRef.current.muted = newMuted;
       setState(prev => ({ ...prev, isMuted: newMuted }));
     }
-  };
+  }, [state.isMuted]);
 
-  const handleVolumeChange = (value: number[]) => {
+  const handleVolumeChange = useCallback((value: number[]) => {
     const volume = value[0] / 100;
     if (videoRef.current) {
       videoRef.current.volume = volume;
@@ -95,15 +93,15 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         isMuted: volume === 0
       }));
     }
-  };
+  }, []);
 
-  const handleFullscreen = () => {
+  const handleFullscreen = useCallback(() => {
     if (!document.fullscreenElement && containerRef.current) {
       containerRef.current.requestFullscreen();
     } else {
       document.exitFullscreen();
     }
-  };
+  }, []);
 
   const showControlsTemporarily = () => {
     setState(prev => ({ ...prev, showControls: true }));
@@ -136,18 +134,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   // YouTube player event handlers
-  const handleYouTubeStateChange = (isPlaying: boolean) => {
+  const handleYouTubeStateChange = useCallback((isPlaying: boolean) => {
     setState(prev => ({ ...prev, isPlaying }));
-  };
+  }, []);
 
-  const handleYouTubeVolumeChange = (volume: number, isMuted: boolean) => {
+  const handleYouTubeVolumeChange = useCallback((volume: number, isMuted: boolean) => {
     setState(prev => ({ ...prev, volume, isMuted }));
-  };
+  }, []);
 
-  const handleYouTubeError = (error: string) => {
+  const handleYouTubeError = useCallback((error: string) => {
     setState(prev => ({ ...prev, error, isLoading: false }));
     onError?.(error);
-  };
+  }, [onError]);
 
   // Keyboard shortcuts
   useEffect(() => {
