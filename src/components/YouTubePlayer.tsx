@@ -70,6 +70,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     const initializePlayer = () => {
       if (playerRef.current && !ytPlayerRef.current) {
         try {
+          console.log('Initializing YouTube player for video:', videoId);
           ytPlayerRef.current = new window.YT.Player(playerRef.current, {
             videoId: videoId,
             width: '100%',
@@ -97,13 +98,18 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
               },
               onStateChange: (event: any) => {
                 const isCurrentlyPlaying = event.data === window.YT.PlayerState.PLAYING;
-                setIsPlaying(isCurrentlyPlaying);
-                onStateChange?.(isCurrentlyPlaying);
+                console.log('YouTube raw state:', event.data, 'isPlaying:', isCurrentlyPlaying);
+                
+                // Prevent rapid state changes by debouncing
+                if (isCurrentlyPlaying !== isPlaying) {
+                  setIsPlaying(isCurrentlyPlaying);
+                  onStateChange?.(isCurrentlyPlaying);
 
-                if (isCurrentlyPlaying) {
-                  startProgressTracking();
-                } else {
-                  stopProgressTracking();
+                  if (isCurrentlyPlaying) {
+                    startProgressTracking();
+                  } else {
+                    stopProgressTracking();
+                  }
                 }
               },
               onError: (event: any) => {
