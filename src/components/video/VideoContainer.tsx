@@ -126,7 +126,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     setShowControls,
     onPlay: handlePlay,
     onVolumeToggle: handleVolumeToggle,
-    onFullscreen: handleFullscreen
+    onFullscreen: handleFullscreen,
+    isYoutube
   });
 
   // Fullscreen change listener

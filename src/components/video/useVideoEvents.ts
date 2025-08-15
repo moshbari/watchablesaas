@@ -8,6 +8,7 @@ interface UseVideoEventsProps {
   onPlay: () => void;
   onVolumeToggle: () => void;
   onFullscreen: () => void;
+  isYoutube?: boolean;
 }
 
 export const useVideoEvents = ({
@@ -16,7 +17,8 @@ export const useVideoEvents = ({
   setShowControls,
   onPlay,
   onVolumeToggle,
-  onFullscreen
+  onFullscreen,
+  isYoutube = false
 }: UseVideoEventsProps) => {
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -44,8 +46,10 @@ export const useVideoEvents = ({
     }
   }, [state.isPlaying, setShowControls]);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - skip for YouTube videos to avoid conflicts
   useEffect(() => {
+    if (isYoutube) return; // Skip keyboard shortcuts for YouTube
+    
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
       
@@ -67,17 +71,19 @@ export const useVideoEvents = ({
 
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [onPlay, onFullscreen, onVolumeToggle]);
+  }, [onPlay, onFullscreen, onVolumeToggle, isYoutube]);
 
-  // Fullscreen change listener
+  // Fullscreen change listener - skip for YouTube to avoid state conflicts
   useEffect(() => {
+    if (isYoutube) return; // Skip for YouTube to avoid state conflicts
+    
     const handleFullscreenChange = () => {
       setPlaying(!!document.fullscreenElement);
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, [setPlaying]);
+  }, [setPlaying, isYoutube]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
