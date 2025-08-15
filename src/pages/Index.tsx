@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number | undefined>(undefined);
+  const [endTime, setEndTime] = useState<number | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
@@ -55,7 +57,7 @@ const Index = () => {
     }
   }, []);
 
-  const handleVideoSubmit = async (url: string) => {
+  const handleVideoSubmit = async (url: string, startTimeParam?: number, endTimeParam?: number) => {
     if (!session) {
       setRestrictionType('unauthenticated');
       setShowRestrictedDialog(true);
@@ -74,6 +76,8 @@ const Index = () => {
     
     try {
       setCurrentVideo(url);
+      setStartTime(startTimeParam);
+      setEndTime(endTimeParam);
       toast({
         title: "Video loaded successfully",
         description: "Enjoy your distraction-free viewing experience!",
@@ -99,6 +103,8 @@ const Index = () => {
 
   const handleBack = () => {
     setCurrentVideo(null);
+    setStartTime(undefined);
+    setEndTime(undefined);
   };
 
   return (
@@ -125,6 +131,8 @@ const Index = () => {
               playButtonColor={playButtonColor}
               playButtonSize={playButtonSize}
               overlayButtonConfig={overlayButtonConfig}
+              startTime={startTime}
+              endTime={endTime}
             />
           </div>
 

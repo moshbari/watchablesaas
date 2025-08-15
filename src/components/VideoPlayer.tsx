@@ -15,6 +15,8 @@ interface VideoPlayerProps {
   playButtonColor?: string;
   playButtonSize?: number;
   overlayButtonConfig?: OverlayButtonConfig;
+  startTime?: number;
+  endTime?: number;
 }
 
 interface VideoState {
@@ -33,7 +35,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onError, 
   playButtonColor = '#ff0000', 
   playButtonSize = 96,
-  overlayButtonConfig
+  overlayButtonConfig,
+  startTime,
+  endTime 
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,6 +59,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     isLoading: true,
     error: null
   });
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Detect if source is YouTube using the extracted URL
   const isYoutube = isYouTubeUrl(actualVideoUrl);
@@ -199,15 +204,35 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onError?.(error);
     };
 
-    // Progress saving
+    // Progress saving and end time checking
     const handleTimeUpdate = () => {
       if (video.currentTime > 0) {
+        // Check if we've reached the end time
+        if (endTime && video.currentTime >= endTime) {
+          video.pause();
+          setState(prev => ({ ...prev, isPlaying: false }));
+          return;
+        }
         saveProgress(video.currentTime);
+      }
+    };
+
+    const handleLoadedData = () => {
+      setState(prev => ({ ...prev, isLoading: false }));
+      
+      if (!hasInitialized) {
+        setHasInitialized(true);
+        
+        // Set start time if provided
+        if (startTime && video) {
+          video.currentTime = startTime;
+        }
       }
     };
 
     video.addEventListener('loadstart', handleLoadStart);
     video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('playing', handlePlaying);
     video.addEventListener('pause', handlePause);
     video.addEventListener('error', handleError);
@@ -216,12 +241,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     return () => {
       video.removeEventListener('loadstart', handleLoadStart);
       video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('playing', handlePlaying);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('error', handleError);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [saveProgress, onError, isYoutube]);
+  }, [saveProgress, onError, isYoutube, startTime, endTime, hasInitialized]);
 
   // Initialize volume for HTML5 videos
   useEffect(() => {
@@ -260,12 +286,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onVolumeChange={handleYouTubeVolumeChange}
             onError={handleYouTubeError}
             savedProgress={savedProgress || undefined}
-            onProgressUpdate={saveProgress}
+            onProgressUpdate={(currentTime: number) => {
+              // Check if we've reached the end time for YouTube videos
+              if (endTime && currentTime >= endTime) {
+                console.log('End time reached for YouTube video');
+              }
+              saveProgress(currentTime);
+            }}
             showControls={state.showControls || !state.isPlaying}
             onFullscreen={handleFullscreen}
             playButtonColor={playButtonColor}
             playButtonSize={playButtonSize}
-            shouldSeekTo={state.shouldSeekTo}
+            shouldSeekTo={state.shouldSeekTo || (startTime && !hasInitialized ? startTime : undefined)}
             onSeekComplete={() => setState(prev => ({ ...prev, shouldSeekTo: undefined }))}
           />
         ) : (
