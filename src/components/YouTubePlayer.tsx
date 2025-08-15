@@ -51,9 +51,13 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
 
   // Load YouTube API
   useEffect(() => {
+    let isComponentMounted = true;
+    
     const loadYouTubeAPI = () => {
       if (window.YT && window.YT.Player) {
-        initializePlayer();
+        if (isComponentMounted) {
+          initializePlayer();
+        }
         return;
       }
 
@@ -64,11 +68,22 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
         document.head.appendChild(script);
       }
 
-      window.onYouTubeIframeAPIReady = initializePlayer;
+      window.onYouTubeIframeAPIReady = () => {
+        if (isComponentMounted) {
+          initializePlayer();
+        }
+      };
     };
 
     const initializePlayer = () => {
-      if (playerRef.current && !ytPlayerRef.current) {
+      // Destroy existing player first to prevent multiple instances
+      if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
+        console.log('Destroying existing YouTube player');
+        ytPlayerRef.current.destroy();
+        ytPlayerRef.current = null;
+      }
+      
+      if (playerRef.current && !ytPlayerRef.current && isComponentMounted) {
         try {
           console.log('Initializing YouTube player for video:', videoId);
           ytPlayerRef.current = new window.YT.Player(playerRef.current, {
@@ -152,9 +167,12 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     loadYouTubeAPI();
 
     return () => {
+      isComponentMounted = false;
       stopProgressTracking();
       if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
+        console.log('Cleanup: Destroying YouTube player');
         ytPlayerRef.current.destroy();
+        ytPlayerRef.current = null;
       }
     };
   }, [videoId]);
