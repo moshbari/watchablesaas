@@ -170,7 +170,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
         const currentTime = ytPlayerRef.current.getCurrentTime();
         onProgressUpdate?.(currentTime);
       }
-    }, 5000);
+    }, 1000);
   };
 
   const stopProgressTracking = () => {
@@ -241,7 +241,6 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
       <div 
         ref={playerRef}
         className="w-full h-full"
-        style={{ pointerEvents: 'none' }}
       />
 
       {/* Loading Overlay */}
