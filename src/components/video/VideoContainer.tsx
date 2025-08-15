@@ -107,6 +107,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
 
   // YouTube player event handlers
   const handleYouTubeStateChange = useCallback((isPlaying: boolean) => {
+    console.log('YouTube state change:', isPlaying);
     setPlaying(isPlaying);
   }, [setPlaying]);
 
@@ -160,6 +161,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       if (video.currentTime > 0) {
         // Check if we've reached the end time
         if (endTime && video.currentTime >= endTime) {
+          console.log('End time reached, pausing video');
           video.pause();
           setPlaying(false);
           return;
@@ -238,6 +240,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onError={handleYouTubeError}
             savedProgress={savedProgress || undefined}
             onProgressUpdate={(currentTime: number) => {
+              console.log('YouTube progress update:', currentTime);
               // Check if we've reached the end time for YouTube videos
               if (endTime && currentTime >= endTime) {
                 console.log('End time reached for YouTube video');
