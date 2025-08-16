@@ -181,7 +181,7 @@ export const ExternalVideoScript: React.FC = () => {
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
             <CardTitle className="flex items-center justify-between">
-              🌐 Add Overlay Button to YOUR Website
+              Add Overlay Button On The Video Player (Currently Not Active)
               {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
