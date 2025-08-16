@@ -20,6 +20,18 @@ const Index = () => {
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [showCustomizer, setShowCustomizer] = useState(false);
+  const [overlayButtonConfig] = useState({
+    enabled: true,
+    text: 'Get Started Now!',
+    url: 'https://example.com',
+    delay: 3,
+    position: 'center' as const,
+    width: '300px',
+    height: '50px',
+    backgroundColor: '#3b82f6',
+    textColor: '#ffffff',
+    fontSize: '16px'
+  });
   const { toast } = useToast();
   const { role, session } = useAuth();
   const [showRestrictedDialog, setShowRestrictedDialog] = useState(false);
@@ -117,6 +129,7 @@ const Index = () => {
               onError={handleVideoError}
               playButtonColor={playButtonColor}
               playButtonSize={playButtonSize}
+              overlayButtonConfig={overlayButtonConfig}
               startTime={startTime}
               endTime={endTime}
             />
