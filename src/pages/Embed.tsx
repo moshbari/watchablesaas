@@ -10,12 +10,12 @@ const Embed = () => {
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [overlayButtonConfig, setOverlayButtonConfig] = useState<OverlayButtonConfig>({
     enabled: false,
-    text: 'Click Here!',
+    text: 'Click Here to Secure Your Spot Now',
     url: 'https://example.com',
     delay: 3,
     position: 'top-right',
-    width: '200px',
-    height: '50px',
+    width: '320px',
+    height: '60px',
     backgroundColor: '#3b82f6',
     textColor: '#ffffff',
     fontSize: '16px'

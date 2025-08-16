@@ -27,12 +27,12 @@ interface VideoOverlayButtonProps {
 
 const defaultConfig: OverlayButtonConfig = {
   enabled: false,
-  text: 'Click Here!',
+  text: 'Click Here to Secure Your Spot Now',
   url: 'https://example.com',
   delay: 3,
   position: 'top-right',
-  width: '200px',
-  height: '50px',
+  width: '320px',
+  height: '60px',
   backgroundColor: '#3b82f6',
   textColor: '#ffffff',
   fontSize: '16px'
@@ -83,7 +83,7 @@ export const VideoOverlayButton: React.FC<VideoOverlayButtonProps> = ({
                       id="overlay-text"
                       value={config.text}
                       onChange={(e) => updateConfig('text', e.target.value)}
-                      placeholder="Click Here!"
+                      placeholder="Click Here to Secure Your Spot Now"
                     />
                   </div>
                   
@@ -134,7 +134,7 @@ export const VideoOverlayButton: React.FC<VideoOverlayButtonProps> = ({
                       id="overlay-width"
                       value={config.width}
                       onChange={(e) => updateConfig('width', e.target.value)}
-                      placeholder="200px"
+                      placeholder="320px"
                     />
                   </div>
                   
@@ -144,7 +144,7 @@ export const VideoOverlayButton: React.FC<VideoOverlayButtonProps> = ({
                       id="overlay-height"
                       value={config.height}
                       onChange={(e) => updateConfig('height', e.target.value)}
-                      placeholder="50px"
+                      placeholder="60px"
                     />
                   </div>
                   
