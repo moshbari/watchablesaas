@@ -485,7 +485,8 @@ const TimedButtonPreview: React.FC<{ config: TimedButtonConfig }> = ({ config })
   }
 
   return (
-    <div style={{ textAlign: config.alignment, width: '100%' }}>
+    <div className="flex justify-center w-full">
+      <div style={{ textAlign: config.alignment }}>
       <a
         href="#"
         onClick={(e) => e.preventDefault()}
@@ -516,6 +517,7 @@ const TimedButtonPreview: React.FC<{ config: TimedButtonConfig }> = ({ config })
       >
         {config.text}
       </a>
+      </div>
     </div>
   );
 };
