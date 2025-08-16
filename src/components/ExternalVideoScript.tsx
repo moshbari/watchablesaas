@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Switch } from '@/components/ui/switch';
 import { ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -44,6 +45,7 @@ const defaultConfig: ExternalScriptConfig = {
 export const ExternalVideoScript: React.FC = () => {
   const [config, setConfig] = useState<ExternalScriptConfig>(defaultConfig);
   const [isOpen, setIsOpen] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
   const { toast } = useToast();
 
   const updateConfig = (key: keyof ExternalScriptConfig, value: string | number) => {
@@ -192,14 +194,33 @@ export const ExternalVideoScript: React.FC = () => {
         
         <CollapsibleContent>
           <CardContent className="space-y-6">
-            {/* Info */}
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-900/20 dark:border-blue-800">
-              <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>Universal Script:</strong> This script can be injected into any website to add overlay buttons to existing video players. Perfect for sites like MeetVio, YouTube, Vimeo, etc.
-              </p>
+            {/* Enable/Disable Switch */}
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
+              <div className="space-y-1">
+                <Label htmlFor="overlay-enabled" className="text-base font-medium">
+                  Enable Overlay Button
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Turn on to generate code for adding overlay buttons to your website
+                </p>
+              </div>
+              <Switch
+                id="overlay-enabled"
+                checked={isEnabled}
+                onCheckedChange={setIsEnabled}
+              />
             </div>
 
-            {/* Configuration Form */}
+            {isEnabled && (
+              <>
+                {/* Info */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-900/20 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Universal Script:</strong> This script can be injected into any website to add overlay buttons to existing video players. Perfect for sites like MeetVio, YouTube, Vimeo, etc.
+                  </p>
+                </div>
+
+                {/* Configuration Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="ext-button-text">Button Text</Label>
@@ -434,14 +455,16 @@ export const ExternalVideoScript: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-900/20 dark:border-blue-800">
-              <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>📝 Simple Setup:</strong> Just add this JavaScript code to your website's Custom Code section, Script area, or before the closing {"</body>"} tag.
-              </p>
-              <p className="text-sm text-blue-800 dark:text-blue-200 mt-2">
-                <strong>✅ Works with:</strong> WordPress, Wix, Squarespace, Webflow, and any website with video content.
-              </p>
-            </div>
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-900/20 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>📝 Simple Setup:</strong> Just add this JavaScript code to your website's Custom Code section, Script area, or before the closing {"</body>"} tag.
+                  </p>
+                  <p className="text-sm text-blue-800 dark:text-blue-200 mt-2">
+                    <strong>✅ Works with:</strong> WordPress, Wix, Squarespace, Webflow, and any website with video content.
+                  </p>
+                </div>
+              </>
+            )}
           </CardContent>
         </CollapsibleContent>
       </Collapsible>
