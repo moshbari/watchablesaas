@@ -54,31 +54,19 @@ export const ExternalVideoScript: React.FC = () => {
     return config.delayHours * 3600 + config.delayMinutes * 60 + config.delaySeconds;
   };
 
-  const generateScript = () => {
+  const generateHTMLCode = () => {
+    return `<div id="video-overlay-container" style="display: none;"></div>`;
+  };
+
+  const generateJavaScriptCode = () => {
     const totalDelaySeconds = getTotalDelaySeconds();
-    const positionStyles = {
-      'top-left': 'top: 20px; left: 20px;',
-      'top-center': 'top: 20px; left: 50%; transform: translateX(-50%);',
-      'top-right': 'top: 20px; right: 20px;',
-      'center-left': 'top: 50%; left: 20px; transform: translateY(-50%);',
-      'center': 'top: 50%; left: 50%; transform: translate(-50%, -50%);',
-      'center-right': 'top: 50%; right: 20px; transform: translateY(-50%);',
-      'bottom-left': 'bottom: 20px; left: 20px;',
-      'bottom-center': 'bottom: 20px; left: 50%; transform: translateX(-50%);',
-      'bottom-right': 'bottom: 20px; right: 20px;'
-    };
-
-    return `<!-- HTML for Page Builders -->
-<div id="video-overlay-container" style="display: none;"></div>
-
-<!-- JavaScript (Place in separate code block or before </body>) -->
-<script>
-(function() {
+    
+    return `(function() {
   'use strict';
   
   // Configuration
   const config = {
-    text: '${config.text}',
+    text: '${config.text.replace(/'/g, "\\'")}',
     url: '${config.url}',
     delay: ${totalDelaySeconds},
     position: '${config.position}',
@@ -148,100 +136,80 @@ export const ExternalVideoScript: React.FC = () => {
       overflow: hidden;
       text-overflow: ellipsis;
     \`;
-    
-    // Responsive font size
-    const updateResponsiveFontSize = () => {
-      const baseFontSize = parseInt(config.fontSize);
-      const screenWidth = window.innerWidth;
-      let responsiveFontSize = baseFontSize;
-      
-      if (screenWidth < 768) {
-        responsiveFontSize = Math.max(baseFontSize * 0.6, 16);
-        button.style.width = 'calc(90vw - 40px)';
-        button.style.height = 'auto';
-        button.style.minHeight = '60px';
-        button.style.padding = '12px 16px';
-        button.style.whiteSpace = 'normal';
-        button.style.lineHeight = '1.2';
-      } else if (screenWidth < 1024) {
-        responsiveFontSize = Math.max(baseFontSize * 0.8, 20);
-        button.style.width = 'min(80vw, ' + config.width + ')';
-      }
-      
-      button.style.fontSize = responsiveFontSize + 'px';
-    };
-    
-    updateResponsiveFontSize();
-    window.addEventListener('resize', updateResponsiveFontSize);
+
+    // Add CSS animation
+    if (!document.querySelector('#video-overlay-styles')) {
+      const style = document.createElement('style');
+      style.id = 'video-overlay-styles';
+      style.textContent = \`
+        @keyframes slideIn {
+          0% {
+            opacity: 0;
+            transform: \${config.position.includes('top') ? 'translateY(-20px)' : config.position.includes('bottom') ? 'translateY(20px)' : 'scale(0.8)'};
+          }
+          100% {
+            opacity: 1;
+            transform: none;
+            display: flex;
+          }
+        }
+        .video-overlay-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+      \`;
+      document.head.appendChild(style);
+    }
 
     // Add hover effects
     button.addEventListener('mouseenter', function() {
-      this.style.transform += ' scale(1.05)';
-      this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+      this.style.transform = 'scale(1.05)';
     });
 
     button.addEventListener('mouseleave', function() {
-      this.style.transform = this.style.transform.replace(' scale(1.05)', '');
-      this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.25)';
+      this.style.transform = 'scale(1)';
     });
 
-    // Add to container
-    videoContainer.appendChild(button);
-
-    // Show after delay
+    // Show button after delay
     setTimeout(() => {
       button.style.display = 'flex';
     }, config.delay * 1000);
+
+    // Append to video container
+    videoContainer.appendChild(button);
   }
 
   function findVideoContainers() {
-    // Common selectors for video containers
     const selectors = [
       'video',
-      'iframe[src*="youtube"]',
-      'iframe[src*="vimeo"]',
-      'iframe[src*="wistia"]',
-      'iframe[src*="brightcove"]',
-      'iframe[src*="jwplayer"]',
+      '.video-container',
+      '.video-player',
+      '.player',
+      '.video-wrapper',
+      '.wp-video',
       '[class*="video"]',
-      '[class*="player"]',
       '[id*="video"]',
-      '[id*="player"]'
+      '.plyr',
+      '.vjs-tech'
     ];
 
     const containers = [];
     
     selectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
-      elements.forEach(element => {
-        // Find the appropriate container
-        let container = element;
-        
-        // If it's a video or iframe, look for a positioned parent
-        if (element.tagName === 'VIDEO' || element.tagName === 'IFRAME') {
-          let parent = element.parentElement;
-          while (parent && parent !== document.body) {
-            const style = window.getComputedStyle(parent);
-            if (style.position === 'relative' || style.position === 'absolute') {
-              container = parent;
-              break;
-            }
-            parent = parent.parentElement;
-          }
-          
-          // If no positioned parent found, make the direct parent relative
-          if (container === element && element.parentElement) {
-            element.parentElement.style.position = 'relative';
-            container = element.parentElement;
-          }
-        }
-        
-        // Ensure container has relative positioning
-        if (container && window.getComputedStyle(container).position === 'static') {
-          container.style.position = 'relative';
+      elements.forEach(el => {
+        let container = el;
+        if (el.tagName === 'VIDEO') {
+          // Look for a parent container
+          container = el.closest('.video-container, .video-player, .player, .video-wrapper, [class*="video"]') || el.parentElement;
         }
         
         if (container && !containers.includes(container)) {
+          // Make container relative if not already positioned
+          const computedStyle = window.getComputedStyle(container);
+          if (computedStyle.position === 'static') {
+            container.style.position = 'relative';
+          }
           containers.push(container);
         }
       });
@@ -250,75 +218,64 @@ export const ExternalVideoScript: React.FC = () => {
     return containers;
   }
 
-  function addButtonsToVideos() {
-    const containers = findVideoContainers();
-    containers.forEach(container => {
-      createOverlayButton(container);
-    });
-  }
-
-  // Add CSS animation
-  function addAnimationCSS() {
-    if (document.getElementById('video-overlay-styles')) return;
-    
-    const style = document.createElement('style');
-    style.id = 'video-overlay-styles';
-    style.textContent = \`
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    \`;
-    document.head.appendChild(style);
-  }
-
-  // Initialize when DOM is ready
   function init() {
-    addAnimationCSS();
-    addButtonsToVideos();
-    
-    // Watch for dynamically added videos
-    const observer = new MutationObserver(function(mutations) {
-      let shouldCheck = false;
-      mutations.forEach(function(mutation) {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-          shouldCheck = true;
-        }
-      });
-      if (shouldCheck) {
-        setTimeout(addButtonsToVideos, 100);
-      }
-    });
-    
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    const containers = findVideoContainers();
+    containers.forEach(createOverlayButton);
   }
 
-  // Run when page loads
+  // Run on page load
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 
-})();
-</script>`;
+  // Watch for dynamically added videos
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const videos = node.querySelectorAll ? node.querySelectorAll('video, [class*="video"], [id*="video"]') : [];
+            if (videos.length > 0 || (node.tagName && (node.tagName === 'VIDEO' || node.className.includes('video')))) {
+              setTimeout(init, 100);
+            }
+          }
+        });
+      }
+    });
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+})();`;
   };
 
-  const handleCopy = async () => {
+  const handleCopyHTML = async () => {
     try {
-      await navigator.clipboard.writeText(generateScript());
+      await navigator.clipboard.writeText(generateHTMLCode());
       toast({
-        title: "Copied!",
-        description: "Universal video overlay script copied to clipboard",
+        title: "HTML Copied!",
+        description: "HTML code copied to clipboard",
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCopyJS = async () => {
+    try {
+      await navigator.clipboard.writeText(generateJavaScriptCode());
+      toast({
+        title: "JavaScript Copied!",
+        description: "JavaScript code copied to clipboard",
       });
     } catch (err) {
       toast({
@@ -339,7 +296,7 @@ export const ExternalVideoScript: React.FC = () => {
               {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
-              Copy this script to add overlay buttons to videos on your own website
+              Copy these codes to add overlay buttons to videos on your own website
             </p>
           </CardHeader>
         </CollapsibleTrigger>
@@ -557,28 +514,51 @@ export const ExternalVideoScript: React.FC = () => {
               </div>
             </div>
 
-            {/* Generated Script */}
+            {/* HTML Code Section */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Universal Overlay Script</Label>
-                <Button onClick={handleCopy} size="sm" variant="outline">
+                <Label>1️⃣ HTML Code (Add to HTML Section)</Label>
+                <Button onClick={handleCopyHTML} size="sm" variant="outline">
                   <Copy className="w-4 h-4 mr-2" />
-                  Copy Script
+                  Copy HTML
                 </Button>
               </div>
               <textarea
                 readOnly
-                value={generateScript()}
+                value={generateHTMLCode()}
+                className="w-full h-24 p-3 text-sm font-mono bg-muted border border-border rounded-md resize-none"
+              />
+              <p className="text-xs text-muted-foreground">
+                Add this HTML code to your page's HTML section or body
+              </p>
+            </div>
+
+            {/* JavaScript Code Section */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>2️⃣ JavaScript Code (Add to Script Section)</Label>
+                <Button onClick={handleCopyJS} size="sm" variant="outline">
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy JavaScript
+                </Button>
+              </div>
+              <textarea
+                readOnly
+                value={generateJavaScriptCode()}
                 className="w-full h-48 p-3 text-sm font-mono bg-muted border border-border rounded-md resize-none"
               />
-              <div className="p-3 bg-green-50 border border-green-200 rounded-md dark:bg-green-900/20 dark:border-green-800">
-                <p className="text-sm text-green-800 dark:text-green-200">
-                  <strong>For Page Builders:</strong> Copy the HTML part into your HTML editor, then add the JavaScript part to a separate "Custom Code" or "JavaScript" section. The script is fully responsive and works on all devices.
-                </p>
-                <p className="text-sm text-green-800 dark:text-green-200 mt-2">
-                  <strong>For Website Injection:</strong> Copy the entire code and inject it using browser developer tools, browser extensions, or add it to your site's HTML.
-                </p>
-              </div>
+              <p className="text-xs text-muted-foreground">
+                Add this JavaScript code to your Custom Code, Script, or before closing {"</body>"} tag
+              </p>
+            </div>
+
+            <div className="p-3 bg-green-50 border border-green-200 rounded-md dark:bg-green-900/20 dark:border-green-800">
+              <p className="text-sm text-green-800 dark:text-green-200">
+                <strong>📝 Instructions:</strong> Most website builders have separate sections for HTML and JavaScript. Add the HTML code first, then add the JavaScript code to your Custom Code/Script section.
+              </p>
+              <p className="text-sm text-green-800 dark:text-green-200 mt-2">
+                <strong>✅ Compatibility:</strong> Works with WordPress, Wix, Squarespace, Webflow, and any website with video content.
+              </p>
             </div>
           </CardContent>
         </CollapsibleContent>
