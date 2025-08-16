@@ -157,6 +157,8 @@ const Index = () => {
               videoUrl={currentVideo} 
               playButtonColor={playButtonColor}
               playButtonSize={playButtonSize}
+              startTime={startTime}
+              endTime={endTime}
             />
             <TimedButton />
             <ExternalVideoScript />

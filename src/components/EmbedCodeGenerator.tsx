@@ -8,12 +8,16 @@ interface EmbedCodeGeneratorProps {
   videoUrl: string;
   playButtonColor?: string;
   playButtonSize?: number;
+  startTime?: number;
+  endTime?: number;
 }
 
 export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ 
   videoUrl, 
   playButtonColor = '#ff0000', 
-  playButtonSize = 96 
+  playButtonSize = 96,
+  startTime,
+  endTime
 }) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -27,6 +31,13 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({
     playButtonColor: playButtonColor,
     playButtonSize: playButtonSize.toString()
   });
+  
+  if (startTime !== undefined) {
+    embedParams.set('startTime', startTime.toString());
+  }
+  if (endTime !== undefined) {
+    embedParams.set('endTime', endTime.toString());
+  }
   
   const embedCode = `<center><iframe src="${currentDomain}/embed?${embedParams.toString()}" width="800" height="450" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" style="max-width: 100%; height: auto; aspect-ratio: 16/9;"></iframe></center>`;
 
