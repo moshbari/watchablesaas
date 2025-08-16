@@ -6,6 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 
 const Embed = () => {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number | undefined>(undefined);
+  const [endTime, setEndTime] = useState<number | undefined>(undefined);
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [overlayButtonConfig, setOverlayButtonConfig] = useState<OverlayButtonConfig>({
@@ -28,6 +30,8 @@ const Embed = () => {
     const videoParam = urlParams.get('video');
     const colorParam = urlParams.get('playButtonColor');
     const sizeParam = urlParams.get('playButtonSize');
+    const startParam = urlParams.get('startTime');
+    const endParam = urlParams.get('endTime');
     const buttonText = urlParams.get('buttonText');
     const buttonUrl = urlParams.get('buttonUrl');
     const buttonEnabled = urlParams.get('buttonEnabled');
@@ -40,6 +44,12 @@ const Embed = () => {
     }
     if (sizeParam) {
       setPlayButtonSize(parseInt(sizeParam) || 96);
+    }
+    if (startParam) {
+      setStartTime(parseInt(startParam));
+    }
+    if (endParam) {
+      setEndTime(parseInt(endParam));
     }
     
     // Configure overlay button from URL params
@@ -76,6 +86,8 @@ const Embed = () => {
         onError={handleVideoError}
         playButtonColor={playButtonColor}
         playButtonSize={playButtonSize}
+        startTime={startTime}
+        endTime={endTime}
       />
       
       {/* Action Button Below Video */}
