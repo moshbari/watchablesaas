@@ -180,47 +180,140 @@ export const ExternalVideoScript: React.FC = () => {
   }
 
   function findVideoContainers() {
+    // Enhanced selectors for ConvertRI, GoHighLevel, and other platforms
     const selectors = [
+      // Standard video elements
       'video',
+      'iframe[src*="youtube"]',
+      'iframe[src*="vimeo"]',
+      'iframe[src*="wistia"]',
+      
+      // ConvertRI specific selectors
+      '.cf-video-container',
+      '.convertri-video',
+      '[data-element="video"]',
+      '.cr-video-wrapper',
+      
+      // GoHighLevel specific selectors
+      '.hl_video',
+      '.ghl-video',
+      '.highlevel-video',
+      '[data-widget="video"]',
+      
+      // Generic video containers
       '.video-container',
       '.video-player',
-      '.player',
       '.video-wrapper',
+      '.player',
       '.wp-video',
+      '.elementor-video',
+      '.elementor-widget-video',
+      
+      // Class and ID wildcards
       '[class*="video"]',
       '[id*="video"]',
+      '[class*="player"]',
+      '[id*="player"]',
+      
+      // Popular video players
       '.plyr',
-      '.vjs-tech'
+      '.vjs-tech',
+      '.jwplayer',
+      '.flowplayer',
+      '.video-js'
     ];
 
     const containers = [];
     
+    // First pass: find all potential video elements
     selectors.forEach(selector => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach(el => {
-        let container = el;
-        if (el.tagName === 'VIDEO') {
-          // Look for a parent container
-          container = el.closest('.video-container, .video-player, .player, .video-wrapper, [class*="video"]') || el.parentElement;
-        }
-        
-        if (container && !containers.includes(container)) {
-          // Make container relative if not already positioned
-          const computedStyle = window.getComputedStyle(container);
-          if (computedStyle.position === 'static') {
-            container.style.position = 'relative';
+      try {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          let container = el;
+          
+          // For iframes and video tags, try to find a proper container
+          if (el.tagName === 'VIDEO' || el.tagName === 'IFRAME') {
+            // Look for specific parent containers
+            const parentContainer = el.closest(
+              '.video-container, .video-player, .player, .video-wrapper, ' +
+              '.cf-video-container, .convertri-video, .cr-video-wrapper, ' +
+              '.hl_video, .ghl-video, .highlevel-video, ' +
+              '.elementor-video, .elementor-widget-video, ' +
+              '[class*="video"], [id*="video"], [data-element="video"], [data-widget="video"]'
+            );
+            
+            if (parentContainer) {
+              container = parentContainer;
+            } else {
+              // Use the immediate parent if no specific container found
+              container = el.parentElement || el;
+            }
           }
-          containers.push(container);
-        }
-      });
+          
+          if (container && !containers.includes(container)) {
+            // Ensure container has relative positioning for overlay
+            const computedStyle = window.getComputedStyle(container);
+            if (computedStyle.position === 'static') {
+              container.style.position = 'relative';
+            }
+            
+            // Add debugging info
+            console.log('Video container found:', container, 'Original element:', el);
+            containers.push(container);
+          }
+        });
+      } catch (e) {
+        console.warn('Error processing selector:', selector, e);
+      }
     });
 
+    // Second pass: if no containers found, be more aggressive
+    if (containers.length === 0) {
+      // Look for any element that might contain videos
+      const fallbackSelectors = [
+        'div[style*="video"]',
+        'div[class*="embed"]',
+        'section[class*="video"]',
+        '.widget',
+        '[data-widget]',
+        '[data-element]'
+      ];
+      
+      fallbackSelectors.forEach(selector => {
+        try {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach(el => {
+            // Check if this element or its children contain video-like content
+            const hasVideoContent = el.querySelector('video, iframe[src*="youtube"], iframe[src*="vimeo"], iframe[src*="wistia"]');
+            if (hasVideoContent && !containers.includes(el)) {
+              el.style.position = 'relative';
+              console.log('Fallback video container found:', el);
+              containers.push(el);
+            }
+          });
+        } catch (e) {
+          console.warn('Error processing fallback selector:', selector, e);
+        }
+      });
+    }
+
+    console.log('Total video containers found:', containers.length);
     return containers;
   }
 
   function init() {
+    console.log('Overlay button script initializing...');
     const containers = findVideoContainers();
-    containers.forEach(createOverlayButton);
+    console.log('Found containers:', containers);
+    containers.forEach((container, index) => {
+      console.log(\`Adding overlay to container \${index + 1}:\`, container);
+      createOverlayButton(container);
+    });
+    
+    if (containers.length === 0) {
+      console.warn('No video containers found. The script may need platform-specific selectors.');
+    }
   }
 
   // Run on page load
