@@ -27,7 +27,7 @@ const App = () => (
           <Header />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/embed" element={<RequireRole allow={["user","admin"]}><Embed /></RequireRole>} />
+            <Route path="/embed" element={<Embed />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
