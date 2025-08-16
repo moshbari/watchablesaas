@@ -7,8 +7,6 @@ import { EmbedCodeGenerator } from '@/components/EmbedCodeGenerator';
 import { TimedButton } from '@/components/TimedButton';
 import { PlayButtonCustomizer } from '@/components/PlayButtonCustomizer';
 import { ExternalVideoScript } from '@/components/ExternalVideoScript';
-import { VideoOverlayButton, type OverlayButtonConfig } from '@/components/VideoOverlayButton';
-import { VideoActionButton } from '@/components/VideoActionButton';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthProvider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -22,18 +20,6 @@ const Index = () => {
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [showCustomizer, setShowCustomizer] = useState(false);
-  const [overlayButtonConfig, setOverlayButtonConfig] = useState<OverlayButtonConfig>({
-    enabled: true,
-    text: 'Click Here to Secure Your Spot Now',
-    url: 'https://example.com',
-    delay: 3,
-    position: 'top-right',
-    width: '320px',
-    height: '60px',
-    backgroundColor: '#3b82f6',
-    textColor: '#ffffff',
-    fontSize: '16px'
-  });
   const { toast } = useToast();
   const { role, session } = useAuth();
   const [showRestrictedDialog, setShowRestrictedDialog] = useState(false);
@@ -131,13 +117,9 @@ const Index = () => {
               onError={handleVideoError}
               playButtonColor={playButtonColor}
               playButtonSize={playButtonSize}
-              overlayButtonConfig={overlayButtonConfig}
               startTime={startTime}
               endTime={endTime}
             />
-            
-            {/* Action Button Below Video */}
-            <VideoActionButton config={overlayButtonConfig} />
           </div>
 
           {/* Customization & Embed Options */}
@@ -161,20 +143,8 @@ const Index = () => {
               endTime={endTime}
             />
             
-            {/* 3. Overlay Button Settings */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4 text-center">📹 Overlay Button Configuration</h3>
-              <p className="text-sm text-muted-foreground text-center mb-6">
-                Preview settings below, then get the code to add overlay buttons to your website
-              </p>
-              <div className="space-y-6">
-                <VideoOverlayButton
-                  config={overlayButtonConfig}
-                  onConfigChange={setOverlayButtonConfig}
-                />
-                <ExternalVideoScript />
-              </div>
-            </div>
+            {/* 3. Add Overlay Button to Your Website */}
+            <ExternalVideoScript />
             
             {/* 4. Timed Button */}
             <TimedButton />
