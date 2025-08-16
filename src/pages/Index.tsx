@@ -131,6 +131,7 @@ const Index = () => {
               onError={handleVideoError}
               playButtonColor={playButtonColor}
               playButtonSize={playButtonSize}
+              overlayButtonConfig={overlayButtonConfig}
               startTime={startTime}
               endTime={endTime}
             />
