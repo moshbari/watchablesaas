@@ -334,10 +334,13 @@ export const ExternalVideoScript: React.FC = () => {
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-          <CardTitle className="flex items-center justify-between">
-            Universal Script (for external websites)
-            {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            <CardTitle className="flex items-center justify-between">
+              🌐 Add Overlay Button to YOUR Website
+              {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Copy this script to add overlay buttons to videos on your own website
+            </p>
           </CardHeader>
         </CollapsibleTrigger>
         
