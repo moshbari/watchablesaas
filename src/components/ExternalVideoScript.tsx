@@ -62,10 +62,7 @@ export const ExternalVideoScript: React.FC = () => {
     const totalDelaySeconds = getTotalDelaySeconds();
     
     return `(function() {
-  'use strict';
-  
-  // Configuration
-  const config = {
+  var config = {
     text: '${config.text.replace(/'/g, "\\'")}',
     url: '${config.url}',
     delay: ${totalDelaySeconds},
@@ -80,8 +77,7 @@ export const ExternalVideoScript: React.FC = () => {
     fontFamily: '${config.fontFamily}'
   };
 
-  // Position styles
-  const positionStyles = {
+  var positionStyles = {
     'top-left': 'top: 20px; left: 20px;',
     'top-center': 'top: 20px; left: 50%; transform: translateX(-50%);',
     'top-right': 'top: 20px; right: 20px;',
@@ -93,224 +89,56 @@ export const ExternalVideoScript: React.FC = () => {
     'bottom-right': 'bottom: 20px; right: 20px;'
   };
 
-  function createOverlayButton(container) {
-    // Check if button already exists
-    if (container.querySelector('.video-overlay-btn')) {
-      return;
-    }
+  function createButton() {
+    var targetElement = document.body;
+    var existingButton = document.getElementById('overlay-button-generated');
+    if (existingButton) return;
 
-    // Create button element
-    const button = document.createElement('a');
+    var button = document.createElement('a');
+    button.id = 'overlay-button-generated';
     button.href = config.url;
     button.target = '_blank';
-    button.className = 'video-overlay-btn';
     button.textContent = config.text;
-    button.style.cssText = \`
-      position: absolute;
-      \${positionStyles[config.position] || positionStyles['center']}
-      width: \${config.width};
-      height: \${config.height};
-      max-width: 90vw;
-      max-height: 20vh;
-      background-color: \${config.backgroundColor};
-      border: 4px solid \${config.borderColor};
-      color: \${config.textColor};
-      font-size: \${config.fontSize};
-      font-weight: \${config.fontWeight};
-      font-family: \${config.fontFamily};
-      text-decoration: none;
-      border-radius: 8px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      z-index: 9999;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      transition: all 0.3s ease;
-      animation: slideIn 0.5s ease-out forwards;
-      animation-delay: \${config.delay}s;
-      opacity: 0;
-      outline: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    \`;
+    
+    var styles = 'position: fixed; ' + 
+                 (positionStyles[config.position] || positionStyles['center']) + 
+                 ' width: ' + config.width + '; height: ' + config.height + ';' +
+                 ' max-width: 90vw; max-height: 20vh;' +
+                 ' background-color: ' + config.backgroundColor + ';' +
+                 ' border: 4px solid ' + config.borderColor + ';' +
+                 ' color: ' + config.textColor + ';' +
+                 ' font-size: ' + config.fontSize + ';' +
+                 ' font-weight: ' + config.fontWeight + ';' +
+                 ' font-family: ' + config.fontFamily + ';' +
+                 ' text-decoration: none; border-radius: 8px;' +
+                 ' display: none; align-items: center; justify-content: center;' +
+                 ' text-align: center; z-index: 9999; cursor: pointer;' +
+                 ' box-shadow: 0 4px 12px rgba(0,0,0,0.25);' +
+                 ' transition: all 0.3s ease; outline: none;' +
+                 ' white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+    
+    button.style.cssText = styles;
 
-    // Add CSS animation
-    if (!document.querySelector('#video-overlay-styles')) {
-      const style = document.createElement('style');
-      style.id = 'video-overlay-styles';
-      style.textContent = \`
-        @keyframes slideIn {
-          0% {
-            opacity: 0;
-            transform: \${config.position.includes('top') ? 'translateY(-20px)' : config.position.includes('bottom') ? 'translateY(20px)' : 'scale(0.8)'};
-          }
-          100% {
-            opacity: 1;
-            transform: none;
-            display: flex;
-          }
-        }
-        .video-overlay-btn:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-      \`;
-      document.head.appendChild(style);
-    }
+    button.onmouseenter = function() {
+      this.style.transform = this.style.transform.replace('scale(1.05)', '') + ' scale(1.05)';
+    };
 
-    // Add hover effects
-    button.addEventListener('mouseenter', function() {
-      this.style.transform = 'scale(1.05)';
-    });
+    button.onmouseleave = function() {
+      this.style.transform = this.style.transform.replace(' scale(1.05)', '');
+    };
 
-    button.addEventListener('mouseleave', function() {
-      this.style.transform = 'scale(1)';
-    });
-
-    // Show button after delay
-    setTimeout(() => {
+    setTimeout(function() {
       button.style.display = 'flex';
     }, config.delay * 1000);
 
-    // Append to container
-    container.appendChild(button);
+    targetElement.appendChild(button);
   }
 
-  function findTargetContainers() {
-    // Step 1: Target any element with specific ID if provided
-    const targetId = 'video-overlay-container';
-    const specificTarget = document.getElementById(targetId);
-    if (specificTarget) {
-      console.log('Found specific target container:', specificTarget);
-      return [specificTarget];
-    }
-
-    // Step 2: Look for HTML sections and div containers
-    const selectors = [
-      // HTML sections - common in ConvertRI/GoHighLevel
-      'section',
-      '.section',
-      '.html-section', 
-      '.custom-html',
-      '.cf-section',
-      '.convertri-section',
-      '.hl-section',
-      '.ghl-section',
-      
-      // Generic containers
-      '.container',
-      '.wrapper',
-      '.content',
-      '.main-content',
-      'main',
-      
-      // Video-related (if any exist)
-      'video',
-      'iframe[src*="youtube"]',
-      'iframe[src*="vimeo"]',
-      'iframe[src*="wistia"]',
-      '.video-container',
-      '.video-player',
-      '.video-wrapper',
-      
-      // Fallback to common elements
-      'article',
-      '.widget',
-      '[data-widget]',
-      '[data-element]',
-      'div[class*="element"]',
-      'div[id*="element"]'
-    ];
-
-    const containers = [];
-    
-    selectors.forEach(selector => {
-      try {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach(el => {
-          // Skip if element is too small (likely not a main container)
-          const rect = el.getBoundingClientRect();
-          if (rect.width < 100 || rect.height < 50) {
-            return;
-          }
-          
-          // Skip if element is hidden
-          const style = window.getComputedStyle(el);
-          if (style.display === 'none' || style.visibility === 'hidden') {
-            return;
-          }
-          
-          // Avoid duplicates
-          if (!containers.includes(el)) {
-            // Ensure container has relative positioning for overlay
-            if (style.position === 'static') {
-              el.style.position = 'relative';
-            }
-            
-            console.log('Target container found:', el, 'Selector:', selector);
-            containers.push(el);
-          }
-        });
-      } catch (e) {
-        console.warn('Error processing selector:', selector, e);
-      }
-    });
-
-    // If still no containers, target body as last resort
-    if (containers.length === 0) {
-      console.log('No containers found, targeting body');
-      document.body.style.position = 'relative';
-      containers.push(document.body);
-    }
-
-    console.log('Total target containers found:', containers.length);
-    return containers;
-  }
-
-  function init() {
-    console.log('Overlay button script initializing...');
-    const containers = findTargetContainers();
-    console.log('Found containers:', containers);
-    containers.forEach((container, index) => {
-      console.log(\`Adding overlay to container \${index + 1}:\`, container);
-      createOverlayButton(container);
-    });
-    
-    if (containers.length === 0) {
-      console.warn('No target containers found. The script may need platform-specific selectors.');
-    }
-  }
-
-  // Run on page load
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', createButton);
   } else {
-    init();
+    createButton();
   }
-
-  // Watch for dynamically added videos
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList') {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            const videos = node.querySelectorAll ? node.querySelectorAll('video, [class*="video"], [id*="video"]') : [];
-            if (videos.length > 0 || (node.tagName && (node.tagName === 'VIDEO' || node.className.includes('video')))) {
-              setTimeout(init, 100);
-            }
-          }
-        });
-      }
-    });
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
 
 })();`;
   };
