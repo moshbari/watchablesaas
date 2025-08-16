@@ -55,7 +55,7 @@ export const ExternalVideoScript: React.FC = () => {
   };
 
   const generateHTMLCode = () => {
-    return `<div id="video-overlay-container" style="display: none;"></div>`;
+    return `<!-- No HTML required - JavaScript creates the overlay button automatically -->`;
   };
 
   const generateJavaScriptCode = () => {
@@ -517,26 +517,19 @@ export const ExternalVideoScript: React.FC = () => {
             {/* HTML Code Section */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>1️⃣ HTML Code (Add to HTML Section)</Label>
-                <Button onClick={handleCopyHTML} size="sm" variant="outline">
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy HTML
-                </Button>
+                <Label>✅ No HTML Required!</Label>
               </div>
-              <textarea
-                readOnly
-                value={generateHTMLCode()}
-                className="w-full h-24 p-3 text-sm font-mono bg-muted border border-border rounded-md resize-none"
-              />
-              <p className="text-xs text-muted-foreground">
-                Add this HTML code to your page's HTML section or body
-              </p>
+              <div className="p-3 bg-green-50 border border-green-200 rounded-md dark:bg-green-900/20 dark:border-green-800">
+                <p className="text-sm text-green-800 dark:text-green-200">
+                  <strong>Good news!</strong> You only need to add the JavaScript code below. No HTML required!
+                </p>
+              </div>
             </div>
 
             {/* JavaScript Code Section */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>2️⃣ JavaScript Code (Add to Script Section)</Label>
+                <Label>📋 JavaScript Code (Add to Script Section)</Label>
                 <Button onClick={handleCopyJS} size="sm" variant="outline">
                   <Copy className="w-4 h-4 mr-2" />
                   Copy JavaScript
@@ -552,12 +545,12 @@ export const ExternalVideoScript: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-3 bg-green-50 border border-green-200 rounded-md dark:bg-green-900/20 dark:border-green-800">
-              <p className="text-sm text-green-800 dark:text-green-200">
-                <strong>📝 Instructions:</strong> Most website builders have separate sections for HTML and JavaScript. Add the HTML code first, then add the JavaScript code to your Custom Code/Script section.
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-900/20 dark:border-blue-800">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                <strong>📝 Simple Setup:</strong> Just add this JavaScript code to your website's Custom Code section, Script area, or before the closing {"</body>"} tag.
               </p>
-              <p className="text-sm text-green-800 dark:text-green-200 mt-2">
-                <strong>✅ Compatibility:</strong> Works with WordPress, Wix, Squarespace, Webflow, and any website with video content.
+              <p className="text-sm text-blue-800 dark:text-blue-200 mt-2">
+                <strong>✅ Works with:</strong> WordPress, Wix, Squarespace, Webflow, and any website with video content.
               </p>
             </div>
           </CardContent>
