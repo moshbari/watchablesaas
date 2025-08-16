@@ -80,7 +80,9 @@ export const TimedButton: React.FC = () => {
       font-family: ${config.fontFamily};
       text-decoration: none;
       border-radius: 8px;
-      line-height: ${config.height};
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       transition: all 0.3s ease;
@@ -119,7 +121,9 @@ export const TimedButton: React.FC = () => {
     min-height: 60px !important;
     padding: 12px 16px !important;
     white-space: normal !important;
-    line-height: 1.2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     font-size: 20px !important;
   }
 }
@@ -488,7 +492,7 @@ const TimedButtonPreview: React.FC<{ config: TimedButtonConfig }> = ({ config })
         href="#"
         onClick={(e) => e.preventDefault()}
         style={{
-          display: 'inline-block',
+          display: 'flex',
           width: config.width,
           height: config.height,
           maxWidth: '90vw',
@@ -501,7 +505,8 @@ const TimedButtonPreview: React.FC<{ config: TimedButtonConfig }> = ({ config })
           fontFamily: config.fontFamily,
           textDecoration: 'none',
           borderRadius: '8px',
-          lineHeight: config.height,
+          alignItems: 'center',
+          justifyContent: 'center',
           textAlign: 'center',
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           transition: 'all 0.3s ease',
