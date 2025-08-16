@@ -55,7 +55,7 @@ export const VideoOverlayButton: React.FC<VideoOverlayButtonProps> = ({
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
             <CardTitle className="flex items-center justify-between">
-              Video Overlay Button
+              Overlay Button (for this video player)
               {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </CardTitle>
           </CardHeader>
