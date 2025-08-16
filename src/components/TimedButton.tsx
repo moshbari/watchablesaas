@@ -66,8 +66,10 @@ export const TimedButton: React.FC = () => {
     animation: fadeIn 0.5s ease-in forwards;
     animation-delay: ${totalDelaySeconds}s;
   ">
-    <a href="${config.url}" target="_blank" style="
-      display: inline-block;
+     <a href="${config.url}" target="_blank" style="
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: ${config.width};
       height: ${config.height};
       max-width: 90vw;
@@ -80,10 +82,6 @@ export const TimedButton: React.FC = () => {
       font-family: ${config.fontFamily};
       text-decoration: none;
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       transition: all 0.3s ease;
       white-space: nowrap;
@@ -492,7 +490,7 @@ const TimedButtonPreview: React.FC<{ config: TimedButtonConfig }> = ({ config })
         href="#"
         onClick={(e) => e.preventDefault()}
         style={{
-          display: 'flex',
+          display: 'inline-flex',
           width: config.width,
           height: config.height,
           maxWidth: '90vw',
