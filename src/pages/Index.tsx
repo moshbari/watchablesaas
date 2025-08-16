@@ -142,6 +142,7 @@ const Index = () => {
 
           {/* Customization & Embed Options */}
           <div className="max-w-4xl mx-auto mt-8 space-y-6">
+            {/* 1. Customize Play Button */}
             <PlayButtonCustomizer
               color={playButtonColor}
               size={playButtonSize}
@@ -150,10 +151,8 @@ const Index = () => {
               isOpen={showCustomizer}
               onToggle={setShowCustomizer}
             />
-            <VideoOverlayButton
-              config={overlayButtonConfig}
-              onConfigChange={setOverlayButtonConfig}
-            />
+            
+            {/* 2. Embed This Video */}
             <EmbedCodeGenerator 
               videoUrl={currentVideo} 
               playButtonColor={playButtonColor}
@@ -161,8 +160,24 @@ const Index = () => {
               startTime={startTime}
               endTime={endTime}
             />
+            
+            {/* 3. Overlay Button Settings */}
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-center">📹 Overlay Button Configuration</h3>
+              <p className="text-sm text-muted-foreground text-center mb-6">
+                Preview settings below, then get the code to add overlay buttons to your website
+              </p>
+              <div className="space-y-6">
+                <VideoOverlayButton
+                  config={overlayButtonConfig}
+                  onConfigChange={setOverlayButtonConfig}
+                />
+                <ExternalVideoScript />
+              </div>
+            </div>
+            
+            {/* 4. Timed Button */}
             <TimedButton />
-            <ExternalVideoScript />
           </div>
 
           {/* Instructions */}
