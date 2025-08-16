@@ -8,6 +8,7 @@ import { TimedButton } from '@/components/TimedButton';
 import { PlayButtonCustomizer } from '@/components/PlayButtonCustomizer';
 import { ExternalVideoScript } from '@/components/ExternalVideoScript';
 import { VideoOverlayButton, type OverlayButtonConfig } from '@/components/VideoOverlayButton';
+import { VideoActionButton } from '@/components/VideoActionButton';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthProvider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -130,10 +131,12 @@ const Index = () => {
               onError={handleVideoError}
               playButtonColor={playButtonColor}
               playButtonSize={playButtonSize}
-              overlayButtonConfig={overlayButtonConfig}
               startTime={startTime}
               endTime={endTime}
             />
+            
+            {/* Action Button Below Video */}
+            <VideoActionButton config={overlayButtonConfig} />
           </div>
 
           {/* Customization & Embed Options */}
