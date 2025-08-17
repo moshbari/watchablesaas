@@ -42,8 +42,8 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+  <TooltipProvider>
+    <QueryClientProvider client={queryClient}>
       <Toaster />
       <Sonner />
       <AuthProvider>
@@ -51,8 +51,8 @@ const App = () => (
           <AppContent />
         </BrowserRouter>
       </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </TooltipProvider>
 );
 
 export default App;
