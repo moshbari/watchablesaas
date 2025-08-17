@@ -182,6 +182,16 @@ const Campaigns: React.FC = () => {
                     return `${minutes}:${secs.toString().padStart(2, '0')}`;
                   };
 
+                  // Extract times from HTML script if not in database columns
+                  let startTime = campaign.start_time;
+                  let endTime = campaign.end_time;
+                  
+                  if (!startTime && !endTime && campaign.html_script) {
+                    const urlParams = new URLSearchParams(campaign.html_script.split('?')[1]?.split('"')[0] || '');
+                    startTime = urlParams.get('startTime') ? parseInt(urlParams.get('startTime')!) : null;
+                    endTime = urlParams.get('endTime') ? parseInt(urlParams.get('endTime')!) : null;
+                  }
+
                   return (
                     <TableRow key={campaign.id}>
                       <TableCell className="font-mono">
@@ -216,10 +226,10 @@ const Campaigns: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell className="font-mono text-sm">
-                        {formatTime(campaign.start_time)}
+                        {formatTime(startTime)}
                       </TableCell>
                       <TableCell className="font-mono text-sm">
-                        {formatTime(campaign.end_time)}
+                        {formatTime(endTime)}
                       </TableCell>
                       <TableCell>
                         {format(new Date(campaign.created_at), 'MMM dd, yyyy')}
