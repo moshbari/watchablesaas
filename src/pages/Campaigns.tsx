@@ -274,57 +274,6 @@ const Campaigns: React.FC = () => {
                            <Button
                              variant="outline"
                              size="sm"
-                             onClick={() => {
-                               // Generate fresh JavaScript code without any overlay buttons
-                               const generateScriptCode = (url: string, color: string, size: number, startTime?: number, endTime?: number) => {
-                                 const params = new URLSearchParams();
-                                 params.append('video', encodeURIComponent(url));
-                                 params.append('playButtonColor', encodeURIComponent(color));
-                                 params.append('playButtonSize', size.toString());
-                                 if (startTime !== undefined) params.append('startTime', startTime.toString());
-                                 if (endTime !== undefined) params.append('endTime', endTime.toString());
-                                 
-                                 return `<script>
-// Watchables Embedded Player Script
-(function() {
-  const iframe = document.createElement('iframe');
-  iframe.src = '${window.location.origin}/embed?${params.toString()}';
-  iframe.style.cssText = \`
-    width: 100%;
-    height: 450px;
-    border: none;
-    border-radius: 8px;
-    max-width: 100%;
-    aspect-ratio: 16/9;
-  \`;
-  iframe.setAttribute('allowfullscreen', 'true');
-  iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-  
-  // Insert the iframe where the script is placed
-  const scripts = document.getElementsByTagName('script');
-  const currentScript = scripts[scripts.length - 1];
-  currentScript.parentNode.insertBefore(iframe, currentScript);
-})();
-</script>`;
-                               };
-                               
-                               const freshJsCode = generateScriptCode(
-                                 campaign.video_url || '', 
-                                 '#ff0000', 
-                                 96, 
-                                 startTime || undefined, 
-                                 endTime || undefined
-                               );
-                               copyToClipboard(freshJsCode, 'JavaScript');
-                             }}
-                             title="Copy JavaScript Script"
-                           >
-                             <Copy className="w-3 h-3" />
-                             JS
-                           </Button>
-                           <Button
-                             variant="outline"
-                             size="sm"
                              onClick={() => navigate(`/?edit=${campaign.id}`)}
                              title="Edit Campaign"
                            >
