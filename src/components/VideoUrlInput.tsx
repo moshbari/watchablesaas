@@ -223,7 +223,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
                   className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
                   disabled={isLoading || !url.trim()}
                 >
-                  {isLoading ? (isEditing ? 'Saving Campaign...' : 'Creating Campaign...') : (isEditing ? 'Save Campaign' : 'Create Campaign')}
+                  {isLoading ? (isEditing ? 'Saving Changes...' : 'Creating Campaign...') : (isEditing ? 'Save Changes' : 'Create Campaign')}
                 </Button>
               </form>
 
@@ -340,7 +340,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
                   className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
                   disabled={isLoading || !url.trim()}
                 >
-                  {isLoading ? (isEditing ? 'Saving Campaign...' : 'Creating Campaign...') : (isEditing ? 'Save Campaign' : 'Create Campaign')}
+                  {isLoading ? (isEditing ? 'Saving Changes...' : 'Creating Campaign...') : (isEditing ? 'Save Changes' : 'Create Campaign')}
                 </Button>
               </form>
 

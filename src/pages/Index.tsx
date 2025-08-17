@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Instagram } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { VideoUrlInput } from '@/components/VideoUrlInput';
 import { EmbedCodeGenerator } from '@/components/EmbedCodeGenerator';
@@ -11,9 +10,27 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Instagram, ArrowLeft } from 'lucide-react';
+
+interface Campaign {
+  id: string;
+  name: string;
+  video_type: string;
+  video_url: string | null;
+  youtube_title: string | null;
+  html_script: string;
+  javascript_script: string;
+  created_at: string;
+  updated_at: string;
+}
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editCampaignId = searchParams.get('edit');
+  const isEditMode = !!editCampaignId;
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const [endTime, setEndTime] = useState<number | undefined>(undefined);
@@ -37,7 +54,13 @@ const Index = () => {
   const { role, session } = useAuth();
   const [showRestrictedDialog, setShowRestrictedDialog] = useState(false);
   const [restrictionType, setRestrictionType] = useState<'unauthenticated' | 'interested' | null>(null);
-  const navigate = useNavigate();
+
+  // Load campaign data if in edit mode
+  useEffect(() => {
+    if (editCampaignId && session) {
+      fetchCampaignForEdit();
+    }
+  }, [editCampaignId, session]);
 
   // Check for video parameter in URL on component mount
   useEffect(() => {
@@ -57,6 +80,49 @@ const Index = () => {
     }
   }, []);
 
+  const fetchCampaignForEdit = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('id', editCampaignId)
+        .maybeSingle();
+
+      if (error) throw error;
+      
+      if (data) {
+        setEditingCampaign(data);
+        setCurrentVideo(data.video_url);
+        
+        // Extract start/end times from existing embed code if available
+        // This is a simplified approach - in a real app you'd store these separately
+        const urlParams = new URLSearchParams(data.html_script.split('?')[1]?.split('"')[0] || '');
+        const storedStartTime = urlParams.get('startTime');
+        const storedEndTime = urlParams.get('endTime');
+        
+        setStartTime(storedStartTime ? parseInt(storedStartTime) : undefined);
+        setEndTime(storedEndTime ? parseInt(storedEndTime) : undefined);
+        setPlayButtonColor('#ff0000'); // Default for now
+        setPlayButtonSize(96); // Default for now
+      } else {
+        toast({
+          title: 'Campaign not found',
+          description: 'The campaign you are trying to edit was not found.',
+          variant: 'destructive',
+        });
+        navigate('/campaigns');
+      }
+    } catch (error) {
+      console.error('Error fetching campaign for edit:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch campaign details',
+        variant: 'destructive',
+      });
+      navigate('/campaigns');
+    }
+  };
+
   const handleVideoSubmit = async (url: string, startTimeParam?: number, endTimeParam?: number) => {
     if (!session) {
       setRestrictionType('unauthenticated');
@@ -72,7 +138,6 @@ const Index = () => {
     setIsLoading(true);
     
     try {
-      // Create campaign in database
       const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
       let campaignName = url;
       
@@ -86,38 +151,63 @@ const Index = () => {
         }
       }
       
-      // Generate embed code and script
       const embedCode = generateEmbedCode(url, playButtonColor, playButtonSize, startTimeParam, endTimeParam);
       const scriptCode = generateScriptCode(url, playButtonColor, playButtonSize);
       
-      const { data, error } = await supabase
-        .from('campaigns')
-        .insert({
-          user_id: session.user.id,
-          name: campaignName,
-          video_type: isYouTube ? 'youtube' : 'self-hosted',
-          video_url: url,
-          youtube_title: isYouTube ? campaignName : null,
-          html_script: embedCode,
-          javascript_script: scriptCode
-        })
-        .select()
-        .single();
+      if (isEditMode && editingCampaign) {
+        // Update existing campaign
+        const { error } = await supabase
+          .from('campaigns')
+          .update({
+            name: campaignName,
+            video_type: isYouTube ? 'youtube' : 'self-hosted',
+            video_url: url,
+            youtube_title: isYouTube ? campaignName : null,
+            html_script: embedCode,
+            javascript_script: scriptCode
+          })
+          .eq('id', editingCampaign.id);
 
-      if (error) throw error;
+        if (error) throw error;
+
+        toast({
+          title: "Campaign updated successfully!",
+          description: "Your campaign changes have been saved.",
+        });
+      } else {
+        // Create new campaign
+        const { error } = await supabase
+          .from('campaigns')
+          .insert({
+            name: campaignName,
+            video_type: isYouTube ? 'youtube' : 'self-hosted',
+            video_url: url,
+            youtube_title: isYouTube ? campaignName : null,
+            html_script: embedCode,
+            javascript_script: scriptCode,
+            user_id: session!.user.id
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Campaign created successfully!",
+          description: "Your new campaign has been saved.",
+        });
+      }
 
       setCurrentVideo(url);
       setStartTime(startTimeParam);
       setEndTime(endTimeParam);
       
-      toast({
-        title: "Campaign created successfully!",
-        description: "Your campaign has been saved and is ready to use.",
-      });
+      // If we were editing, redirect back to campaigns
+      if (isEditMode) {
+        setTimeout(() => navigate('/campaigns'), 1500);
+      }
     } catch (error) {
-      console.error('Error creating campaign:', error);
+      console.error('Error creating/updating campaign:', error);
       toast({
-        title: "Error creating campaign",
+        title: isEditMode ? "Error updating campaign" : "Error creating campaign",
         description: "Please try again later.",
         variant: "destructive",
       });
@@ -277,6 +367,10 @@ const Index = () => {
           <VideoUrlInput 
             onVideoSubmit={handleVideoSubmit}
             isLoading={isLoading}
+            isEditing={isEditMode}
+            initialUrl={editingCampaign?.video_url || ''}
+            initialStartTime={startTime}
+            initialEndTime={endTime}
           />
         </div>
       )}

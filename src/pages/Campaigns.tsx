@@ -208,7 +208,7 @@ const Campaigns: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => navigate(`/campaigns/${campaign.id}/edit`)}
+                          onClick={() => navigate(`/?edit=${campaign.id}`)}
                           title="Edit Campaign"
                         >
                           <Edit className="w-3 h-3" />
