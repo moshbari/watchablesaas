@@ -80,7 +80,7 @@ const Embed = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{ margin: 0, padding: 0 }}>
       <VideoPlayer 
         src={currentVideo} 
         onError={handleVideoError}

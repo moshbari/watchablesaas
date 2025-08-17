@@ -257,26 +257,23 @@ const Index = () => {
 
   const generateScriptCode = (url: string, color: string, size: number) => {
     return `<script>
-// Watchables Overlay Button Script
+// Watchables Embedded Player Script
 (function() {
-  const button = document.createElement('button');
-  button.innerHTML = 'Watch Video';
-  button.style.cssText = \`
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: ${color};
-    color: white;
+  const iframe = document.createElement('iframe');
+  iframe.src = '${window.location.origin}/embed?video=${encodeURIComponent(url)}&playButtonColor=${encodeURIComponent(color)}&playButtonSize=${size}';
+  iframe.style.cssText = \`
+    width: 100%;
+    height: 400px;
     border: none;
-    padding: 12px 24px;
     border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    z-index: 9999;
   \`;
-  button.onclick = () => window.open('${url}', '_blank');
-  document.body.appendChild(button);
+  iframe.setAttribute('allowfullscreen', 'true');
+  iframe.setAttribute('allow', 'autoplay; fullscreen');
+  
+  // Insert the iframe where the script is placed
+  const scripts = document.getElementsByTagName('script');
+  const currentScript = scripts[scripts.length - 1];
+  currentScript.parentNode.insertBefore(iframe, currentScript);
 })();
 </script>`;
   };
