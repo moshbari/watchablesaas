@@ -305,6 +305,8 @@ const EditCampaign = () => {
               isLoading={isLoading}
               isEditing={true}
               initialUrl={campaign.video_url || ''}
+              initialStartTime={startTime}
+              initialEndTime={endTime}
             />
           </div>
         </div>

@@ -12,17 +12,41 @@ interface VideoUrlInputProps {
   isLoading?: boolean;
   isEditing?: boolean;
   initialUrl?: string;
+  initialStartTime?: number;
+  initialEndTime?: number;
 }
 
-export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ onVideoSubmit, isLoading, isEditing = false, initialUrl = '' }) => {
+export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ 
+  onVideoSubmit, 
+  isLoading, 
+  isEditing = false, 
+  initialUrl = '', 
+  initialStartTime,
+  initialEndTime 
+}) => {
+  const secondsToTime = (seconds?: number) => {
+    if (!seconds) return { hours: '', minutes: '', seconds: '' };
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return {
+      hours: h > 0 ? h.toString() : '',
+      minutes: m > 0 ? m.toString() : '',
+      seconds: s > 0 ? s.toString() : ''
+    };
+  };
+
+  const initialStart = secondsToTime(initialStartTime);
+  const initialEnd = secondsToTime(initialEndTime);
+
   const [url, setUrl] = useState(initialUrl);
   const [urlType, setUrlType] = useState<'youtube' | 'direct'>('youtube');
-  const [startHour, setStartHour] = useState('');
-  const [startMinute, setStartMinute] = useState('');
-  const [startSecond, setStartSecond] = useState('');
-  const [endHour, setEndHour] = useState('');
-  const [endMinute, setEndMinute] = useState('');
-  const [endSecond, setEndSecond] = useState('');
+  const [startHour, setStartHour] = useState(initialStart.hours);
+  const [startMinute, setStartMinute] = useState(initialStart.minutes);
+  const [startSecond, setStartSecond] = useState(initialStart.seconds);
+  const [endHour, setEndHour] = useState(initialEnd.hours);
+  const [endMinute, setEndMinute] = useState(initialEnd.minutes);
+  const [endSecond, setEndSecond] = useState(initialEnd.seconds);
 
   const validateUrl = (input: string): boolean => {
     try {
