@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { VideoPlayer } from '@/components/VideoPlayer';
@@ -11,9 +12,23 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { useNavigate } from 'react-router-dom';
 
-const Index = () => {
+interface Campaign {
+  id: string;
+  name: string;
+  video_type: string;
+  video_url: string | null;
+  youtube_title: string | null;
+  html_script: string;
+  javascript_script: string;
+  created_at: string;
+  updated_at: string;
+}
+
+const EditCampaign = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const [endTime, setEndTime] = useState<number | undefined>(undefined);
@@ -37,25 +52,40 @@ const Index = () => {
   const { role, session } = useAuth();
   const [showRestrictedDialog, setShowRestrictedDialog] = useState(false);
   const [restrictionType, setRestrictionType] = useState<'unauthenticated' | 'interested' | null>(null);
-  const navigate = useNavigate();
 
-  // Check for video parameter in URL on component mount
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoParam = urlParams.get('video');
-    const colorParam = urlParams.get('playButtonColor');
-    const sizeParam = urlParams.get('playButtonSize');
-    
-    if (videoParam) {
-      setCurrentVideo(decodeURIComponent(videoParam));
+    if (id && session) {
+      fetchCampaign();
     }
-    if (colorParam) {
-      setPlayButtonColor(decodeURIComponent(colorParam));
+  }, [id, session]);
+
+  const fetchCampaign = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      setCampaign(data);
+      setCurrentVideo(data.video_url);
+      
+      // Extract customization from existing data if possible
+      // This is a simplified approach - in a real app you'd store these separately
+      setPlayButtonColor('#ff0000'); // Default for now
+      setPlayButtonSize(96); // Default for now
+    } catch (error) {
+      console.error('Error fetching campaign:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch campaign details',
+        variant: 'destructive',
+      });
+      navigate('/campaigns');
     }
-    if (sizeParam) {
-      setPlayButtonSize(parseInt(sizeParam) || 96);
-    }
-  }, []);
+  };
 
   const handleVideoSubmit = async (url: string, startTimeParam?: number, endTimeParam?: number) => {
     if (!session) {
@@ -72,7 +102,6 @@ const Index = () => {
     setIsLoading(true);
     
     try {
-      // Create campaign in database
       const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
       let campaignName = url;
       
@@ -86,14 +115,12 @@ const Index = () => {
         }
       }
       
-      // Generate embed code and script
       const embedCode = generateEmbedCode(url, playButtonColor, playButtonSize, startTimeParam, endTimeParam);
       const scriptCode = generateScriptCode(url, playButtonColor, playButtonSize);
       
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('campaigns')
-        .insert({
-          user_id: session.user.id,
+        .update({
           name: campaignName,
           video_type: isYouTube ? 'youtube' : 'self-hosted',
           video_url: url,
@@ -101,8 +128,7 @@ const Index = () => {
           html_script: embedCode,
           javascript_script: scriptCode
         })
-        .select()
-        .single();
+        .eq('id', id);
 
       if (error) throw error;
 
@@ -111,13 +137,13 @@ const Index = () => {
       setEndTime(endTimeParam);
       
       toast({
-        title: "Campaign created successfully!",
-        description: "Your campaign has been saved and is ready to use.",
+        title: "Campaign updated successfully!",
+        description: "Your campaign changes have been saved.",
       });
     } catch (error) {
-      console.error('Error creating campaign:', error);
+      console.error('Error updating campaign:', error);
       toast({
-        title: "Error creating campaign",
+        title: "Error updating campaign",
         description: "Please try again later.",
         variant: "destructive",
       });
@@ -187,10 +213,18 @@ const Index = () => {
   };
 
   const handleBack = () => {
-    setCurrentVideo(null);
-    setStartTime(undefined);
-    setEndTime(undefined);
+    navigate('/campaigns');
   };
+
+  if (!campaign) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <p>Loading campaign...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -204,8 +238,12 @@ const Index = () => {
               className="text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Load Different Video
+              Back to Campaigns
             </Button>
+          </div>
+
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold">Edit Campaign: {campaign.name}</h1>
           </div>
 
           {/* Video Player */}
@@ -223,7 +261,6 @@ const Index = () => {
 
           {/* Customization & Embed Options */}
           <div className="max-w-4xl mx-auto mt-8 space-y-6">
-            {/* 1. Customize Play Button */}
             <PlayButtonCustomizer
               color={playButtonColor}
               size={playButtonSize}
@@ -233,7 +270,6 @@ const Index = () => {
               onToggle={setShowCustomizer}
             />
             
-            {/* 2. Embed This Video */}
             <EmbedCodeGenerator 
               videoUrl={currentVideo} 
               playButtonColor={playButtonColor}
@@ -242,44 +278,38 @@ const Index = () => {
               endTime={endTime}
             />
             
-            {/* 3. Add Overlay Button to Your Website */}
             <ExternalVideoScript />
-            
-            {/* 4. Timed Button */}
             <TimedButton />
-          </div>
-
-          {/* Instructions */}
-          <div className="max-w-4xl mx-auto mt-8 text-center">
-            <div className="bg-card border border-player-border rounded-lg p-6">
-              <h3 className="text-lg font-medium mb-4 text-foreground">
-                Keyboard Shortcuts
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center justify-center gap-2">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Space</kbd>
-                  <span>Play / Pause</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F</kbd>
-                  <span>Fullscreen</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">M</kbd>
-                  <span>Mute / Unmute</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       ) : (
         <div className="flex items-center justify-center min-h-screen p-4">
-          <VideoUrlInput 
-            onVideoSubmit={handleVideoSubmit}
-            isLoading={isLoading}
-          />
+          <div className="w-full max-w-2xl">
+            <div className="mb-6">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Campaigns
+              </Button>
+            </div>
+            
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-center">Edit Campaign: {campaign.name}</h1>
+            </div>
+            
+            <VideoUrlInput 
+              onVideoSubmit={handleVideoSubmit}
+              isLoading={isLoading}
+              isEditing={true}
+              initialUrl={campaign.video_url || ''}
+            />
+          </div>
         </div>
       )}
+      
       <Dialog open={showRestrictedDialog} onOpenChange={setShowRestrictedDialog}>
         <DialogContent className="sm:max-w-md border border-border shadow-player">
           <DialogHeader>
@@ -287,14 +317,14 @@ const Index = () => {
               <>
                 <DialogTitle>Create a free account to continue</DialogTitle>
                 <DialogDescription>
-                  Please create a free account to load and customize videos.
+                  Please create a free account to edit campaigns.
                 </DialogDescription>
               </>
             ) : (
               <>
                 <DialogTitle>Feature available to users only</DialogTitle>
                 <DialogDescription>
-                  To load and customize videos, please upgrade to a user account. For full access, contact us on Instagram.
+                  To edit campaigns, please upgrade to a user account.
                 </DialogDescription>
               </>
             )}
@@ -320,4 +350,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default EditCampaign;

@@ -10,10 +10,12 @@ import { validateVideoUrl } from '@/lib/videoUtils';
 interface VideoUrlInputProps {
   onVideoSubmit: (url: string, startTime?: number, endTime?: number) => void;
   isLoading?: boolean;
+  isEditing?: boolean;
+  initialUrl?: string;
 }
 
-export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ onVideoSubmit, isLoading }) => {
-  const [url, setUrl] = useState('');
+export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ onVideoSubmit, isLoading, isEditing = false, initialUrl = '' }) => {
+  const [url, setUrl] = useState(initialUrl);
   const [urlType, setUrlType] = useState<'youtube' | 'direct'>('youtube');
   const [startHour, setStartHour] = useState('');
   const [startMinute, setStartMinute] = useState('');
@@ -197,7 +199,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ onVideoSubmit, isL
                   className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
                   disabled={isLoading || !url.trim()}
                 >
-                  {isLoading ? 'Creating Campaign...' : 'Create Campaign'}
+                  {isLoading ? (isEditing ? 'Saving Campaign...' : 'Creating Campaign...') : (isEditing ? 'Save Campaign' : 'Create Campaign')}
                 </Button>
               </form>
 
@@ -314,7 +316,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ onVideoSubmit, isL
                   className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
                   disabled={isLoading || !url.trim()}
                 >
-                  {isLoading ? 'Creating Campaign...' : 'Create Campaign'}
+                  {isLoading ? (isEditing ? 'Saving Campaign...' : 'Creating Campaign...') : (isEditing ? 'Save Campaign' : 'Create Campaign')}
                 </Button>
               </form>
 

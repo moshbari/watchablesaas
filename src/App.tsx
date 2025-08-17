@@ -14,6 +14,7 @@ import Account from "@/pages/Account";
 import Admin from "@/pages/Admin";
 import AuthCallback from "@/pages/AuthCallback";
 import Campaigns from "@/pages/Campaigns";
+import EditCampaign from "@/pages/EditCampaign";
 import { RequireAuth, RequireRole } from "@/routes/guards";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const AppContent = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/campaigns" element={<RequireAuth><Campaigns /></RequireAuth>} />
+        <Route path="/campaigns/:id/edit" element={<RequireAuth><EditCampaign /></RequireAuth>} />
         <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="/admin" element={<RequireRole allow={["admin"]}><Admin /></RequireRole>} />
         <Route path="/auth/callback" element={<AuthCallback />} />
