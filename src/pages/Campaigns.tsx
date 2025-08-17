@@ -172,10 +172,11 @@ const Campaigns: React.FC = () => {
                 {campaigns.map((campaign, index) => {
                   // Helper function to format time
                   const formatTime = (seconds: number | null) => {
-                    if (!seconds) return 'N/A';
-                    const hours = Math.floor(seconds / 3600);
-                    const minutes = Math.floor((seconds % 3600) / 60);
-                    const secs = seconds % 60;
+                    // Default to 0 if null/undefined
+                    const timeValue = seconds || 0;
+                    const hours = Math.floor(timeValue / 3600);
+                    const minutes = Math.floor((timeValue % 3600) / 60);
+                    const secs = timeValue % 60;
                     if (hours > 0) {
                       return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                     }
