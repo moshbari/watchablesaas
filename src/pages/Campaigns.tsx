@@ -275,7 +275,7 @@ const Campaigns: React.FC = () => {
                              variant="outline"
                              size="sm"
                              onClick={() => {
-                               // Generate fresh JavaScript code using the same logic as Index.tsx
+                               // Generate fresh JavaScript code without any overlay buttons
                                const generateScriptCode = (url: string, color: string, size: number, startTime?: number, endTime?: number) => {
                                  const params = new URLSearchParams();
                                  params.append('video', encodeURIComponent(url));
@@ -291,12 +291,14 @@ const Campaigns: React.FC = () => {
   iframe.src = '${window.location.origin}/embed?${params.toString()}';
   iframe.style.cssText = \`
     width: 100%;
-    height: 400px;
+    height: 450px;
     border: none;
     border-radius: 8px;
+    max-width: 100%;
+    aspect-ratio: 16/9;
   \`;
   iframe.setAttribute('allowfullscreen', 'true');
-  iframe.setAttribute('allow', 'autoplay; fullscreen');
+  iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
   
   // Insert the iframe where the script is placed
   const scripts = document.getElementsByTagName('script');
