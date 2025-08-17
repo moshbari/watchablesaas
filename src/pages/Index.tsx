@@ -97,9 +97,20 @@ const Index = () => {
         setEditingCampaign(data);
         // Don't set currentVideo in edit mode - we want to show the input form
         
-        // Use the stored start/end times from the database
-        setStartTime(data.start_time || undefined);
-        setEndTime(data.end_time || undefined);
+        // Use the stored start/end times from the database, or extract from HTML script as fallback
+        let startTimeValue = data.start_time;
+        let endTimeValue = data.end_time;
+        
+        if (!startTimeValue && !endTimeValue && data.html_script) {
+          // Extract from HTML script as fallback for older campaigns
+          const urlParams = new URLSearchParams(data.html_script.split('?')[1]?.split('"')[0] || '');
+          startTimeValue = urlParams.get('startTime') ? parseInt(urlParams.get('startTime')!) : null;
+          endTimeValue = urlParams.get('endTime') ? parseInt(urlParams.get('endTime')!) : null;
+          console.log('Extracted times from HTML script:', { startTimeValue, endTimeValue });
+        }
+        
+        setStartTime(startTimeValue || undefined);
+        setEndTime(endTimeValue || undefined);
         setPlayButtonColor('#ff0000'); // Default for now
         setPlayButtonSize(96); // Default for now
       } else {
