@@ -94,7 +94,7 @@ const Index = () => {
       
       if (data) {
         setEditingCampaign(data);
-        setCurrentVideo(data.video_url);
+        // Don't set currentVideo in edit mode - we want to show the input form
         
         // Use the stored start/end times from the database
         setStartTime(data.start_time || undefined);
