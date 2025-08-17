@@ -41,7 +41,7 @@ const Index = () => {
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [overlayButtonConfig] = useState({
-    enabled: true,
+    enabled: false,
     text: 'Get Started Now!',
     url: 'https://example.com',
     delay: 3,
