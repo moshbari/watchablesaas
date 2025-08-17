@@ -21,6 +21,8 @@ interface Campaign {
   youtube_title: string | null;
   html_script: string;
   javascript_script: string;
+  start_time: number | null;
+  end_time: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -94,14 +96,9 @@ const Index = () => {
         setEditingCampaign(data);
         setCurrentVideo(data.video_url);
         
-        // Extract start/end times from existing embed code if available
-        // This is a simplified approach - in a real app you'd store these separately
-        const urlParams = new URLSearchParams(data.html_script.split('?')[1]?.split('"')[0] || '');
-        const storedStartTime = urlParams.get('startTime');
-        const storedEndTime = urlParams.get('endTime');
-        
-        setStartTime(storedStartTime ? parseInt(storedStartTime) : undefined);
-        setEndTime(storedEndTime ? parseInt(storedEndTime) : undefined);
+        // Use the stored start/end times from the database
+        setStartTime(data.start_time || undefined);
+        setEndTime(data.end_time || undefined);
         setPlayButtonColor('#ff0000'); // Default for now
         setPlayButtonSize(96); // Default for now
       } else {
@@ -164,7 +161,9 @@ const Index = () => {
             video_url: url,
             youtube_title: isYouTube ? campaignName : null,
             html_script: embedCode,
-            javascript_script: scriptCode
+            javascript_script: scriptCode,
+            start_time: startTimeParam || null,
+            end_time: endTimeParam || null
           })
           .eq('id', editingCampaign.id);
 
@@ -185,6 +184,8 @@ const Index = () => {
             youtube_title: isYouTube ? campaignName : null,
             html_script: embedCode,
             javascript_script: scriptCode,
+            start_time: startTimeParam || null,
+            end_time: endTimeParam || null,
             user_id: session!.user.id
           });
 

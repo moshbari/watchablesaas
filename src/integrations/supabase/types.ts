@@ -18,10 +18,12 @@ export type Database = {
         Row: {
           created_at: string
           deleted_at: string | null
+          end_time: number | null
           html_script: string
           id: string
           javascript_script: string
           name: string
+          start_time: number | null
           updated_at: string
           user_id: string
           video_type: string
@@ -31,10 +33,12 @@ export type Database = {
         Insert: {
           created_at?: string
           deleted_at?: string | null
+          end_time?: number | null
           html_script: string
           id?: string
           javascript_script: string
           name: string
+          start_time?: number | null
           updated_at?: string
           user_id: string
           video_type: string
@@ -44,10 +48,12 @@ export type Database = {
         Update: {
           created_at?: string
           deleted_at?: string | null
+          end_time?: number | null
           html_script?: string
           id?: string
           javascript_script?: string
           name?: string
+          start_time?: number | null
           updated_at?: string
           user_id?: string
           video_type?: string
