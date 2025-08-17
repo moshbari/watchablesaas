@@ -244,7 +244,17 @@ const Campaigns: React.FC = () => {
                            <Button
                              variant="outline"
                              size="sm"
-                             onClick={() => copyToClipboard(campaign.html_script, 'HTML')}
+                             onClick={() => {
+                               // Generate fresh HTML code using current logic
+                               const params = new URLSearchParams();
+                               params.append('video', encodeURIComponent(campaign.video_url || ''));
+                               params.append('playButtonColor', encodeURIComponent('#ff0000'));
+                               params.append('playButtonSize', '96');
+                               if (startTime) params.append('startTime', startTime.toString());
+                               if (endTime) params.append('endTime', endTime.toString());
+                               const freshHtmlCode = `<iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`;
+                               copyToClipboard(freshHtmlCode, 'HTML');
+                             }}
                              title="Copy HTML Script"
                            >
                              <Copy className="w-3 h-3" />
@@ -253,7 +263,30 @@ const Campaigns: React.FC = () => {
                            <Button
                              variant="outline"
                              size="sm"
-                             onClick={() => copyToClipboard(campaign.javascript_script, 'JavaScript')}
+                             onClick={() => {
+                               // Generate fresh JavaScript code using current logic
+                               const freshJsCode = `<script>
+// Watchables Embedded Player Script
+(function() {
+  const iframe = document.createElement('iframe');
+  iframe.src = '${window.location.origin}/embed?video=${encodeURIComponent(campaign.video_url || '')}&playButtonColor=${encodeURIComponent('#ff0000')}&playButtonSize=96${startTime ? '&startTime=' + startTime : ''}${endTime ? '&endTime=' + endTime : ''}';
+  iframe.style.cssText = \`
+    width: 100%;
+    height: 400px;
+    border: none;
+    border-radius: 8px;
+  \`;
+  iframe.setAttribute('allowfullscreen', 'true');
+  iframe.setAttribute('allow', 'autoplay; fullscreen');
+  
+  // Insert the iframe where the script is placed
+  const scripts = document.getElementsByTagName('script');
+  const currentScript = scripts[scripts.length - 1];
+  currentScript.parentNode.insertBefore(iframe, currentScript);
+})();
+</script>`;
+                               copyToClipboard(freshJsCode, 'JavaScript');
+                             }}
                              title="Copy JavaScript Script"
                            >
                              <Copy className="w-3 h-3" />
