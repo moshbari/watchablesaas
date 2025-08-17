@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthProvider';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,7 @@ const Campaigns: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { session } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (session?.user) {
@@ -134,7 +136,7 @@ const Campaigns: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">My Campaigns</h1>
-        <Button>
+        <Button onClick={() => navigate('/')}>
           <Plus className="w-4 h-4 mr-2" />
           New Campaign
         </Button>

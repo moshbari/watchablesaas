@@ -9,6 +9,7 @@ import { PlayButtonCustomizer } from '@/components/PlayButtonCustomizer';
 import { ExternalVideoScript } from '@/components/ExternalVideoScript';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
 
@@ -70,26 +71,86 @@ const Index = () => {
 
     setIsLoading(true);
     
-    // Simulate loading delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     try {
+      // Create campaign in database
+      const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
+      const campaignName = isYouTube ? 'YouTube Video' : url;
+      
+      // Generate embed code and script
+      const embedCode = generateEmbedCode(url, playButtonColor, playButtonSize, startTimeParam, endTimeParam);
+      const scriptCode = generateScriptCode(url, playButtonColor, playButtonSize);
+      
+      const { data, error } = await supabase
+        .from('campaigns')
+        .insert({
+          user_id: session.user.id,
+          name: campaignName,
+          video_type: isYouTube ? 'youtube' : 'self-hosted',
+          video_url: url,
+          youtube_title: isYouTube ? campaignName : null,
+          html_script: embedCode,
+          javascript_script: scriptCode
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
       setCurrentVideo(url);
       setStartTime(startTimeParam);
       setEndTime(endTimeParam);
+      
       toast({
-        title: "Video loaded successfully",
-        description: "Enjoy your distraction-free viewing experience!",
+        title: "Campaign created successfully!",
+        description: "Your campaign has been saved and is ready to use.",
       });
     } catch (error) {
+      console.error('Error creating campaign:', error);
       toast({
-        title: "Error loading video",
-        description: "Please check the URL and try again.",
+        title: "Error creating campaign",
+        description: "Please try again later.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const generateEmbedCode = (url: string, color: string, size: number, startTime?: number, endTime?: number) => {
+    const params = new URLSearchParams();
+    params.append('video', encodeURIComponent(url));
+    params.append('playButtonColor', encodeURIComponent(color));
+    params.append('playButtonSize', size.toString());
+    if (startTime !== undefined) params.append('startTime', startTime.toString());
+    if (endTime !== undefined) params.append('endTime', endTime.toString());
+    
+    return `<iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`;
+  };
+
+  const generateScriptCode = (url: string, color: string, size: number) => {
+    return `<script>
+// Watchables Overlay Button Script
+(function() {
+  const button = document.createElement('button');
+  button.innerHTML = 'Watch Video';
+  button.style.cssText = \`
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: ${color};
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 9999;
+  \`;
+  button.onclick = () => window.open('${url}', '_blank');
+  document.body.appendChild(button);
+})();
+</script>`;
   };
 
   const handleVideoError = (error: string) => {

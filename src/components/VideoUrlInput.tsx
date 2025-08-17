@@ -197,7 +197,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ onVideoSubmit, isL
                   className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
                   disabled={isLoading || !url.trim()}
                 >
-                  {isLoading ? 'Loading...' : 'Load Video'}
+                  {isLoading ? 'Creating Campaign...' : 'Create Campaign'}
                 </Button>
               </form>
 
@@ -314,7 +314,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ onVideoSubmit, isL
                   className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
                   disabled={isLoading || !url.trim()}
                 >
-                  {isLoading ? 'Loading...' : 'Load Video'}
+                  {isLoading ? 'Creating Campaign...' : 'Create Campaign'}
                 </Button>
               </form>
 
