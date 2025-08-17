@@ -245,7 +245,7 @@ const Campaigns: React.FC = () => {
                              variant="outline"
                              size="sm"
                              onClick={() => {
-                               // Generate fresh HTML code using the same logic as Index.tsx
+                               // Generate fresh HTML code using the exact same logic as the working version
                                const generateEmbedCode = (url: string, color: string, size: number, startTime?: number, endTime?: number) => {
                                  const params = new URLSearchParams();
                                  params.append('video', encodeURIComponent(url));
@@ -254,7 +254,7 @@ const Campaigns: React.FC = () => {
                                  if (startTime !== undefined) params.append('startTime', startTime.toString());
                                  if (endTime !== undefined) params.append('endTime', endTime.toString());
                                  
-                                 return `<iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`;
+                                 return `<center><iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="450" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" style="max-width: 100%; height: auto; aspect-ratio: 16/9;"></iframe></center>`;
                                };
                                
                                const freshHtmlCode = generateEmbedCode(
