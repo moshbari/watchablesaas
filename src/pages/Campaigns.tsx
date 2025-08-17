@@ -87,18 +87,20 @@ const Campaigns: React.FC = () => {
 
   const deleteCampaign = async (id: string) => {
     try {
+      // Permanently delete from database (not soft delete)
       const { error } = await supabase
         .from('campaigns')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', id);
 
       if (error) throw error;
 
       toast({
-        title: 'Campaign deleted',
-        description: 'Campaign will be permanently deleted in 24 hours',
+        title: 'Campaign Deleted',
+        description: 'Campaign has been permanently deleted.',
       });
 
+      // Refresh the campaigns list
       fetchCampaigns();
     } catch (error) {
       console.error('Error deleting campaign:', error);
@@ -290,20 +292,27 @@ const Campaigns: React.FC = () => {
                                </Button>
                              </AlertDialogTrigger>
                              <AlertDialogContent>
-                               <AlertDialogHeader>
-                                 <AlertDialogTitle>Delete Campaign</AlertDialogTitle>
-                                 <AlertDialogDescription>
-                                   Are you sure you want to delete "{campaign.name}"? 
-                                   This campaign will be moved to trash and permanently deleted after 24 hours.
-                                 </AlertDialogDescription>
-                               </AlertDialogHeader>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>⚠️ Permanently Delete Campaign</AlertDialogTitle>
+                                  <AlertDialogDescription className="space-y-2">
+                                    <p className="font-semibold text-destructive">
+                                      Are you sure you want to permanently delete "{campaign.name}"?
+                                    </p>
+                                    <p>
+                                      <strong>Warning:</strong> This action cannot be undone. The campaign will be immediately and permanently deleted from the database.
+                                    </p>
+                                    <p>
+                                      <strong>Impact:</strong> All embedded videos using this campaign's code will stop working on websites where they are currently placed.
+                                    </p>
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
                                <AlertDialogFooter>
                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
                                  <AlertDialogAction
                                    onClick={() => deleteCampaign(campaign.id)}
                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                  >
-                                   Delete
+                                    Delete Forever
                                  </AlertDialogAction>
                                </AlertDialogFooter>
                              </AlertDialogContent>
