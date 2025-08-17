@@ -41,18 +41,20 @@ const AppContent = () => {
   );
 };
 
-const App = () => (
-  <TooltipProvider>
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AuthProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
     </QueryClientProvider>
-  </TooltipProvider>
-);
+  );
+};
 
 export default App;
