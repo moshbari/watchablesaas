@@ -83,6 +83,7 @@ const Index = () => {
   }, []);
 
   const fetchCampaignForEdit = async () => {
+    console.log('Fetching campaign for edit:', editCampaignId);
     try {
       const { data, error } = await supabase
         .from('campaigns')
@@ -365,14 +366,28 @@ const Index = () => {
         </div>
       ) : (
         <div className="flex items-center justify-center min-h-screen p-4">
-          <VideoUrlInput 
-            onVideoSubmit={handleVideoSubmit}
-            isLoading={isLoading}
-            isEditing={isEditMode}
-            initialUrl={editingCampaign?.video_url || ''}
-            initialStartTime={startTime}
-            initialEndTime={endTime}
-          />
+          {isEditMode && !editingCampaign ? (
+            <div>Loading campaign data...</div>
+          ) : (
+            (() => {
+              console.log('Rendering VideoUrlInput with:', { 
+                initialUrl: editingCampaign?.video_url, 
+                initialStartTime: startTime, 
+                initialEndTime: endTime,
+                editingCampaign 
+              });
+              return (
+                <VideoUrlInput 
+                  onVideoSubmit={handleVideoSubmit}
+                  isLoading={isLoading}
+                  isEditing={isEditMode}
+                  initialUrl={editingCampaign?.video_url || ''}
+                  initialStartTime={startTime}
+                  initialEndTime={endTime}
+                />
+              );
+            })()
+          )}
         </div>
       )}
       <Dialog open={showRestrictedDialog} onOpenChange={setShowRestrictedDialog}>
