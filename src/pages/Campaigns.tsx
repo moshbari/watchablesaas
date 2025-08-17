@@ -245,14 +245,25 @@ const Campaigns: React.FC = () => {
                              variant="outline"
                              size="sm"
                              onClick={() => {
-                               // Generate fresh HTML code using current logic
-                               const params = new URLSearchParams();
-                               params.append('video', encodeURIComponent(campaign.video_url || ''));
-                               params.append('playButtonColor', encodeURIComponent('#ff0000'));
-                               params.append('playButtonSize', '96');
-                               if (startTime) params.append('startTime', startTime.toString());
-                               if (endTime) params.append('endTime', endTime.toString());
-                               const freshHtmlCode = `<iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`;
+                               // Generate fresh HTML code using the same logic as Index.tsx
+                               const generateEmbedCode = (url: string, color: string, size: number, startTime?: number, endTime?: number) => {
+                                 const params = new URLSearchParams();
+                                 params.append('video', encodeURIComponent(url));
+                                 params.append('playButtonColor', encodeURIComponent(color));
+                                 params.append('playButtonSize', size.toString());
+                                 if (startTime !== undefined) params.append('startTime', startTime.toString());
+                                 if (endTime !== undefined) params.append('endTime', endTime.toString());
+                                 
+                                 return `<iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`;
+                               };
+                               
+                               const freshHtmlCode = generateEmbedCode(
+                                 campaign.video_url || '', 
+                                 '#ff0000', 
+                                 96, 
+                                 startTime || undefined, 
+                                 endTime || undefined
+                               );
                                copyToClipboard(freshHtmlCode, 'HTML');
                              }}
                              title="Copy HTML Script"
@@ -264,12 +275,20 @@ const Campaigns: React.FC = () => {
                              variant="outline"
                              size="sm"
                              onClick={() => {
-                               // Generate fresh JavaScript code using current logic
-                               const freshJsCode = `<script>
+                               // Generate fresh JavaScript code using the same logic as Index.tsx
+                               const generateScriptCode = (url: string, color: string, size: number, startTime?: number, endTime?: number) => {
+                                 const params = new URLSearchParams();
+                                 params.append('video', encodeURIComponent(url));
+                                 params.append('playButtonColor', encodeURIComponent(color));
+                                 params.append('playButtonSize', size.toString());
+                                 if (startTime !== undefined) params.append('startTime', startTime.toString());
+                                 if (endTime !== undefined) params.append('endTime', endTime.toString());
+                                 
+                                 return `<script>
 // Watchables Embedded Player Script
 (function() {
   const iframe = document.createElement('iframe');
-  iframe.src = '${window.location.origin}/embed?video=${encodeURIComponent(campaign.video_url || '')}&playButtonColor=${encodeURIComponent('#ff0000')}&playButtonSize=96${startTime ? '&startTime=' + startTime : ''}${endTime ? '&endTime=' + endTime : ''}';
+  iframe.src = '${window.location.origin}/embed?${params.toString()}';
   iframe.style.cssText = \`
     width: 100%;
     height: 400px;
@@ -285,6 +304,15 @@ const Campaigns: React.FC = () => {
   currentScript.parentNode.insertBefore(iframe, currentScript);
 })();
 </script>`;
+                               };
+                               
+                               const freshJsCode = generateScriptCode(
+                                 campaign.video_url || '', 
+                                 '#ff0000', 
+                                 96, 
+                                 startTime || undefined, 
+                                 endTime || undefined
+                               );
                                copyToClipboard(freshJsCode, 'JavaScript');
                              }}
                              title="Copy JavaScript Script"
