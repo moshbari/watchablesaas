@@ -72,6 +72,8 @@
             background: rgba(26, 29, 33, 0.9);
             border: 1px solid #2d3748;
             border-radius: 50%;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -86,6 +88,9 @@
         }
 
         .play-icon {
+            width: 32px;
+            height: 32px;
+            fill: #22c55e;
             margin-left: 4px;
         }
 
@@ -276,17 +281,11 @@
 
     <script>
         class DistractionFreePlayer {
-            constructor(containerId, videoUrl, options = {}) {
+            constructor(containerId, videoUrl) {
                 this.container = document.getElementById(containerId);
                 this.videoUrl = this.extractVideoUrl(videoUrl);
                 this.isYoutube = this.isYouTubeUrl(this.videoUrl);
                 this.youtubeId = this.isYoutube ? this.getYouTubeId(this.videoUrl) : null;
-                
-                // Configuration options from URL params
-                this.playButtonColor = options.playButtonColor || '#22c55e';
-                this.playButtonSize = parseInt(options.playButtonSize) || 80;
-                this.startTime = options.startTime ? parseInt(options.startTime) : null;
-                this.endTime = options.endTime ? parseInt(options.endTime) : null;
                 
                 this.state = {
                     isPlaying: false,
@@ -357,8 +356,8 @@
                             ${this.state.isLoading ? '<div class="loading-overlay"><div class="loading-spinner"></div></div>' : ''}
                             <div class="controls-overlay ${this.state.showControls ? 'show' : 'hide'}" id="controlsOverlay">
                                 ${!this.state.isPlaying ? `
-                                    <div class="play-button-center" id="playButtonCenter" style="width: ${this.playButtonSize}px; height: ${this.playButtonSize}px;">
-                                        <svg class="play-icon" viewBox="0 0 24 24" style="width: ${this.playButtonSize * 0.4}px; height: ${this.playButtonSize * 0.4}px; fill: ${this.playButtonColor};">
+                                    <div class="play-button-center" id="playButtonCenter">
+                                        <svg class="play-icon" viewBox="0 0 24 24">
                                             <polygon points="5,3 19,12 5,21" fill="currentColor"/>
                                         </svg>
                                     </div>
@@ -399,20 +398,11 @@
             }
 
             renderYouTubePlayer() {
-                let youtubeUrl = `https://www.youtube.com/embed/${this.youtubeId}?enablejsapi=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&cc_load_policy=0&autohide=1&playsinline=1&origin=${window.location.origin}`;
-                
-                if (this.startTime) {
-                    youtubeUrl += `&start=${this.startTime}`;
-                }
-                if (this.endTime) {
-                    youtubeUrl += `&end=${this.endTime}`;
-                }
-                
                 return `
                     <iframe 
                         id="youtubePlayer"
                         class="video-element" 
-                        src="${youtubeUrl}"
+                        src="https://www.youtube.com/embed/${this.youtubeId}?enablejsapi=1&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&cc_load_policy=0&autohide=1&playsinline=1&origin=${window.location.origin}"
                         frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
@@ -421,12 +411,11 @@
             }
 
             renderVideoPlayer() {
-                const videoSrc = this.startTime ? `${this.videoUrl}#t=${this.startTime}` : this.videoUrl;
                 return `
                     <video 
                         id="videoElement" 
                         class="video-element" 
-                        src="${videoSrc}" 
+                        src="${this.videoUrl}" 
                         preload="metadata" 
                         playsinline>
                     </video>
@@ -639,15 +628,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const videoUrl = urlParams.get('url') || urlParams.get('video') || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
             
-            // Extract configuration options from URL params
-            const options = {
-                playButtonColor: urlParams.get('playButtonColor') || '#22c55e',
-                playButtonSize: urlParams.get('playButtonSize') || '80',
-                startTime: urlParams.get('startTime'),
-                endTime: urlParams.get('endTime')
-            };
-            
-            window.videoPlayer = new DistractionFreePlayer('videoPlayer', videoUrl, options);
+            window.videoPlayer = new DistractionFreePlayer('videoPlayer', videoUrl);
         }
 
         // Start when DOM is ready
