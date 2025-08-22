@@ -11,6 +11,8 @@ interface IsolatedYouTubePlayerProps {
   startTime?: number;
   endTime?: number;
   onProgressUpdate?: (currentTime: number) => void;
+  shouldSeekTo?: number;
+  onSeekComplete?: () => void;
 }
 
 declare global {
@@ -27,7 +29,9 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   playButtonSize = 96,
   startTime,
   endTime,
-  onProgressUpdate
+  onProgressUpdate,
+  shouldSeekTo,
+  onSeekComplete
 }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
@@ -143,6 +147,22 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
       }
     };
   }, [videoId]);
+
+  // Handle seeking when shouldSeekTo changes
+  useEffect(() => {
+    if (shouldSeekTo !== undefined && ytPlayerRef.current && !isLoading) {
+      try {
+        console.log('🎬 Seeking to saved time:', shouldSeekTo);
+        ytPlayerRef.current.seekTo(shouldSeekTo, true);
+        // Start playing after seeking
+        ytPlayerRef.current.playVideo();
+        onSeekComplete?.();
+      } catch (error) {
+        console.error('Error seeking to saved time:', error);
+        onSeekComplete?.();
+      }
+    }
+  }, [shouldSeekTo, isLoading, onSeekComplete]);
 
   const startProgressTracking = () => {
     if (progressIntervalRef.current) return;

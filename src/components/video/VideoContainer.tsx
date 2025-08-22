@@ -101,11 +101,14 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   }, []);
 
   const handleResumeChoice = useCallback((shouldResume: boolean) => {
+    console.log('🎬 Resume choice made:', shouldResume, 'saved progress:', savedProgress);
     setShowResumeModal(false);
     if (shouldResume && savedProgress) {
       if (isYoutube) {
+        console.log('🎬 Setting shouldSeekTo for YouTube:', savedProgress);
         setShouldSeekTo(savedProgress);
       } else if (videoRef.current) {
+        console.log('🎬 Setting currentTime for HTML5 video:', savedProgress);
         videoRef.current.currentTime = savedProgress;
       }
     }
@@ -248,6 +251,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             startTime={startTime}
             endTime={endTime}
             onProgressUpdate={saveProgress}
+            shouldSeekTo={state.shouldSeekTo}
+            onSeekComplete={() => setShouldSeekTo(undefined)}
           />
         ) : (
           <>
