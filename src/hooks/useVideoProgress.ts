@@ -19,10 +19,11 @@ export const useVideoProgress = (videoUrl: string) => {
 
   // Load saved progress on mount
   useEffect(() => {
+    console.log('🎬 Loading progress effect triggered for URL:', videoUrl);
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      console.log('Checking stored progress for:', videoUrl);
-      console.log('localStorage content:', stored);
+      console.log('🎬 Checking stored progress for:', videoUrl);
+      console.log('🎬 localStorage content:', stored);
       if (stored) {
         const progressData: VideoProgress[] = JSON.parse(stored);
         console.log('All stored progress:', progressData);
@@ -51,10 +52,11 @@ export const useVideoProgress = (videoUrl: string) => {
   }, [videoUrl]);
 
   const saveProgress = useCallback((currentTime: number) => {
-    console.log('saveProgress called with currentTime:', currentTime, 'for URL:', videoUrl);
+    console.log('🎬 saveProgress called with currentTime:', currentTime, 'for URL:', videoUrl);
+    console.log('🎬 MIN_PROGRESS:', MIN_PROGRESS, 'lastSavedTime:', lastSavedTimeRef.current);
     // Only save if enough time has passed and video has been watched for minimum duration
     if (currentTime < MIN_PROGRESS || currentTime - lastSavedTimeRef.current < 5) {
-      console.log('Not saving - currentTime < MIN_PROGRESS or too soon since last save');
+      console.log('🎬 Not saving - currentTime < MIN_PROGRESS or too soon since last save');
       return;
     }
 
