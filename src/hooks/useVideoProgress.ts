@@ -54,45 +54,44 @@ export const useVideoProgress = (videoUrl: string) => {
   const saveProgress = useCallback((currentTime: number) => {
     console.log('🎬 saveProgress called with currentTime:', currentTime, 'for URL:', videoUrl);
     console.log('🎬 MIN_PROGRESS:', MIN_PROGRESS, 'lastSavedTime:', lastSavedTimeRef.current);
+    
     // Only save if enough time has passed and video has been watched for minimum duration
-    if (currentTime < MIN_PROGRESS || currentTime - lastSavedTimeRef.current < 5) {
-      console.log('🎬 Not saving - currentTime < MIN_PROGRESS or too soon since last save');
+    if (currentTime < MIN_PROGRESS) {
+      console.log('🎬 Not saving - currentTime < MIN_PROGRESS');
       return;
     }
 
-    console.log('Scheduling save for URL:', videoUrl, 'at time:', currentTime);
-    // Debounce saves to avoid excessive localStorage writes
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
+    // Check if we've saved recently (avoid too frequent saves)
+    if (currentTime - lastSavedTimeRef.current < 5) {
+      console.log('🎬 Not saving - too soon since last save');
+      return;
     }
 
-    saveTimeoutRef.current = setTimeout(() => {
-      try {
-        console.log('Actually saving progress for URL:', videoUrl, 'at time:', currentTime);
-        const stored = localStorage.getItem(STORAGE_KEY);
-        let progressData: VideoProgress[] = stored ? JSON.parse(stored) : [];
-        
-        // Remove existing entry for this video
-        progressData = progressData.filter(p => p.url !== videoUrl);
-        
-        // Add new progress entry
-        progressData.push({
-          url: videoUrl,
-          timestamp: currentTime,
-          lastUpdated: Date.now()
-        });
+    try {
+      console.log('🎬 Actually saving progress for URL:', videoUrl, 'at time:', currentTime);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      let progressData: VideoProgress[] = stored ? JSON.parse(stored) : [];
+      
+      // Remove existing entry for this video
+      progressData = progressData.filter(p => p.url !== videoUrl);
+      
+      // Add new progress entry
+      progressData.push({
+        url: videoUrl,
+        timestamp: currentTime,
+        lastUpdated: Date.now()
+      });
 
-        // Keep only last 10 videos to prevent storage bloat
-        progressData.sort((a, b) => b.lastUpdated - a.lastUpdated);
-        progressData = progressData.slice(0, 10);
+      // Keep only last 10 videos to prevent storage bloat
+      progressData.sort((a, b) => b.lastUpdated - a.lastUpdated);
+      progressData = progressData.slice(0, 10);
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
-        console.log('Progress saved successfully. New localStorage content:', JSON.stringify(progressData));
-        lastSavedTimeRef.current = currentTime;
-      } catch (error) {
-        console.error('Error saving video progress:', error);
-      }
-    }, 1000); // Debounce by 1 second
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
+      console.log('🎬 Progress saved successfully. New localStorage content:', JSON.stringify(progressData));
+      lastSavedTimeRef.current = currentTime;
+    } catch (error) {
+      console.error('Error saving video progress:', error);
+    }
   }, [videoUrl]);
 
   const clearProgress = useCallback(() => {
