@@ -22,8 +22,8 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
-  // Use production domain for embed codes
-  const productionDomain = 'https://watchable.99dfy.com';
+  // Get the current domain (published Lovable URL)
+  const currentDomain = window.location.origin;
   
   // Generate the embed code with play button customization
   const embedParams = new URLSearchParams({
@@ -39,7 +39,7 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({
     embedParams.set('endTime', endTime.toString());
   }
   
-  const embedCode = `<center><iframe src="${productionDomain}/embed-player.html?${embedParams.toString()}" width="800" height="450" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" style="max-width: 100%; height: auto; aspect-ratio: 16/9;"></iframe></center>`;
+  const embedCode = `<center><iframe src="${currentDomain}/embed?${embedParams.toString()}" width="800" height="450" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" style="max-width: 100%; height: auto; aspect-ratio: 16/9;"></iframe></center>`;
 
   const handleCopy = async () => {
     try {

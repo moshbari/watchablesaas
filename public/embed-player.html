@@ -72,6 +72,8 @@
             background: rgba(26, 29, 33, 0.9);
             border: 1px solid #2d3748;
             border-radius: 50%;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -86,6 +88,9 @@
         }
 
         .play-icon {
+            width: 32px;
+            height: 32px;
+            fill: #22c55e;
             margin-left: 4px;
         }
 
@@ -276,19 +281,11 @@
 
     <script>
         class DistractionFreePlayer {
-            constructor(containerId, videoUrl, options = {}) {
+            constructor(containerId, videoUrl) {
                 this.container = document.getElementById(containerId);
                 this.videoUrl = this.extractVideoUrl(videoUrl);
                 this.isYoutube = this.isYouTubeUrl(this.videoUrl);
                 this.youtubeId = this.isYoutube ? this.getYouTubeId(this.videoUrl) : null;
-                
-                // Store customization options
-                this.options = {
-                    playButtonColor: options.playButtonColor || '#22c55e',
-                    playButtonSize: options.playButtonSize || 80,
-                    startTime: options.startTime || null,
-                    endTime: options.endTime || null
-                };
                 
                 this.state = {
                     isPlaying: false,
@@ -359,8 +356,8 @@
                             ${this.state.isLoading ? '<div class="loading-overlay"><div class="loading-spinner"></div></div>' : ''}
                             <div class="controls-overlay ${this.state.showControls ? 'show' : 'hide'}" id="controlsOverlay">
                                 ${!this.state.isPlaying ? `
-                                    <div class="play-button-center" id="playButtonCenter" style="width: ${this.options.playButtonSize}px; height: ${this.options.playButtonSize}px;">
-                                        <svg class="play-icon" viewBox="0 0 24 24" style="width: ${this.options.playButtonSize * 0.4}px; height: ${this.options.playButtonSize * 0.4}px; fill: ${this.options.playButtonColor};">
+                                    <div class="play-button-center" id="playButtonCenter">
+                                        <svg class="play-icon" viewBox="0 0 24 24">
                                             <polygon points="5,3 19,12 5,21" fill="currentColor"/>
                                         </svg>
                                     </div>
@@ -449,16 +446,10 @@
                     const video = document.getElementById('videoElement');
                     if (video) {
                         video.addEventListener('loadstart', () => this.setState({ isLoading: true }));
-                        video.addEventListener('canplay', () => {
-                            this.setState({ isLoading: false });
-                            this.handleStartTime();
-                        });
+                        video.addEventListener('canplay', () => this.setState({ isLoading: false }));
                         video.addEventListener('play', () => this.setState({ isPlaying: true }));
                         video.addEventListener('pause', () => this.setState({ isPlaying: false }));
-                        video.addEventListener('timeupdate', () => {
-                            this.saveProgress();
-                            this.handleEndTime();
-                        });
+                        video.addEventListener('timeupdate', () => this.saveProgress());
                         video.addEventListener('error', () => this.handleError());
                     }
                 }
@@ -620,26 +611,6 @@
                 }
             }
 
-            handleStartTime() {
-                if (this.options.startTime && !this.hasSetStartTime) {
-                    const video = document.getElementById('videoElement');
-                    if (video && video.readyState >= 2) {
-                        video.currentTime = this.options.startTime;
-                        this.hasSetStartTime = true;
-                    }
-                }
-            }
-
-            handleEndTime() {
-                if (this.options.endTime) {
-                    const video = document.getElementById('videoElement');
-                    if (video && video.currentTime >= this.options.endTime) {
-                        video.pause();
-                        video.currentTime = this.options.endTime;
-                    }
-                }
-            }
-
             handleError() {
                 this.container.innerHTML = `
                     <div class="video-container">
@@ -657,18 +628,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const videoUrl = urlParams.get('url') || urlParams.get('video') || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
             
-            // Get customization parameters
-            const playButtonColor = urlParams.get('playButtonColor') || '#22c55e';
-            const playButtonSize = parseInt(urlParams.get('playButtonSize')) || 80;
-            const startTime = urlParams.get('startTime') ? parseFloat(urlParams.get('startTime')) : null;
-            const endTime = urlParams.get('endTime') ? parseFloat(urlParams.get('endTime')) : null;
-            
-            window.videoPlayer = new DistractionFreePlayer('videoPlayer', videoUrl, {
-                playButtonColor,
-                playButtonSize,
-                startTime,
-                endTime
-            });
+            window.videoPlayer = new DistractionFreePlayer('videoPlayer', videoUrl);
         }
 
         // Start when DOM is ready

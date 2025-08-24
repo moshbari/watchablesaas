@@ -175,7 +175,7 @@ const EditCampaign = () => {
     if (startTime !== undefined) params.append('startTime', startTime.toString());
     if (endTime !== undefined) params.append('endTime', endTime.toString());
     
-    return `<center><iframe src="https://watchable.99dfy.com/embed-player.html?${params.toString()}" width="800" height="450" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" style="max-width: 100%; height: auto; aspect-ratio: 16/9;"></iframe></center>`;
+    return `<iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`;
   };
 
   const generateScriptCode = (url: string, color: string, size: number) => {
@@ -183,7 +183,7 @@ const EditCampaign = () => {
 // Watchables Embedded Player Script
 (function() {
   const iframe = document.createElement('iframe');
-  iframe.src = 'https://watchable.99dfy.com/embed-player.html?video=${encodeURIComponent(url)}&playButtonColor=${encodeURIComponent(color)}&playButtonSize=${size}';
+  iframe.src = '${window.location.origin}/embed?video=${encodeURIComponent(url)}&playButtonColor=${encodeURIComponent(color)}&playButtonSize=${size}';
   iframe.style.cssText = \`
     width: 100%;
     height: 400px;
@@ -191,7 +191,7 @@ const EditCampaign = () => {
     border-radius: 8px;
   \`;
   iframe.setAttribute('allowfullscreen', 'true');
-  iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+  iframe.setAttribute('allow', 'autoplay; fullscreen');
   
   // Insert the iframe where the script is placed
   const scripts = document.getElementsByTagName('script');
