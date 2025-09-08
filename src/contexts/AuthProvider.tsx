@@ -73,12 +73,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn: AuthContextValue["signIn"] = async (email, password) => {
     try {
+      // Log connection attempt for debugging
+      console.log("Attempting to sign in...", { 
+        supabaseUrl: "https://kjabpmcsiluvtxmbbfbg.supabase.co",
+        userAgent: navigator.userAgent,
+        location: window.location.href 
+      });
+      
       cleanupAuthState();
       try { await supabase.auth.signOut({ scope: "global" }); } catch {}
+      
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return { error: error.message };
+      if (error) {
+        console.error("Supabase sign in error:", error);
+        return { error: error.message };
+      }
       return {};
     } catch (e: any) {
+      console.error("Network/Connection error during sign in:", {
+        error: e,
+        message: e?.message,
+        stack: e?.stack,
+        name: e?.name,
+        supabaseUrl: "https://kjabpmcsiluvtxmbbfbg.supabase.co"
+      });
+      
+      // More specific error messages for network issues
+      if (e?.message?.includes('fetch') || e?.name === 'TypeError') {
+        return { 
+          error: `Network connection failed. Please check your internet connection and try again. If the problem persists, contact support. Error: ${e?.message}` 
+        };
+      }
+      
       return { error: e?.message || "Failed to sign in" };
     }
   };
