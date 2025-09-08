@@ -56,7 +56,7 @@ const Login: React.FC = () => {
           </form>
           <div className="flex justify-between items-center mt-4 text-sm">
             <Link to="/register" className="underline">Create account</Link>
-            <Link to={`/account?reset=${encodeURIComponent(email || "")}`} className="underline">Forgot password?</Link>
+            <Link to="/forgot-password" className="underline">Forgot password?</Link>
           </div>
           
           {!showDiagnostics && (

@@ -10,6 +10,8 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import Header from "@/components/Header";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import Account from "@/pages/Account";
 import Admin from "@/pages/Admin";
 import AuthCallback from "@/pages/AuthCallback";
@@ -31,6 +33,8 @@ const AppContent = () => {
         <Route path="/embed" element={<Embed />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/campaigns" element={<RequireAuth><Campaigns /></RequireAuth>} />
         <Route path="/campaigns/:id/edit" element={<RequireAuth><EditCampaign /></RequireAuth>} />
         <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
