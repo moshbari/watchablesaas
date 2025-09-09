@@ -86,6 +86,21 @@ const PageBuilder = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Function to generate slug from title
+  const generateSlugFromTitle = (title: string): string => {
+    if (!title.trim()) return '';
+    
+    const words = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+      .split(/\s+/) // Split by whitespace
+      .filter(word => word.length > 0) // Remove empty strings
+      .slice(0, 3); // Take first 3 words
+    
+    const randomNumber = Math.floor(Math.random() * 1000000);
+    return words.join('-') + '-' + randomNumber;
+  };
+
   useEffect(() => {
     fetchPages();
   }, []);
@@ -372,7 +387,17 @@ const PageBuilder = () => {
                     <Input
                       id="title"
                       value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e) => {
+                        const newTitle = e.target.value;
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          title: newTitle,
+                          // Auto-generate slug if it's empty or hasn't been manually edited
+                          slug: prev.slug === '' || prev.slug === generateSlugFromTitle(prev.title) 
+                            ? generateSlugFromTitle(newTitle) 
+                            : prev.slug
+                        }));
+                      }}
                       placeholder="My Landing Page"
                       required
                     />
@@ -384,11 +409,11 @@ const PageBuilder = () => {
                       id="slug"
                       value={formData.slug}
                       onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                      placeholder="my-landing-page"
+                      placeholder="Auto-generated from title..."
                       required
                     />
                     <p className="text-sm text-muted-foreground mt-1">
-                      Your page will be available at: /{formData.slug || 'your-slug'}
+                      Your page will be available at: /{formData.slug || 'auto-generated-slug'}
                     </p>
                   </div>
 
