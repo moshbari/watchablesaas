@@ -24,6 +24,13 @@ interface Page {
   sub_headline_font_size?: number;
   button_bg_color?: string;
   button_text_color?: string;
+  footer_enabled?: boolean;
+  copyright_text?: string;
+  privacy_policy_url?: string;
+  terms_conditions_url?: string;
+  earnings_disclaimer_url?: string;
+  legal_disclaimer_text?: string;
+  earnings_disclaimer_text?: string;
 }
 
 const DynamicPage = () => {
@@ -160,6 +167,56 @@ const DynamicPage = () => {
               <section>
                 <VideoActionButton config={overlayButtonConfig} />
               </section>
+            )}
+
+            {/* Footer Section */}
+            {page.footer_enabled && (
+              <footer className="mt-16 pt-8 border-t border-gray-200">
+                <div className="text-center space-y-6">
+                  <p className="text-sm text-gray-600">
+                    {page.copyright_text || '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.'}
+                  </p>
+                  
+                  <div className="flex justify-center flex-wrap gap-x-4 gap-y-2 text-sm">
+                    <a 
+                      href={page.privacy_policy_url || 'https://winarzapps.com/privacy-policy/'} 
+                      className="text-blue-600 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Privacy Policy
+                    </a>
+                    <span className="text-gray-400 hidden sm:inline">|</span>
+                    <a 
+                      href={page.terms_conditions_url || 'https://winarzapps.com/terms-of-service/'} 
+                      className="text-blue-600 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Terms & Conditions
+                    </a>
+                    <span className="text-gray-400 hidden sm:inline">|</span>
+                    <a 
+                      href={page.earnings_disclaimer_url || 'https://winarzapps.com/earning-disclaimer'} 
+                      className="text-blue-600 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Earnings/Income Disclaimer
+                    </a>
+                  </div>
+
+                  <div className="space-y-4 text-xs text-gray-500 max-w-4xl mx-auto">
+                    <p className="font-medium">Legal & Disclaimers:</p>
+                    <p className="leading-relaxed">
+                      {page.legal_disclaimer_text || 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.'}
+                    </p>
+                    <p className="leading-relaxed">
+                      {page.earnings_disclaimer_text || '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.'}
+                    </p>
+                  </div>
+                </div>
+              </footer>
             )}
           </div>
         </main>

@@ -31,6 +31,13 @@ interface Page {
   sub_headline_font_size: number;
   button_bg_color: string;
   button_text_color: string;
+  footer_enabled?: boolean;
+  copyright_text?: string;
+  privacy_policy_url?: string;
+  terms_conditions_url?: string;
+  earnings_disclaimer_url?: string;
+  legal_disclaimer_text?: string;
+  earnings_disclaimer_text?: string;
   created_at: string;
 }
 
@@ -53,7 +60,14 @@ const PageBuilder = () => {
     headline_font_size: 28,
     sub_headline_font_size: 16,
     button_bg_color: '#0084ff',
-    button_text_color: '#ffffff'
+    button_text_color: '#ffffff',
+    footer_enabled: true,
+    copyright_text: '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
+    privacy_policy_url: 'https://winarzapps.com/privacy-policy/',
+    terms_conditions_url: 'https://winarzapps.com/terms-of-service/',
+    earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
+    legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
+    earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.'
   });
   const [loading, setLoading] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
@@ -193,7 +207,14 @@ const PageBuilder = () => {
       headline_font_size: 28,
       sub_headline_font_size: 16,
       button_bg_color: '#0084ff',
-      button_text_color: '#ffffff'
+      button_text_color: '#ffffff',
+      footer_enabled: true,
+      copyright_text: '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
+      privacy_policy_url: 'https://winarzapps.com/privacy-policy/',
+      terms_conditions_url: 'https://winarzapps.com/terms-of-service/',
+      earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
+      legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
+      earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.'
     });
     setPreviewVideo(null);
   };
@@ -215,7 +236,14 @@ const PageBuilder = () => {
       headline_font_size: page.headline_font_size || 28,
       sub_headline_font_size: page.sub_headline_font_size || 16,
       button_bg_color: page.button_bg_color || '#0084ff',
-      button_text_color: page.button_text_color || '#ffffff'
+      button_text_color: page.button_text_color || '#ffffff',
+      footer_enabled: page.footer_enabled ?? true,
+      copyright_text: page.copyright_text || '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
+      privacy_policy_url: page.privacy_policy_url || 'https://winarzapps.com/privacy-policy/',
+      terms_conditions_url: page.terms_conditions_url || 'https://winarzapps.com/terms-of-service/',
+      earnings_disclaimer_url: page.earnings_disclaimer_url || 'https://winarzapps.com/earning-disclaimer',
+      legal_disclaimer_text: page.legal_disclaimer_text || 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
+      earnings_disclaimer_text: page.earnings_disclaimer_text || '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.'
     });
     setPreviewVideo(page.video_url || null);
     setIsCreating(true);
@@ -435,6 +463,90 @@ const PageBuilder = () => {
 
                   <Separator />
 
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="footer_enabled"
+                        checked={formData.footer_enabled}
+                        onCheckedChange={(checked) => setFormData(prev => ({ ...prev, footer_enabled: checked }))}
+                      />
+                      <Label htmlFor="footer_enabled">Enable Footer & Legal Disclaimers</Label>
+                    </div>
+
+                    {formData.footer_enabled && (
+                      <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                        <div>
+                          <Label htmlFor="copyright_text">Copyright Text</Label>
+                          <Input
+                            id="copyright_text"
+                            value={formData.copyright_text}
+                            onChange={(e) => setFormData(prev => ({ ...prev, copyright_text: e.target.value }))}
+                            placeholder="2025 Mosh Bari - Copyright© 2025. All Rights Reserved."
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                          <div>
+                            <Label htmlFor="privacy_policy_url">Privacy Policy URL</Label>
+                            <Input
+                              id="privacy_policy_url"
+                              value={formData.privacy_policy_url}
+                              onChange={(e) => setFormData(prev => ({ ...prev, privacy_policy_url: e.target.value }))}
+                              placeholder="https://winarzapps.com/privacy-policy/"
+                              type="url"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="terms_conditions_url">Terms & Conditions URL</Label>
+                            <Input
+                              id="terms_conditions_url"
+                              value={formData.terms_conditions_url}
+                              onChange={(e) => setFormData(prev => ({ ...prev, terms_conditions_url: e.target.value }))}
+                              placeholder="https://winarzapps.com/terms-of-service/"
+                              type="url"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="earnings_disclaimer_url">Earnings Disclaimer URL</Label>
+                            <Input
+                              id="earnings_disclaimer_url"
+                              value={formData.earnings_disclaimer_url}
+                              onChange={(e) => setFormData(prev => ({ ...prev, earnings_disclaimer_url: e.target.value }))}
+                              placeholder="https://winarzapps.com/earning-disclaimer"
+                              type="url"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="legal_disclaimer_text">Legal Disclaimer Text</Label>
+                          <Textarea
+                            id="legal_disclaimer_text"
+                            value={formData.legal_disclaimer_text}
+                            onChange={(e) => setFormData(prev => ({ ...prev, legal_disclaimer_text: e.target.value }))}
+                            placeholder="This site is not a part of the Facebook website..."
+                            rows={3}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="earnings_disclaimer_text">Earnings Disclaimer Text</Label>
+                          <Textarea
+                            id="earnings_disclaimer_text"
+                            value={formData.earnings_disclaimer_text}
+                            onChange={(e) => setFormData(prev => ({ ...prev, earnings_disclaimer_text: e.target.value }))}
+                            placeholder="*Earnings and income representations made by..."
+                            rows={4}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="is_published"
@@ -504,6 +616,32 @@ const PageBuilder = () => {
                           <p className="text-sm text-gray-500 mt-2">
                             Button appears after {formData.button_delay} seconds
                           </p>
+                        </div>
+                      )}
+
+                      {formData.footer_enabled && (
+                        <div className="pt-8 mt-8 border-t border-gray-200">
+                          <div className="text-center space-y-4">
+                            <p className="text-sm text-gray-600">{formData.copyright_text}</p>
+                            <div className="flex justify-center space-x-2 text-sm">
+                              <a href={formData.privacy_policy_url} className="text-blue-600 hover:underline">
+                                Privacy Policy
+                              </a>
+                              <span className="text-gray-400">|</span>
+                              <a href={formData.terms_conditions_url} className="text-blue-600 hover:underline">
+                                Terms & Conditions
+                              </a>
+                              <span className="text-gray-400">|</span>
+                              <a href={formData.earnings_disclaimer_url} className="text-blue-600 hover:underline">
+                                Earnings/Income Disclaimer
+                              </a>
+                            </div>
+                            <div className="space-y-3 text-xs text-gray-500 max-w-2xl mx-auto">
+                              <p><strong>Legal & Disclaimers:</strong></p>
+                              <p>{formData.legal_disclaimer_text}</p>
+                              <p>{formData.earnings_disclaimer_text}</p>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>

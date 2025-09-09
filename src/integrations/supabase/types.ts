@@ -70,14 +70,21 @@ export type Database = {
           button_text: string | null
           button_text_color: string | null
           button_url: string | null
+          copyright_text: string | null
           created_at: string
+          earnings_disclaimer_text: string | null
+          earnings_disclaimer_url: string | null
+          footer_enabled: boolean | null
           headline: string
           headline_font_size: number | null
           id: string
           is_published: boolean | null
+          legal_disclaimer_text: string | null
+          privacy_policy_url: string | null
           slug: string
           sub_headline: string | null
           sub_headline_font_size: number | null
+          terms_conditions_url: string | null
           title: string
           updated_at: string
           user_id: string
@@ -91,14 +98,21 @@ export type Database = {
           button_text?: string | null
           button_text_color?: string | null
           button_url?: string | null
+          copyright_text?: string | null
           created_at?: string
+          earnings_disclaimer_text?: string | null
+          earnings_disclaimer_url?: string | null
+          footer_enabled?: boolean | null
           headline: string
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
+          legal_disclaimer_text?: string | null
+          privacy_policy_url?: string | null
           slug: string
           sub_headline?: string | null
           sub_headline_font_size?: number | null
+          terms_conditions_url?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -112,14 +126,21 @@ export type Database = {
           button_text?: string | null
           button_text_color?: string | null
           button_url?: string | null
+          copyright_text?: string | null
           created_at?: string
+          earnings_disclaimer_text?: string | null
+          earnings_disclaimer_url?: string | null
+          footer_enabled?: boolean | null
           headline?: string
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
+          legal_disclaimer_text?: string | null
+          privacy_policy_url?: string | null
           slug?: string
           sub_headline?: string | null
           sub_headline_font_size?: number | null
+          terms_conditions_url?: string | null
           title?: string
           updated_at?: string
           user_id?: string
