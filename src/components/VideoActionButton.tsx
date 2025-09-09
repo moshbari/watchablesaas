@@ -26,16 +26,13 @@ export const VideoActionButton: React.FC<VideoActionButtonProps> = ({ config }) 
   }
 
   return (
-    <div className="flex justify-center mt-6 animate-fade-in">
+    <div className="flex justify-center mt-6 animate-fade-in px-4">
       <Button
         asChild
-        className="hover:scale-105 transition-all duration-200"
+        className="hover:scale-105 transition-all duration-200 min-h-[60px] w-full max-w-md sm:max-w-lg lg:max-w-xl"
         style={{
-          width: config.width,
-          height: config.height,
           backgroundColor: config.backgroundColor,
           color: config.textColor,
-          fontSize: config.fontSize,
           fontWeight: '600',
         }}
       >
@@ -43,10 +40,13 @@ export const VideoActionButton: React.FC<VideoActionButtonProps> = ({ config }) 
           href={config.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2"
+          className="flex items-center justify-center gap-2 px-6 py-4 text-center leading-tight"
+          style={{
+            fontSize: `clamp(14px, ${config.fontSize}, 20px)`,
+          }}
         >
-          <span>{config.text}</span>
-          <ArrowRight className="w-5 h-5 animate-pulse" />
+          <span className="flex-shrink break-words">{config.text}</span>
+          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse flex-shrink-0" />
         </a>
       </Button>
     </div>
