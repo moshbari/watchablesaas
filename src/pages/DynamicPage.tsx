@@ -20,6 +20,10 @@ interface Page {
   button_delay: number;
   button_enabled: boolean;
   is_published: boolean;
+  headline_font_size?: number;
+  sub_headline_font_size?: number;
+  button_bg_color?: string;
+  button_text_color?: string;
 }
 
 const DynamicPage = () => {
@@ -96,8 +100,8 @@ const DynamicPage = () => {
     position: 'center',
     width: '320px',
     height: '60px',
-    backgroundColor: '#3b82f6',
-    textColor: '#ffffff',
+    backgroundColor: page.button_bg_color || '#3b82f6',
+    textColor: page.button_text_color || '#ffffff',
     fontSize: '18px'
   };
 
@@ -120,12 +124,18 @@ const DynamicPage = () => {
           <div className="max-w-4xl mx-auto text-center">
             {/* Hero Section */}
             <section className="space-y-6 mb-12">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 
+                className="font-bold text-gray-900 leading-tight"
+                style={{ fontSize: `${page.headline_font_size || 48}px` }}
+              >
                 {page.headline}
               </h1>
               
               {page.sub_headline && (
-                <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                <p 
+                  className="text-gray-600 max-w-3xl mx-auto leading-relaxed"
+                  style={{ fontSize: `${page.sub_headline_font_size || 20}px` }}
+                >
                   {page.sub_headline}
                 </p>
               )}

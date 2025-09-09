@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +27,10 @@ interface Page {
   button_delay: number;
   button_enabled: boolean;
   is_published: boolean;
+  headline_font_size: number;
+  sub_headline_font_size: number;
+  button_bg_color: string;
+  button_text_color: string;
   created_at: string;
 }
 
@@ -44,7 +49,11 @@ const PageBuilder = () => {
     button_url: 'https://example.com',
     button_delay: 3,
     button_enabled: false,
-    is_published: false
+    is_published: false,
+    headline_font_size: 48,
+    sub_headline_font_size: 20,
+    button_bg_color: '#000000',
+    button_text_color: '#ffffff'
   });
   const [loading, setLoading] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
@@ -180,7 +189,11 @@ const PageBuilder = () => {
       button_url: 'https://example.com',
       button_delay: 3,
       button_enabled: false,
-      is_published: false
+      is_published: false,
+      headline_font_size: 48,
+      sub_headline_font_size: 20,
+      button_bg_color: '#000000',
+      button_text_color: '#ffffff'
     });
     setPreviewVideo(null);
   };
@@ -198,7 +211,11 @@ const PageBuilder = () => {
       button_url: page.button_url || 'https://example.com',
       button_delay: page.button_delay,
       button_enabled: page.button_enabled,
-      is_published: page.is_published
+      is_published: page.is_published,
+      headline_font_size: page.headline_font_size || 48,
+      sub_headline_font_size: page.sub_headline_font_size || 20,
+      button_bg_color: page.button_bg_color || '#000000',
+      button_text_color: page.button_text_color || '#ffffff'
     });
     setPreviewVideo(page.video_url || null);
     setIsCreating(true);
@@ -354,6 +371,79 @@ const PageBuilder = () => {
 
                   <Separator />
 
+                  <div className="space-y-6">
+                    <div>
+                      <Label>Design Customization</Label>
+                      <div className="space-y-4 mt-3">
+                        <div>
+                          <Label htmlFor="headline_font_size">Headline Font Size: {formData.headline_font_size}px</Label>
+                          <Slider
+                            id="headline_font_size"
+                            min={24}
+                            max={80}
+                            step={2}
+                            value={[formData.headline_font_size]}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, headline_font_size: value[0] }))}
+                            className="mt-2"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="sub_headline_font_size">Sub-headline Font Size: {formData.sub_headline_font_size}px</Label>
+                          <Slider
+                            id="sub_headline_font_size"
+                            min={14}
+                            max={32}
+                            step={1}
+                            value={[formData.sub_headline_font_size]}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, sub_headline_font_size: value[0] }))}
+                            className="mt-2"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="button_bg_color">Button Background Color</Label>
+                          <div className="flex gap-2 mt-2">
+                            <Input
+                              id="button_bg_color"
+                              type="color"
+                              value={formData.button_bg_color}
+                              onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
+                              className="w-16 h-10 p-1 border"
+                            />
+                            <Input
+                              value={formData.button_bg_color}
+                              onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
+                              placeholder="#000000"
+                              className="flex-1"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="button_text_color">Button Text Color</Label>
+                          <div className="flex gap-2 mt-2">
+                            <Input
+                              id="button_text_color"
+                              type="color"
+                              value={formData.button_text_color}
+                              onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
+                              className="w-16 h-10 p-1 border"
+                            />
+                            <Input
+                              value={formData.button_text_color}
+                              onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
+                              placeholder="#ffffff"
+                              className="flex-1"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="is_published"
@@ -379,12 +469,18 @@ const PageBuilder = () => {
                 <CardContent>
                   <div className="bg-white p-6 rounded-lg border min-h-[400px]">
                     <div className="text-center space-y-4">
-                      <h1 className="text-3xl font-bold text-gray-900">
+                      <h1 
+                        className="font-bold text-gray-900"
+                        style={{ fontSize: `${formData.headline_font_size}px` }}
+                      >
                         {formData.headline || 'Your Headline Here'}
                       </h1>
                       
                       {formData.sub_headline && (
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p 
+                          className="text-gray-600 max-w-2xl mx-auto"
+                          style={{ fontSize: `${formData.sub_headline_font_size}px` }}
+                        >
                           {formData.sub_headline}
                         </p>
                       )}
@@ -404,6 +500,11 @@ const PageBuilder = () => {
                         <div className="pt-6">
                           <Button 
                             className="px-8 py-3 text-lg"
+                            style={{
+                              backgroundColor: formData.button_bg_color,
+                              color: formData.button_text_color,
+                              borderColor: formData.button_bg_color
+                            }}
                             disabled
                           >
                             {formData.button_text || 'Get Started Now'}

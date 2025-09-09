@@ -64,16 +64,20 @@ export type Database = {
       }
       pages: {
         Row: {
+          button_bg_color: string | null
           button_delay: number | null
           button_enabled: boolean | null
           button_text: string | null
+          button_text_color: string | null
           button_url: string | null
           created_at: string
           headline: string
+          headline_font_size: number | null
           id: string
           is_published: boolean | null
           slug: string
           sub_headline: string | null
+          sub_headline_font_size: number | null
           title: string
           updated_at: string
           user_id: string
@@ -81,16 +85,20 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          button_bg_color?: string | null
           button_delay?: number | null
           button_enabled?: boolean | null
           button_text?: string | null
+          button_text_color?: string | null
           button_url?: string | null
           created_at?: string
           headline: string
+          headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
           slug: string
           sub_headline?: string | null
+          sub_headline_font_size?: number | null
           title: string
           updated_at?: string
           user_id: string
@@ -98,16 +106,20 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          button_bg_color?: string | null
           button_delay?: number | null
           button_enabled?: boolean | null
           button_text?: string | null
+          button_text_color?: string | null
           button_url?: string | null
           created_at?: string
           headline?: string
+          headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
           slug?: string
           sub_headline?: string | null
+          sub_headline_font_size?: number | null
           title?: string
           updated_at?: string
           user_id?: string
