@@ -50,9 +50,9 @@ const PageBuilder = () => {
     button_delay: 3,
     button_enabled: false,
     is_published: false,
-    headline_font_size: 48,
-    sub_headline_font_size: 20,
-    button_bg_color: '#000000',
+    headline_font_size: 28,
+    sub_headline_font_size: 16,
+    button_bg_color: '#0084ff',
     button_text_color: '#ffffff'
   });
   const [loading, setLoading] = useState(false);
@@ -190,9 +190,9 @@ const PageBuilder = () => {
       button_delay: 3,
       button_enabled: false,
       is_published: false,
-      headline_font_size: 48,
-      sub_headline_font_size: 20,
-      button_bg_color: '#000000',
+      headline_font_size: 28,
+      sub_headline_font_size: 16,
+      button_bg_color: '#0084ff',
       button_text_color: '#ffffff'
     });
     setPreviewVideo(null);
@@ -212,9 +212,9 @@ const PageBuilder = () => {
       button_delay: page.button_delay,
       button_enabled: page.button_enabled,
       is_published: page.is_published,
-      headline_font_size: page.headline_font_size || 48,
-      sub_headline_font_size: page.sub_headline_font_size || 20,
-      button_bg_color: page.button_bg_color || '#000000',
+      headline_font_size: page.headline_font_size || 28,
+      sub_headline_font_size: page.sub_headline_font_size || 16,
+      button_bg_color: page.button_bg_color || '#0084ff',
       button_text_color: page.button_text_color || '#ffffff'
     });
     setPreviewVideo(page.video_url || null);
@@ -289,6 +289,18 @@ const PageBuilder = () => {
                       placeholder="Transform Your Business Today"
                       required
                     />
+                    <div className="mt-3">
+                      <Label htmlFor="headline_font_size">Font Size: {formData.headline_font_size}px</Label>
+                      <Slider
+                        id="headline_font_size"
+                        min={24}
+                        max={80}
+                        step={2}
+                        value={[formData.headline_font_size]}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, headline_font_size: value[0] }))}
+                        className="mt-2"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -300,6 +312,18 @@ const PageBuilder = () => {
                       placeholder="Discover the proven system that's helped thousands..."
                       rows={2}
                     />
+                    <div className="mt-3">
+                      <Label htmlFor="sub_headline_font_size">Font Size: {formData.sub_headline_font_size}px</Label>
+                      <Slider
+                        id="sub_headline_font_size"
+                        min={14}
+                        max={32}
+                        step={1}
+                        value={[formData.sub_headline_font_size]}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, sub_headline_font_size: value[0] }))}
+                        className="mt-2"
+                      />
+                    </div>
                   </div>
 
                   <Separator />
@@ -365,81 +389,48 @@ const PageBuilder = () => {
                             onChange={(e) => setFormData(prev => ({ ...prev, button_delay: parseInt(e.target.value) || 0 }))}
                           />
                         </div>
+
+                        <div className="space-y-4 mt-4">
+                          <div>
+                            <Label htmlFor="button_bg_color">Button Background Color</Label>
+                            <div className="flex gap-2 mt-2">
+                              <Input
+                                id="button_bg_color"
+                                type="color"
+                                value={formData.button_bg_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
+                                className="w-16 h-10 p-1 border"
+                              />
+                              <Input
+                                value={formData.button_bg_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
+                                placeholder="#0084ff"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label htmlFor="button_text_color">Button Text Color</Label>
+                            <div className="flex gap-2 mt-2">
+                              <Input
+                                id="button_text_color"
+                                type="color"
+                                value={formData.button_text_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
+                                className="w-16 h-10 p-1 border"
+                              />
+                              <Input
+                                value={formData.button_text_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
+                                placeholder="#ffffff"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </>
                     )}
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-6">
-                    <div>
-                      <Label>Design Customization</Label>
-                      <div className="space-y-4 mt-3">
-                        <div>
-                          <Label htmlFor="headline_font_size">Headline Font Size: {formData.headline_font_size}px</Label>
-                          <Slider
-                            id="headline_font_size"
-                            min={24}
-                            max={80}
-                            step={2}
-                            value={[formData.headline_font_size]}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, headline_font_size: value[0] }))}
-                            className="mt-2"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="sub_headline_font_size">Sub-headline Font Size: {formData.sub_headline_font_size}px</Label>
-                          <Slider
-                            id="sub_headline_font_size"
-                            min={14}
-                            max={32}
-                            step={1}
-                            value={[formData.sub_headline_font_size]}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, sub_headline_font_size: value[0] }))}
-                            className="mt-2"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="button_bg_color">Button Background Color</Label>
-                          <div className="flex gap-2 mt-2">
-                            <Input
-                              id="button_bg_color"
-                              type="color"
-                              value={formData.button_bg_color}
-                              onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
-                              className="w-16 h-10 p-1 border"
-                            />
-                            <Input
-                              value={formData.button_bg_color}
-                              onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
-                              placeholder="#000000"
-                              className="flex-1"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="button_text_color">Button Text Color</Label>
-                          <div className="flex gap-2 mt-2">
-                            <Input
-                              id="button_text_color"
-                              type="color"
-                              value={formData.button_text_color}
-                              onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
-                              className="w-16 h-10 p-1 border"
-                            />
-                            <Input
-                              value={formData.button_text_color}
-                              onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
-                              placeholder="#ffffff"
-                              className="flex-1"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   <Separator />
