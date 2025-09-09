@@ -46,8 +46,8 @@ const PageBuilder = () => {
     video_url: '',
     video_type: 'youtube',
     button_text: 'Get Started Now',
-    button_url: 'https://example.com',
-    button_delay: 3,
+    button_url: 'https://ultimateonlinemastery.org/',
+    button_delay: 5,
     button_enabled: false,
     is_published: false,
     headline_font_size: 28,
@@ -186,8 +186,8 @@ const PageBuilder = () => {
       video_url: '',
       video_type: 'youtube',
       button_text: 'Get Started Now',
-      button_url: 'https://example.com',
-      button_delay: 3,
+      button_url: 'https://ultimateonlinemastery.org/',
+      button_delay: 5,
       button_enabled: false,
       is_published: false,
       headline_font_size: 28,
@@ -208,8 +208,8 @@ const PageBuilder = () => {
       video_url: page.video_url || '',
       video_type: page.video_type,
       button_text: page.button_text || 'Get Started Now',
-      button_url: page.button_url || 'https://example.com',
-      button_delay: page.button_delay,
+      button_url: page.button_url || 'https://ultimateonlinemastery.org/',
+      button_delay: page.button_delay || 5,
       button_enabled: page.button_enabled,
       is_published: page.is_published,
       headline_font_size: page.headline_font_size || 28,
@@ -373,7 +373,7 @@ const PageBuilder = () => {
                             id="button_url"
                             value={formData.button_url}
                             onChange={(e) => setFormData(prev => ({ ...prev, button_url: e.target.value }))}
-                            placeholder="https://example.com"
+                            placeholder="https://ultimateonlinemastery.org/"
                             type="url"
                           />
                         </div>
