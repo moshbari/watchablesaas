@@ -74,6 +74,7 @@ export type Database = {
           created_at: string
           earnings_disclaimer_text: string | null
           earnings_disclaimer_url: string | null
+          end_time: number | null
           footer_enabled: boolean | null
           headline: string
           headline_font_size: number | null
@@ -82,6 +83,7 @@ export type Database = {
           legal_disclaimer_text: string | null
           privacy_policy_url: string | null
           slug: string
+          start_time: number | null
           sub_headline: string | null
           sub_headline_font_size: number | null
           terms_conditions_url: string | null
@@ -102,6 +104,7 @@ export type Database = {
           created_at?: string
           earnings_disclaimer_text?: string | null
           earnings_disclaimer_url?: string | null
+          end_time?: number | null
           footer_enabled?: boolean | null
           headline: string
           headline_font_size?: number | null
@@ -110,6 +113,7 @@ export type Database = {
           legal_disclaimer_text?: string | null
           privacy_policy_url?: string | null
           slug: string
+          start_time?: number | null
           sub_headline?: string | null
           sub_headline_font_size?: number | null
           terms_conditions_url?: string | null
@@ -130,6 +134,7 @@ export type Database = {
           created_at?: string
           earnings_disclaimer_text?: string | null
           earnings_disclaimer_url?: string | null
+          end_time?: number | null
           footer_enabled?: boolean | null
           headline?: string
           headline_font_size?: number | null
@@ -138,6 +143,7 @@ export type Database = {
           legal_disclaimer_text?: string | null
           privacy_policy_url?: string | null
           slug?: string
+          start_time?: number | null
           sub_headline?: string | null
           sub_headline_font_size?: number | null
           terms_conditions_url?: string | null

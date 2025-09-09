@@ -31,6 +31,8 @@ interface Page {
   earnings_disclaimer_url?: string;
   legal_disclaimer_text?: string;
   earnings_disclaimer_text?: string;
+  start_time?: number;
+  end_time?: number;
 }
 
 const DynamicPage = () => {
@@ -157,6 +159,8 @@ const DynamicPage = () => {
                     onError={handleVideoError}
                     playButtonColor="#ef4444"
                     playButtonSize={120}
+                    startTime={page.start_time}
+                    endTime={page.end_time}
                   />
                 </div>
               </section>

@@ -38,6 +38,8 @@ interface Page {
   earnings_disclaimer_url?: string;
   legal_disclaimer_text?: string;
   earnings_disclaimer_text?: string;
+  start_time?: number;
+  end_time?: number;
   created_at: string;
 }
 
@@ -67,7 +69,17 @@ const PageBuilder = () => {
     terms_conditions_url: 'https://winarzapps.com/terms-of-service/',
     earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
     legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
-    earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.'
+    earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
+    start_time: undefined,
+    end_time: undefined
+  });
+  const [timeInputs, setTimeInputs] = useState({
+    startHour: '',
+    startMinute: '',
+    startSecond: '',
+    endHour: '',
+    endMinute: '',
+    endSecond: ''
   });
   const [loading, setLoading] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
@@ -77,6 +89,25 @@ const PageBuilder = () => {
   useEffect(() => {
     fetchPages();
   }, []);
+
+  // Helper functions for time conversion
+  const timeToSeconds = (hours: string, minutes: string, seconds: string): number => {
+    const h = parseInt(hours) || 0;
+    const m = parseInt(minutes) || 0;
+    const s = parseInt(seconds) || 0;
+    return h * 3600 + m * 60 + s;
+  };
+
+  const secondsToTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return {
+      hours: h.toString().padStart(2, '0'),
+      minutes: m.toString().padStart(2, '0'),
+      seconds: s.toString().padStart(2, '0')
+    };
+  };
 
   const fetchPages = async () => {
     try {
@@ -118,12 +149,32 @@ const PageBuilder = () => {
         }));
       }
 
+      // Convert time inputs to seconds
+      const { startHour, startMinute, startSecond, endHour, endMinute, endSecond } = timeInputs;
+      let startTime: number | undefined;
+      let endTime: number | undefined;
+
+      if (startHour || startMinute || startSecond) {
+        startTime = timeToSeconds(startHour, startMinute, startSecond);
+      }
+
+      if (endHour || endMinute || endSecond) {
+        endTime = timeToSeconds(endHour, endMinute, endSecond);
+        
+        // Validate end time is after start time
+        if (startTime && endTime <= startTime) {
+          throw new Error('End time must be after start time');
+        }
+      }
+
       // Format slug
       const slug = formData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
 
       const pageData = {
         ...formData,
         slug,
+        start_time: startTime,
+        end_time: endTime,
         user_id: (await supabase.auth.getUser()).data.user?.id
       };
 
@@ -214,7 +265,17 @@ const PageBuilder = () => {
       terms_conditions_url: 'https://winarzapps.com/terms-of-service/',
       earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
       legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
-      earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.'
+      earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
+      start_time: undefined,
+      end_time: undefined
+    });
+    setTimeInputs({
+      startHour: '',
+      startMinute: '',
+      startSecond: '',
+      endHour: '',
+      endMinute: '',
+      endSecond: ''
     });
     setPreviewVideo(null);
   };
@@ -243,8 +304,31 @@ const PageBuilder = () => {
       terms_conditions_url: page.terms_conditions_url || 'https://winarzapps.com/terms-of-service/',
       earnings_disclaimer_url: page.earnings_disclaimer_url || 'https://winarzapps.com/earning-disclaimer',
       legal_disclaimer_text: page.legal_disclaimer_text || 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
-      earnings_disclaimer_text: page.earnings_disclaimer_text || '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.'
+      earnings_disclaimer_text: page.earnings_disclaimer_text || '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
+      start_time: page.start_time,
+      end_time: page.end_time
     });
+
+    // Set time inputs based on existing times
+    if (page.start_time) {
+      const startTime = secondsToTime(page.start_time);
+      setTimeInputs(prev => ({
+        ...prev,
+        startHour: startTime.hours,
+        startMinute: startTime.minutes,
+        startSecond: startTime.seconds
+      }));
+    }
+    if (page.end_time) {
+      const endTime = secondsToTime(page.end_time);
+      setTimeInputs(prev => ({
+        ...prev,
+        endHour: endTime.hours,
+        endMinute: endTime.minutes,
+        endSecond: endTime.seconds
+      }));
+    }
+
     setPreviewVideo(page.video_url || null);
     setIsCreating(true);
   };
@@ -370,6 +454,89 @@ const PageBuilder = () => {
                       </Button>
                     </div>
                   </div>
+
+                  {/* Time Range Controls */}
+                  {formData.video_url && (
+                    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
+                      <Label className="text-sm font-medium">Time Range (Optional)</Label>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">Start Time</Label>
+                          <div className="flex gap-1 items-center">
+                            <Input
+                              type="number"
+                              placeholder="HH"
+                              min="0"
+                              max="23"
+                              value={timeInputs.startHour}
+                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startHour: e.target.value }))}
+                              className="w-14 text-center text-xs"
+                            />
+                            <span className="text-muted-foreground">:</span>
+                            <Input
+                              type="number"
+                              placeholder="MM"
+                              min="0"
+                              max="59"
+                              value={timeInputs.startMinute}
+                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startMinute: e.target.value }))}
+                              className="w-14 text-center text-xs"
+                            />
+                            <span className="text-muted-foreground">:</span>
+                            <Input
+                              type="number"
+                              placeholder="SS"
+                              min="0"
+                              max="59"
+                              value={timeInputs.startSecond}
+                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startSecond: e.target.value }))}
+                              className="w-14 text-center text-xs"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">End Time</Label>
+                          <div className="flex gap-1 items-center">
+                            <Input
+                              type="number"
+                              placeholder="HH"
+                              min="0"
+                              max="23"
+                              value={timeInputs.endHour}
+                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endHour: e.target.value }))}
+                              className="w-14 text-center text-xs"
+                            />
+                            <span className="text-muted-foreground">:</span>
+                            <Input
+                              type="number"
+                              placeholder="MM"
+                              min="0"
+                              max="59"
+                              value={timeInputs.endMinute}
+                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endMinute: e.target.value }))}
+                              className="w-14 text-center text-xs"
+                            />
+                            <span className="text-muted-foreground">:</span>
+                            <Input
+                              type="number"
+                              placeholder="SS"
+                              min="0"
+                              max="59"
+                              value={timeInputs.endSecond}
+                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endSecond: e.target.value }))}
+                              className="w-14 text-center text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        Leave empty to play the full video. End time must be after start time.
+                      </p>
+                    </div>
+                  )}
 
                   <Separator />
 
