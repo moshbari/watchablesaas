@@ -3,8 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import Embed from "./pages/Embed";
+import PageBuilder from "./pages/PageBuilder";
+import DynamicPage from "./pages/DynamicPage";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "@/contexts/AuthProvider";
 import Header from "@/components/Header";
@@ -24,10 +27,22 @@ const queryClient = new QueryClient();
 const AppContent = () => {
   const location = useLocation();
   const isEmbedRoute = location.pathname === '/embed';
+  const isDynamicPage = location.pathname !== '/' && 
+                        location.pathname !== '/embed' && 
+                        !location.pathname.startsWith('/login') &&
+                        !location.pathname.startsWith('/register') &&
+                        !location.pathname.startsWith('/forgot-password') &&
+                        !location.pathname.startsWith('/reset-password') &&
+                        !location.pathname.startsWith('/campaigns') &&
+                        !location.pathname.startsWith('/account') &&
+                        !location.pathname.startsWith('/admin') &&
+                        !location.pathname.startsWith('/auth/callback') &&
+                        !location.pathname.startsWith('/page-builder') &&
+                        !location.pathname.startsWith('/404');
 
   return (
     <>
-      {!isEmbedRoute && <Header />}
+      {!isEmbedRoute && !isDynamicPage && <Header />}
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/embed" element={<Embed />} />
@@ -39,8 +54,12 @@ const AppContent = () => {
         <Route path="/campaigns/:id/edit" element={<RequireAuth><EditCampaign /></RequireAuth>} />
         <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="/admin" element={<RequireRole allow={["admin"]}><Admin /></RequireRole>} />
+        <Route path="/page-builder" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="/404" element={<NotFound />} />
+        {/* Dynamic pages route - this must be second to last */}
+        <Route path="/:slug" element={<DynamicPage />} />
+        {/* Catch-all route - this must be last */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
@@ -50,15 +69,17 @@ const AppContent = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AuthProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
+      <HelmetProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AuthProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </HelmetProvider>
     </QueryClientProvider>
   );
 };

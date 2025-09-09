@@ -62,6 +62,60 @@ export type Database = {
         }
         Relationships: []
       }
+      pages: {
+        Row: {
+          button_delay: number | null
+          button_enabled: boolean | null
+          button_text: string | null
+          button_url: string | null
+          created_at: string
+          headline: string
+          id: string
+          is_published: boolean | null
+          slug: string
+          sub_headline: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          video_type: string
+          video_url: string | null
+        }
+        Insert: {
+          button_delay?: number | null
+          button_enabled?: boolean | null
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string
+          headline: string
+          id?: string
+          is_published?: boolean | null
+          slug: string
+          sub_headline?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          video_type?: string
+          video_url?: string | null
+        }
+        Update: {
+          button_delay?: number | null
+          button_enabled?: boolean | null
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string
+          headline?: string
+          id?: string
+          is_published?: boolean | null
+          slug?: string
+          sub_headline?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          video_type?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
