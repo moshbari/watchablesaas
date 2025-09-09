@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
-import { Plus, Eye, Edit, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
 
 interface Page {
   id: string;
@@ -490,7 +490,7 @@ const PageBuilder = () => {
                       {formData.button_enabled && (
                         <div className="pt-6">
                           <Button 
-                            className="px-8 py-3 text-lg"
+                            className="px-8 py-3 text-lg flex items-center gap-2"
                             style={{
                               backgroundColor: formData.button_bg_color,
                               color: formData.button_text_color,
@@ -498,7 +498,8 @@ const PageBuilder = () => {
                             }}
                             disabled
                           >
-                            {formData.button_text || 'Get Started Now'}
+                            <span>{formData.button_text || 'Get Started Now'}</span>
+                            <ArrowRight className="w-5 h-5" />
                           </Button>
                           <p className="text-sm text-gray-500 mt-2">
                             Button appears after {formData.button_delay} seconds

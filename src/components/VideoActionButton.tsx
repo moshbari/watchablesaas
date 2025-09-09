@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { OverlayButtonConfig } from '@/components/VideoOverlayButton';
+import { ArrowRight } from 'lucide-react';
 
 interface VideoActionButtonProps {
   config: OverlayButtonConfig;
@@ -42,8 +43,10 @@ export const VideoActionButton: React.FC<VideoActionButtonProps> = ({ config }) 
           href={config.url}
           target="_blank"
           rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2"
         >
-          {config.text}
+          <span>{config.text}</span>
+          <ArrowRight className="w-5 h-5 animate-pulse" />
         </a>
       </Button>
     </div>
