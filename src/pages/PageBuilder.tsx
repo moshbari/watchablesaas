@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
+import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
 import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
 
 interface Page {
@@ -418,7 +419,18 @@ const PageBuilder = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="headline">Headline</Label>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="headline">Headline</Label>
+                      <HeadlineTemplateSelector 
+                        onTemplateSelect={(headline, subHeadline) => {
+                          setFormData(prev => ({ 
+                            ...prev, 
+                            headline: headline,
+                            sub_headline: subHeadline
+                          }));
+                        }}
+                      />
+                    </div>
                     <Input
                       id="headline"
                       value={formData.headline}
