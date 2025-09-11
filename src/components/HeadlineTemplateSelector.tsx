@@ -41,6 +41,182 @@ const templates: HeadlineTemplate[] = [
     rating: 5,
     reason: "Creates urgency, quantifies problem, positions solution. Strong pain-avoidance trigger.",
     placeholders: ["Problem", "Amount", "Time Period", "Specific Solution", "Time Frame"]
+  },
+  {
+    id: 4,
+    headline: "Finally! A [Product Category] That [Unique Benefit] Without [Common Drawback]",
+    subHeadline: "Say goodbye to [Frustration] and hello to [Desired Outcome] in just [Time Frame]",
+    rating: 4,
+    reason: "Addresses market sophistication, unique positioning, but \"Finally!\" can feel overused.",
+    placeholders: ["Product Category", "Unique Benefit", "Common Drawback", "Frustration", "Desired Outcome", "Time Frame"]
+  },
+  {
+    id: 5,
+    headline: "If You [Qualifying Condition], This [Product] Will [Specific Promise] or Your Money Back",
+    subHeadline: "100% guaranteed results for [Target Audience] who [Specific Action/Behavior]",
+    rating: 5,
+    reason: "Qualification + guarantee + specificity = high conversion. Risk reversal is powerful.",
+    placeholders: ["Qualifying Condition", "Product", "Specific Promise", "Target Audience", "Specific Action/Behavior"]
+  },
+  {
+    id: 6,
+    headline: "[Number] [Time Period] Ago I Was [Negative State]. Today I [Positive State]",
+    subHeadline: "The simple [Method/System] that changed everything - and how you can copy my exact blueprint",
+    rating: 4,
+    reason: "Story-driven, transformation proof, relatability. May need credibility markers.",
+    placeholders: ["Number", "Time Period", "Negative State", "Positive State", "Method/System"]
+  },
+  {
+    id: 7,
+    headline: "The $[Amount] [Product/Service] That [Impressive Result] in [Time Frame]",
+    subHeadline: "See the exact [Tool/Method] that [Specific Achievement] - no [Common Excuse] required",
+    rating: 4,
+    reason: "Price anchoring, result-focused, removes excuses. Needs strong proof elements.",
+    placeholders: ["Amount", "Product/Service", "Impressive Result", "Time Frame", "Tool/Method", "Specific Achievement", "Common Excuse"]
+  },
+  {
+    id: 8,
+    headline: "PROOF: [Specific Claim] [Achievement] Using This [Simple Description]",
+    subHeadline: "See the documented evidence and get the same results for yourself",
+    rating: 5,
+    reason: "Evidence-based, reduces skepticism, builds credibility. \"PROOF\" is powerful word.",
+    placeholders: ["Specific Claim", "Achievement", "Simple Description"]
+  },
+  {
+    id: 9,
+    headline: "Why [Common Belief] Is Dead Wrong (And What [Smart People] Do Instead)",
+    subHeadline: "The counterintuitive approach that [Specific Benefit] while everyone else [Common Mistake]",
+    rating: 4,
+    reason: "Contrarian angle, positions reader as smart, but needs strong authority to pull off.",
+    placeholders: ["Common Belief", "Smart People", "Specific Benefit", "Common Mistake"]
+  },
+  {
+    id: 10,
+    headline: "Free: The [Valuable Thing] That [Impressive Claim]",
+    subHeadline: "No strings attached - just [Specific Benefit] delivered to your [Delivery Method] instantly",
+    rating: 4,
+    reason: "\"Free\" is powerful, but needs perceived value and clear benefit to convert.",
+    placeholders: ["Valuable Thing", "Impressive Claim", "Specific Benefit", "Delivery Method"]
+  },
+  {
+    id: 11,
+    headline: "[Testimonial Quote About Amazing Result]",
+    subHeadline: "Discover how [Customer] achieved [Specific Result] and how you can too",
+    rating: 4,
+    reason: "Social proof driven, credible, but needs strong testimonial and visual proof.",
+    placeholders: ["Testimonial Quote About Amazing Result", "Customer", "Specific Result"]
+  },
+  {
+    id: 12,
+    headline: "The Lazy Person's Way To [Desired Outcome]",
+    subHeadline: "Get [Result] without [Effort/Time/Skill] - even if you [Common Limitation]",
+    rating: 4,
+    reason: "Appeals to ease-seeking, but can attract wrong customers if not qualified properly.",
+    placeholders: ["Desired Outcome", "Result", "Effort/Time/Skill", "Common Limitation"]
+  },
+  {
+    id: 13,
+    headline: "How To [Achieve Goal] Even If [Common Excuse/Limitation]",
+    subHeadline: "The breakthrough method that works regardless of [Limitation] or [Another Limitation]",
+    rating: 5,
+    reason: "Removes objections, inclusive, addresses common barriers. Highly relatable.",
+    placeholders: ["Achieve Goal", "Common Excuse/Limitation", "Limitation", "Another Limitation"]
+  },
+  {
+    id: 14,
+    headline: "The [Industry] Insider's Guide To [Getting Specific Result]",
+    subHeadline: "Industry secrets revealed: [Specific Tactic] that [Impressive Statistic]",
+    rating: 4,
+    reason: "Authority positioning, insider knowledge appeal, needs credible industry connection.",
+    placeholders: ["Industry", "Getting Specific Result", "Specific Tactic", "Impressive Statistic"]
+  },
+  {
+    id: 15,
+    headline: "What [Number] Studies Reveal About [Topic] Will Shock You",
+    subHeadline: "Scientific proof that [Counterintuitive Finding] - and what it means for your [Goal]",
+    rating: 3,
+    reason: "Research-backed, but \"shock\" language can feel clickbaity. Needs real studies.",
+    placeholders: ["Number", "Topic", "Counterintuitive Finding", "Goal"]
+  },
+  {
+    id: 16,
+    headline: "The [Negative Event] That Led To [Positive Discovery]",
+    subHeadline: "How my biggest [Failure/Challenge] revealed the secret to [Desired Outcome]",
+    rating: 4,
+    reason: "Storytelling, vulnerability builds trust, but needs compelling narrative.",
+    placeholders: ["Negative Event", "Positive Discovery", "Failure/Challenge", "Desired Outcome"]
+  },
+  {
+    id: 17,
+    headline: "Before You [Common Action], Read This",
+    subHeadline: "Critical information that could [Avoid Problem/Increase Success] in your [Endeavor]",
+    rating: 4,
+    reason: "Creates pause, positions as essential reading, good for awareness stage.",
+    placeholders: ["Common Action", "Avoid Problem/Increase Success", "Endeavor"]
+  },
+  {
+    id: 18,
+    headline: "[Specific Number]% Of [Target Audience] Make This [Mistake] - Don't Be One Of Them",
+    subHeadline: "Avoid the costly error that [Negative Consequence] and learn what [Success Group] do instead",
+    rating: 5,
+    reason: "Statistics, fear of missing out, positions reader choice. Very persuasive formula.",
+    placeholders: ["Specific Number", "Target Audience", "Mistake", "Negative Consequence", "Success Group"]
+  },
+  {
+    id: 19,
+    headline: "Copy My Exact [Process/System] That [Specific Achievement]",
+    subHeadline: "Step-by-step blueprint that [Benefit] - no guesswork, no [Common Frustration]",
+    rating: 5,
+    reason: "Copycat appeal, removes uncertainty, promises specificity. Strong for how-to products.",
+    placeholders: ["Process/System", "Specific Achievement", "Benefit", "Common Frustration"]
+  },
+  {
+    id: 20,
+    headline: "The [Time Period] That Changed Everything For [Target Audience]",
+    subHeadline: "Discover what happened during [Specific Period] and how to [Replicate Success]",
+    rating: 3,
+    reason: "Story hook, but needs compelling event and clear relevance to reader.",
+    placeholders: ["Time Period", "Target Audience", "Specific Period", "Replicate Success"]
+  },
+  {
+    id: 21,
+    headline: "Attention [Target Audience]: Your [Current Method] Is Broken",
+    subHeadline: "Why [Popular Approach] fails [Percentage]% of the time and what works instead",
+    rating: 4,
+    reason: "Direct address, challenges status quo, but needs authority to make bold claims.",
+    placeholders: ["Target Audience", "Current Method", "Popular Approach", "Percentage"]
+  },
+  {
+    id: 22,
+    headline: "The [Amount] Question That [Result]",
+    subHeadline: "One simple question that [Specific Benefit] - ask it yourself and see what happens",
+    rating: 4,
+    reason: "Simplicity appeal, interactive element, but needs powerful question for credibility.",
+    placeholders: ["Amount", "Result", "Specific Benefit"]
+  },
+  {
+    id: 23,
+    headline: "Stop [Unwanted Behavior] and Start [Desired Behavior] in [Time Frame]",
+    subHeadline: "The simple swap that [Specific Benefit] without [Common Sacrifice]",
+    rating: 4,
+    reason: "Clear before/after, actionable, but needs unique angle to stand out.",
+    placeholders: ["Unwanted Behavior", "Desired Behavior", "Time Frame", "Specific Benefit", "Common Sacrifice"]
+  },
+  {
+    id: 24,
+    headline: "The [Competitor/Alternative] Alternative That [Superior Benefit]",
+    subHeadline: "Why smart [Target Audience] are switching to [Your Solution] for [Specific Reason]",
+    rating: 4,
+    reason: "Competitive positioning, but requires careful legal and ethical consideration.",
+    placeholders: ["Competitor/Alternative", "Superior Benefit", "Target Audience", "Your Solution", "Specific Reason"]
+  },
+  {
+    id: 25,
+    headline: "[Exact Result] In [Specific Time] Or It's Free",
+    subHeadline: "Our [Guarantee Period] guarantee: Get [Specific Outcome] or pay nothing",
+    rating: 5,
+    reason: "Strong guarantee, risk reversal, specific promise. Powerful conversion driver.",
+    placeholders: ["Exact Result", "Specific Time", "Guarantee Period", "Specific Outcome"]
   }
 ];
 
