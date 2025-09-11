@@ -217,6 +217,126 @@ const templates: HeadlineTemplate[] = [
     rating: 5,
     reason: "Strong guarantee, risk reversal, specific promise. Powerful conversion driver.",
     placeholders: ["Exact Result", "Specific Time", "Guarantee Period", "Specific Outcome"]
+  },
+  {
+    id: 26,
+    headline: "Who Else Wants to [Desired Result] in [Timeframe]?",
+    subHeadline: "Join [Number] of people who are already using this to [Benefit].",
+    rating: 4,
+    reason: "Inclusive curiosity + social proof.",
+    placeholders: ["Desired Result", "Timeframe", "Number", "Benefit"]
+  },
+  {
+    id: 27,
+    headline: "The Shocking Truth About [Topic]—And How It's Costing You [Pain/Money]",
+    subHeadline: "Discover why [Audience] fail—and how you can flip the script today.",
+    rating: 5,
+    reason: "Curiosity + pain agitation. Classic proven hook.",
+    placeholders: ["Topic", "Pain/Money", "Audience"]
+  },
+  {
+    id: 28,
+    headline: "Finally! A Simple Way to [Desired Result] Without [Dreaded Thing]",
+    subHeadline: "Forget [Frustration]. This does the heavy lifting so you don't have to.",
+    rating: 5,
+    reason: "Relief + solution. Strong for saturated niches.",
+    placeholders: ["Desired Result", "Dreaded Thing", "Frustration"]
+  },
+  {
+    id: 29,
+    headline: "Give Me [Short Timeframe] and I'll Show You How to [Desired Result]",
+    subHeadline: "Fast, predictable results—even if you're starting from scratch.",
+    rating: 5,
+    reason: "Bold time-promise formula. Always converts.",
+    placeholders: ["Short Timeframe", "Desired Result"]
+  },
+  {
+    id: 30,
+    headline: "[Number] Little-Known Secrets Every [Audience] Must Know About [Topic]",
+    subHeadline: "These insider tips can save you [Money/Time] and make you [Benefit].",
+    rating: 4,
+    reason: "Specificity + curiosity. Strong for lists.",
+    placeholders: ["Number", "Audience", "Topic", "Money/Time", "Benefit"]
+  },
+  {
+    id: 31,
+    headline: "How I [Achieved Big Result] Without [Common Obstacle]—And How You Can Too",
+    subHeadline: "My story proves you don't need [Barrier] to succeed with [Solution].",
+    rating: 4,
+    reason: "Storytelling + credibility.",
+    placeholders: ["Achieved Big Result", "Common Obstacle", "Barrier", "Solution"]
+  },
+  {
+    id: 32,
+    headline: "Warning: Don't Even Think About [Topic] Until You [Do/Know This One Thing]",
+    subHeadline: "Most [Audience] miss this step—and pay the price. Don't be one of them.",
+    rating: 5,
+    reason: "Fear + authority + urgency.",
+    placeholders: ["Topic", "Do/Know This One Thing", "Audience"]
+  },
+  {
+    id: 33,
+    headline: "The Fastest, Easiest Way to [Desired Result] (Even If You're [Negative Self-Identity])",
+    subHeadline: "Zero skills? Zero problem. This makes [Desired Result] possible.",
+    rating: 5,
+    reason: "Simplicity + inclusivity.",
+    placeholders: ["Desired Result", "Negative Self-Identity"]
+  },
+  {
+    id: 34,
+    headline: "Discover the [Adjective] New Way to [Desired Result] in [Timeframe]",
+    subHeadline: "This isn't the old, broken way. This is faster, smarter, easier.",
+    rating: 4,
+    reason: "\"New mechanism\" positioning.",
+    placeholders: ["Adjective", "Desired Result", "Timeframe"]
+  },
+  {
+    id: 35,
+    headline: "What Every [Audience] Ought to Know About [Topic]",
+    subHeadline: "If you miss this, you'll waste [Money/Time] and regret it later.",
+    rating: 4,
+    reason: "Authoritative \"must-know.\"",
+    placeholders: ["Audience", "Topic", "Money/Time"]
+  },
+  {
+    id: 36,
+    headline: "They Laughed When I [Tried to Achieve Result]… But Then I [Big Win]",
+    subHeadline: "Now they ask me how I did it—and I'll show you too.",
+    rating: 4,
+    reason: "Classic storytelling formula.",
+    placeholders: ["Tried to Achieve Result", "Big Win"]
+  },
+  {
+    id: 37,
+    headline: "Breakthrough: [Audience] Can Now [Desired Result] Without [Pain Point]",
+    subHeadline: "A brand-new way to crush [Goal] with almost no effort.",
+    rating: 5,
+    reason: "\"Breakthrough\" = high novelty appeal.",
+    placeholders: ["Audience", "Desired Result", "Pain Point", "Goal"]
+  },
+  {
+    id: 38,
+    headline: "If You Can [Simple Action], You Can [Desired Result]",
+    subHeadline: "No experience required—just follow the steps and get results.",
+    rating: 5,
+    reason: "Ultra-simple, removes barriers.",
+    placeholders: ["Simple Action", "Desired Result"]
+  },
+  {
+    id: 39,
+    headline: "The Lazy [Audience]'s Way to [Desired Result]",
+    subHeadline: "No hustle. No tech headaches. Just a proven shortcut to [Goal].",
+    rating: 4,
+    reason: "Humor + curiosity.",
+    placeholders: ["Audience", "Desired Result", "Goal"]
+  },
+  {
+    id: 40,
+    headline: "PROOF: [Specific Claim] [Achievement] Using This [Simple Description]",
+    subHeadline: "See the documented evidence and get the same results for yourself.",
+    rating: 5,
+    reason: "Evidence-based, crushes skepticism.",
+    placeholders: ["Specific Claim", "Achievement", "Simple Description"]
   }
 ];
 
