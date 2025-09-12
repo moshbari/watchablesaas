@@ -13,7 +13,7 @@ const Header: React.FC = () => {
           {!session && (
             <>
               <Link to="/login"><Button variant="ghost">Login</Button></Link>
-              <Link to="/register"><Button>Create account</Button></Link>
+              <Link to="/register"><Button className="text-white">Create account</Button></Link>
             </>
           )}
           {session && (

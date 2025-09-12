@@ -35,7 +35,7 @@ const Index = () => {
                 </Button>
               ) : (
                 <>
-                  <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+                  <Button asChild size="lg" className="text-lg px-8 py-6 h-auto text-white">
                     <Link to="/register">Start Free Trial</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
@@ -235,7 +235,7 @@ const Index = () => {
           </p>
           
           {!session && (
-            <Button asChild size="lg" className="text-xl px-12 py-8 h-auto">
+            <Button asChild size="lg" className="text-xl px-12 py-8 h-auto text-white">
               <Link to="/register">Start Your Free Trial</Link>
             </Button>
           )}
