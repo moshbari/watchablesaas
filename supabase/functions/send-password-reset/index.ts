@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p style="margin: 0;">This link will expire in 24 hours for security reasons.</p>
                 <p style="margin: 10px 0 0 0;">
                   Need help? Contact our support team at 
-                  <a href="mailto:support@watchable.99dfy.com" style="color: #667eea; text-decoration: none;">support@watchable.99dfy.com</a>
+                  <a href="mailto:support@watchable.moshbari.com" style="color: #667eea; text-decoration: none;">support@watchable.moshbari.com</a>
                 </p>
               </div>
               
@@ -82,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
           </html>
         `,
         subject: "Reset your Watchable password",
-        from_email: "noreply@transactional.watchable.99dfy.com",
+        from_email: "noreply@watchable.moshbari.com",
         from_name: "Watchable",
         to: [
           {
@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
           }
         ],
         headers: {
-          "Reply-To": "support@watchable.99dfy.com"
+          "Reply-To": "support@watchable.moshbari.com"
         },
         important: false,
         track_opens: true,
