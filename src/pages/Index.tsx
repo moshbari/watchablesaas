@@ -26,7 +26,7 @@ const Index = () => {
               🚀 Stop Perfecting. Start Profiting.
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              Launch interactive videos and sales pages in under 60 seconds—without tech skills, endless tools, or expensive hosting.
+              Launch money-making pages in under 60 seconds—without tech skills, endless tools, or expensive hosting.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {session ? (
@@ -36,7 +36,7 @@ const Index = () => {
               ) : (
                 <>
                   <Button asChild size="lg" className="text-lg px-8 py-6 h-auto text-white">
-                    <Link to="/register">Start Free Trial</Link>
+                    <Link to="/register">Start Free Trial – No Credit Card Required</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
                     <Link to="/login">Sign In</Link>
@@ -53,36 +53,33 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-8">
-              ❌ Why Most People Fail With Video & Pages
+              ❌ Why Most People Never Launch
             </h2>
-            <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto">
-              Let's be honest… most creators and entrepreneurs get stuck because:
-            </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center p-8 rounded-lg bg-card border">
               <p className="text-lg text-muted-foreground leading-relaxed">
-                They waste months "perfecting" a website that never launches.
+                They waste months building a "perfect" website that never goes live.
               </p>
             </div>
 
             <div className="text-center p-8 rounded-lg bg-card border">
               <p className="text-lg text-muted-foreground leading-relaxed">
-                They host videos on YouTube (and lose viewers to ads + distractions).
+                They get stuck comparing tools like ClickFunnels, GoHighLevel, or WordPress.
               </p>
             </div>
 
             <div className="text-center p-8 rounded-lg bg-card border">
               <p className="text-lg text-muted-foreground leading-relaxed">
-                They pay crazy monthly fees to Wistia or Vimeo—only to get shut down when their video finally goes viral.
+                They lose traffic to YouTube distractions—or pay crazy fees for hosting.
               </p>
             </div>
           </div>
           
           <div className="text-center mt-12">
             <p className="text-xl font-semibold text-destructive">
-              👉 Result: No launch. No traffic. No sales.
+              👉 Result: No launch. No sales. No momentum.
             </p>
           </div>
         </div>
