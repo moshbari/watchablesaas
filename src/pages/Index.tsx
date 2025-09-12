@@ -229,7 +229,7 @@ const Index = () => {
           <div className="max-w-3xl mx-auto mb-12">
             <div className="grid md:grid-cols-3 gap-6 text-left">
               <div className="p-6 rounded-lg bg-card border shadow-sm">
-                <p className="font-semibold text-lg mb-2 text-foreground">27-Day Free Test Drive</p>
+                <p className="font-semibold text-lg mb-2 text-foreground">17-Day Free Test Drive</p>
                 <p className="text-muted-foreground">(no credit card required)</p>
               </div>
               
