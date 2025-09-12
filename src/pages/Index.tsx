@@ -85,6 +85,25 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Video Section */}
+      <section className="py-16 bg-card/30">
+        <div className="container mx-auto px-6">
+          <div className="flex justify-center">
+            <div className="w-full max-w-4xl">
+              <iframe 
+                src="https://watchable.99dfy.com/embed?video=https%253A%252F%252Fyoutu.be%252FsvS-ZzkgtBQ&playButtonColor=%2523ff0000&playButtonSize=96" 
+                width="800" 
+                height="450" 
+                frameBorder="0" 
+                allowFullScreen 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                className="w-full h-auto aspect-video rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Solution Section */}
       <section className="py-24">
         <div className="container mx-auto px-6">
