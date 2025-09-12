@@ -92,57 +92,69 @@ const Index = () => {
       <section className="py-24">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              ✅ The Watchable Solution
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">
+              We built Watchable to remove every roadblock keeping you stuck.
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              We built Watchable to eliminate every one of those problems.
-            </p>
           </div>
           
-          <div className="grid lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
-            <div className="text-left">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Video className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-2xl font-bold">🎬 Interactive Videos That Convert</h3>
-              </div>
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div className="p-8 rounded-lg bg-card border">
+              <h3 className="text-xl font-bold mb-4">⚡ Launch in Under 60 Seconds</h3>
               <p className="text-muted-foreground mb-4 leading-relaxed">
-                Add overlays, timed buttons, and calls-to-action that appear exactly when you want.
+                Just pick a headline template, paste in a video, add your link, and click publish.
               </p>
               <p className="text-sm font-medium text-primary">
-                💡 Keep viewers focused on your offer—not YouTube's distractions.
+                → This means you can start earning today, not months from now.
               </p>
             </div>
 
-            <div className="text-left">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-2xl font-bold">⚡ Instant Embedding & Pages</h3>
-              </div>
+            <div className="p-8 rounded-lg bg-card border">
+              <h3 className="text-xl font-bold mb-4">🎬 Unlimited Pages, Unlimited Videos, Unlimited Bandwidth</h3>
               <p className="text-muted-foreground mb-4 leading-relaxed">
-                Forget coding or clunky page builders. Watchable gives you a live, mobile-ready page in under 60 seconds.
+                No hidden limits, no surprise costs. Whether it's your first page or your 100th, you'll never get shut down.
               </p>
               <p className="text-sm font-medium text-primary">
-                💡 No tech overwhelm. No expensive tools. Just launch today.
+                → This means you can scale freely without paying extra fees.
               </p>
             </div>
 
-            <div className="text-left">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <BarChart className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-2xl font-bold">📊 Analytics That Actually Matter</h3>
-              </div>
+            <div className="p-8 rounded-lg bg-card border">
+              <h3 className="text-xl font-bold mb-4">✍️ 40+ Proven Headline Templates</h3>
               <p className="text-muted-foreground mb-4 leading-relaxed">
-                Track who's watching, how long they stay, and when they click.
+                No need to "be a copywriter." Fill in a few blanks and your page looks pro.
               </p>
               <p className="text-sm font-medium text-primary">
-                💡 Stop guessing. Start scaling what works.
+                → This means no writer's block, no stress, and no wasted time.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-lg bg-card border">
+              <h3 className="text-xl font-bold mb-4">🎯 Delayed Buy Button Control</h3>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                Choose exactly when your button appears—after 5 seconds, 30 seconds, or 10 minutes.
+              </p>
+              <p className="text-sm font-medium text-primary">
+                → This means visitors stay engaged with your message before they click.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-lg bg-card border">
+              <h3 className="text-xl font-bold mb-4">📱 Mobile-Ready & One-Click Publishing</h3>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                Forget coding or plugins. Just hit publish, and your page is live instantly—fast, secure, and mobile-ready.
+              </p>
+              <p className="text-sm font-medium text-primary">
+                → This means you look professional from day one, without design skills.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-lg bg-card border">
+              <h3 className="text-xl font-bold mb-4">🎥 5-Minute Quick Start Training</h3>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                Watch once, and you'll know exactly how to launch your first page.
+              </p>
+              <p className="text-sm font-medium text-primary">
+                → This means no overwhelm—just a clear path to go live today.
               </p>
             </div>
           </div>
