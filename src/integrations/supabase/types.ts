@@ -158,21 +158,27 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
-          email: string
+          email: string | null
           id: string
-          role: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          trial_ends_at: string | null
+          trial_started_at: string | null
         }
         Insert: {
           created_at?: string
-          email: string
+          email?: string | null
           id: string
-          role?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
         }
         Update: {
           created_at?: string
-          email?: string
+          email?: string | null
           id?: string
-          role?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
         }
         Relationships: []
       }
@@ -341,9 +347,11 @@ export type Database = {
         Args: { _new_role: string; _user_id: string }
         Returns: {
           created_at: string
-          email: string
+          email: string | null
           id: string
-          role: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          trial_ends_at: string | null
+          trial_started_at: string | null
         }
       }
       cleanup_deleted_campaigns: {
@@ -360,7 +368,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "TRIAL" | "UNLIMITED" | "SUSPENDED" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -487,6 +495,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["TRIAL", "UNLIMITED", "SUSPENDED", "admin"],
+    },
   },
 } as const
