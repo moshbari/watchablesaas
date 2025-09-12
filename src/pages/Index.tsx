@@ -23,10 +23,10 @@ const Index = () => {
         <div className="container mx-auto px-6 py-24 relative">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-primary to-primary-foreground bg-clip-text text-transparent mb-6">
-              Create Watchable Videos
+              🚀 Stop Perfecting. Start Profiting.
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              Transform your videos into interactive experiences with custom overlays, timed buttons, and advanced analytics.
+              Launch interactive videos and sales pages in under 60 seconds—without tech skills, endless tools, or expensive hosting.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {session ? (
@@ -48,63 +48,182 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Why People Fail Section */}
       <section className="py-24 bg-card/50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything you need to create engaging videos
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">
+              ❌ Why Most People Fail With Video & Pages
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Powerful tools to enhance your video content and drive better engagement
+            <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto">
+              Let's be honest… most creators and entrepreneurs get stuck because:
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <Video className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Interactive Videos</h3>
-              <p className="text-muted-foreground">
-                Add custom play buttons, overlays, and timed interactions to any video
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="text-center p-8 rounded-lg bg-card border">
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                They waste months "perfecting" a website that never launches.
               </p>
             </div>
 
-            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <Users className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Easy Embedding</h3>
-              <p className="text-muted-foreground">
-                Generate embed codes and JavaScript snippets for seamless integration
+            <div className="text-center p-8 rounded-lg bg-card border">
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                They host videos on YouTube (and lose viewers to ads + distractions).
               </p>
             </div>
 
-            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <BarChart className="h-8 w-8 text-primary" />
+            <div className="text-center p-8 rounded-lg bg-card border">
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                They pay crazy monthly fees to Wistia or Vimeo—only to get shut down when their video finally goes viral.
+              </p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-xl font-semibold text-destructive">
+              👉 Result: No launch. No traffic. No sales.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Solution Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              ✅ The Watchable Solution
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              We built Watchable to eliminate every one of those problems.
+            </p>
+          </div>
+          
+          <div className="grid lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
+            <div className="text-left">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Video className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold">🎬 Interactive Videos That Convert</h3>
               </div>
-              <h3 className="text-xl font-semibold mb-4">Analytics</h3>
-              <p className="text-muted-foreground">
-                Track engagement, view times, and interaction rates
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                Add overlays, timed buttons, and calls-to-action that appear exactly when you want.
+              </p>
+              <p className="text-sm font-medium text-primary">
+                💡 Keep viewers focused on your offer—not YouTube's distractions.
+              </p>
+            </div>
+
+            <div className="text-left">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold">⚡ Instant Embedding & Pages</h3>
+              </div>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                Forget coding or clunky page builders. Watchable gives you a live, mobile-ready page in under 60 seconds.
+              </p>
+              <p className="text-sm font-medium text-primary">
+                💡 No tech overwhelm. No expensive tools. Just launch today.
+              </p>
+            </div>
+
+            <div className="text-left">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <BarChart className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold">📊 Analytics That Actually Matter</h3>
+              </div>
+              <p className="text-muted-foreground mb-4 leading-relaxed">
+                Track who's watching, how long they stay, and when they click.
+              </p>
+              <p className="text-sm font-medium text-primary">
+                💡 Stop guessing. Start scaling what works.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Results Section */}
+      <section className="py-24 bg-card/50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">
+              Real People. Real Results. Real Fast.
+            </h2>
+            <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto">
+              Watchable has already helped complete beginners launch and profit in weeks:
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
+              <p className="text-lg font-semibold mb-2">Nathan</p>
+              <p className="text-muted-foreground">
+                made <span className="font-bold text-green-600">$1,248 in just 2 weeks</span> with 486 clicks.
+              </p>
+            </div>
+
+            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
+              <p className="text-lg font-semibold mb-2">Petra (retired professor)</p>
+              <p className="text-muted-foreground">
+                earned <span className="font-bold text-green-600">$2,000</span> from 684 visitors.
+              </p>
+            </div>
+
+            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
+              <p className="text-lg font-semibold mb-2">Ruby (stay-at-home mom)</p>
+              <p className="text-muted-foreground">
+                made <span className="font-bold text-green-600">$3,137 in passive commissions</span> + 13,000 followers in under 2 months.
+              </p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-lg italic text-muted-foreground">
+              They didn't build perfect websites. They used Watchable's simple, interactive pages.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
       <section className="py-24">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to get started?
+          <h2 className="text-3xl md:text-4xl font-bold mb-8">
+            🎁 Try It Free. Risk-Free.
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of creators who are already using Watchables to enhance their video content.
+          
+          <div className="max-w-3xl mx-auto mb-12">
+            <div className="grid md:grid-cols-3 gap-6 text-left">
+              <div className="p-6 rounded-lg bg-card/50 border">
+                <p className="font-semibold text-lg mb-2">27-Day Free Test Drive</p>
+                <p className="text-muted-foreground">(no credit card required)</p>
+              </div>
+              
+              <div className="p-6 rounded-lg bg-card/50 border">
+                <p className="font-semibold text-lg mb-2">Keep Forever</p>
+                <p className="text-muted-foreground">1 page + 1 video—even if you don't upgrade</p>
+              </div>
+              
+              <div className="p-6 rounded-lg bg-card/50 border">
+                <p className="font-semibold text-lg mb-2">Upgrade Later</p>
+                <p className="text-muted-foreground">Unlimited pages, videos, and bandwidth for just $19/month FOREVER</p>
+              </div>
+            </div>
+          </div>
+          
+          <p className="text-xl font-semibold mb-8">
+            👉 No risk. No excuses. No more waiting.
           </p>
+          
           {!session && (
-            <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+            <Button asChild size="lg" className="text-xl px-12 py-8 h-auto">
               <Link to="/register">Start Your Free Trial</Link>
             </Button>
           )}
