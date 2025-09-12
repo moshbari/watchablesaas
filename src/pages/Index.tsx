@@ -29,12 +29,12 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {session ? (
-                <Button asChild variant="premium" size="lg" className="text-lg px-8 py-6 h-auto">
+                <Button asChild size="lg" className="text-lg px-8 py-6 h-auto bg-cta hover:bg-cta/90 text-white">
                   <Link to="/campaigns">Go to Dashboard</Link>
                 </Button>
               ) : (
                 <>
-                  <Button asChild variant="premium" size="lg" className="text-lg px-8 py-6 h-auto">
+                  <Button asChild size="lg" className="text-lg px-8 py-6 h-auto bg-cta hover:bg-cta/90 text-white">
                     <Link to="/register">Start Free Trial – No Credit Card Required</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto border-white/30 text-white hover:bg-white/10">
@@ -250,7 +250,7 @@ const Index = () => {
           </p>
           
           {!session && (
-            <Button asChild variant="premium" size="lg" className="text-xl px-12 py-8 h-auto">
+            <Button asChild size="lg" className="text-xl px-12 py-8 h-auto bg-cta hover:bg-cta/90 text-white">
               <Link to="/register">Start Your Free Trial</Link>
             </Button>
           )}
