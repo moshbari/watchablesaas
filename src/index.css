@@ -8,39 +8,45 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Video Player Dark Theme */
-    --background: 220 13% 9%;
-    --foreground: 220 9% 95%;
+    /* Light Theme with Purple/Green/Orange Scheme */
+    --background: 0 0% 98%;
+    --foreground: 240 10% 15%;
 
-    --card: 220 13% 11%;
-    --card-foreground: 220 9% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 15%;
 
-    --popover: 220 13% 11%;
-    --popover-foreground: 220 9% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 15%;
 
-    --primary: 142 76% 36%;
-    --primary-foreground: 220 13% 9%;
+    --primary: 268 83% 58%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 13% 15%;
-    --secondary-foreground: 220 9% 85%;
+    --secondary: 142 76% 36%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 13% 15%;
-    --muted-foreground: 220 9% 60%;
+    --muted: 240 4% 95%;
+    --muted-foreground: 240 5% 45%;
 
     --accent: 142 76% 36%;
-    --accent-foreground: 220 13% 9%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 220 9% 95%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 20%;
-    --input: 220 13% 15%;
-    --ring: 142 76% 36%;
+    --border: 240 5% 90%;
+    --input: 240 5% 96%;
+    --ring: 268 83% 58%;
+
+    /* Orange CTA Button */
+    --cta: 25 95% 53%;
+    --cta-foreground: 0 0% 100%;
 
     /* Brand enhancements */
-    --primary-variant: 142 70% 45%;
+    --primary-variant: 268 70% 65%;
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
-    --shadow-glow: 0 0 32px hsl(var(--primary) / 0.35);
+    --gradient-purple: linear-gradient(135deg, hsl(268 83% 58%), hsl(280 75% 65%));
+    --gradient-green: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 70% 45%));
+    --shadow-glow: 0 0 32px hsl(var(--primary) / 0.25);
 
     /* Video Player Specific */
     --player-bg: 220 13% 9%;
