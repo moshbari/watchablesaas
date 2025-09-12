@@ -82,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
           </html>
         `,
         subject: "Reset your Watchable password",
-        from_email: "noreply@watchable.99dfy.com",
+        from_email: "noreply@transactional.watchable.99dfy.com",
         from_name: "Watchable",
         to: [
           {
@@ -92,7 +92,19 @@ const handler = async (req: Request): Promise<Response> => {
         ],
         headers: {
           "Reply-To": "support@watchable.99dfy.com"
-        }
+        },
+        important: false,
+        track_opens: true,
+        track_clicks: true,
+        auto_text: true,
+        auto_html: false,
+        inline_css: false,
+        url_strip_qs: false,
+        preserve_recipients: false,
+        view_content_link: null,
+        tracking_domain: null,
+        signing_domain: null,
+        return_path_domain: null
       }
     };
 
