@@ -111,15 +111,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp: AuthContextValue["signUp"] = async (email, password) => {
     try {
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: redirectUrl },
+      console.log("Attempting custom signup with Mandrill email...");
+      
+      // Use our custom signup function that bypasses Supabase rate limits
+      const { data, error } = await supabase.functions.invoke('custom-signup', {
+        body: { email, password }
       });
-      if (error) return { error: error.message };
+
+      if (error) {
+        console.error("Custom signup error:", error);
+        return { error: error.message };
+      }
+
+      if (data?.error) {
+        console.error("Custom signup function error:", data.error);
+        return { error: data.error };
+      }
+
+      console.log("Custom signup successful:", data);
       return {};
     } catch (e: any) {
+      console.error("Network error during custom signup:", e);
       return { error: e?.message || "Failed to sign up" };
     }
   };

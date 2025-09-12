@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const TestEmail: React.FC = () => {
   const { toast } = useToast();
@@ -10,28 +11,27 @@ const TestEmail: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const sendTestEmail = async () => {
+    if (!email) return;
+    
     setLoading(true);
     try {
-      const response = await fetch(`https://kjabpmcsiluvtxmbbfbg.supabase.co/functions/v1/send-test-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqYWJwbWNzaWx1dnR4bWJiZmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTcwOTgsImV4cCI6MjA3MDQ5MzA5OH0.KFx4TVE4Nc0NtDiTMC3rwTXadD9maygfri_L-0qRhME`
-        },
-        body: JSON.stringify({ email })
+      const { data, error } = await supabase.functions.invoke('send-test-email', {
+        body: { email }
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to send test email');
+      if (error) {
+        throw new Error(error.message || 'Failed to send test email');
       }
 
-      const result = await response.json();
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       toast({
         title: "Success!",
         description: `Test email sent to ${email} via Mandrill`,
       });
-      console.log("Email sent successfully:", result);
+      console.log("Email sent successfully:", data);
     } catch (error: any) {
       toast({
         title: "Error",

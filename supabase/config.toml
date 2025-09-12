@@ -1,1 +1,16 @@
 project_id = "kjabpmcsiluvtxmbbfbg"
+
+[functions.send-password-reset]
+verify_jwt = false
+
+[functions.send-test-email]  
+verify_jwt = false
+
+[functions.send-signup-confirmation]
+verify_jwt = false
+
+[functions.custom-signup]
+verify_jwt = false
+
+[functions.cleanup-campaigns]
+verify_jwt = false
