@@ -16,7 +16,7 @@ export const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children 
   return <>{children}</>;
 };
 
-export const RequireRole: React.FC<{ allow: ("admin"|"user"|"interested")[]; children: React.ReactNode }> = ({ allow, children }) => {
+export const RequireRole: React.FC<{ allow: ("TRIAL"|"UNLIMITED"|"SUSPENDED"|"admin")[]; children: React.ReactNode }> = ({ allow, children }) => {
   const { role, loading, session } = useAuth();
   const location = useLocation();
 

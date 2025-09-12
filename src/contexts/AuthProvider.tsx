@@ -3,13 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 import { cleanupAuthState } from "@/lib/auth";
 
-export type AppRole = "admin" | "user" | "interested";
+export type AppRole = 'TRIAL' | 'UNLIMITED' | 'SUSPENDED' | 'admin';
 
 export interface Profile {
   id: string;
   email: string;
   role: AppRole;
   created_at: string;
+  trial_started_at?: string;
+  trial_ends_at?: string;
 }
 
 interface AuthContextValue {

@@ -10,6 +10,8 @@ import { Slider } from '@/components/ui/slider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { useCampaignLimits } from '@/hooks/useCampaignLimits';
+import { TrialLimitTooltip } from '@/components/TrialLimitTooltip';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
@@ -85,6 +87,7 @@ const PageBuilder = () => {
   const [loading, setLoading] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
   const { toast } = useToast();
+  const { canCreatePage } = useCampaignLimits();
   const navigate = useNavigate();
 
   // Function to generate slug from title
@@ -864,10 +867,16 @@ const PageBuilder = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Page Builder</h1>
-          <Button onClick={() => setIsCreating(true)} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Create New Page
-          </Button>
+          <TrialLimitTooltip disabled={!canCreatePage}>
+            <Button 
+              onClick={() => setIsCreating(true)} 
+              className="flex items-center gap-2"
+              disabled={!canCreatePage}
+            >
+              <Plus className="h-4 w-4" />
+              Create New Page
+            </Button>
+          </TrialLimitTooltip>
         </div>
 
         <div className="grid gap-6">

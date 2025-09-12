@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Copy, Edit, Trash2, Plus, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useCampaignLimits } from '@/hooks/useCampaignLimits';
+import { TrialLimitTooltip } from '@/components/TrialLimitTooltip';
 import { format } from 'date-fns';
 import {
   AlertDialog,
@@ -41,6 +43,7 @@ const Campaigns: React.FC = () => {
   const { session } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { canCreateVideo } = useCampaignLimits();
 
   useEffect(() => {
     if (session?.user) {
@@ -140,10 +143,15 @@ const Campaigns: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">My Campaigns</h1>
-        <Button onClick={() => navigate('/')}>
-          <Plus className="w-4 h-4 mr-2" />
-          New Campaign
-        </Button>
+        <TrialLimitTooltip disabled={!canCreateVideo}>
+          <Button 
+            onClick={() => navigate('/')}
+            disabled={!canCreateVideo}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Campaign
+          </Button>
+        </TrialLimitTooltip>
       </div>
 
       <Card>

@@ -354,9 +354,22 @@ export type Database = {
           trial_started_at: string | null
         }
       }
+      can_create_campaign: {
+        Args: { campaign_type: string; user_id: string }
+        Returns: boolean
+      }
       cleanup_deleted_campaigns: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_trial_info: {
+        Args: { user_id: string }
+        Returns: {
+          is_active: boolean
+          role: Database["public"]["Enums"]["user_role"]
+          trial_ends_at: string
+          trial_started_at: string
+        }[]
       }
       is_admin: {
         Args: { _user_id: string }
@@ -365,6 +378,14 @@ export type Database = {
       is_sp_admin: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      is_trial_active: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      suspend_expired_trials: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
     }
     Enums: {

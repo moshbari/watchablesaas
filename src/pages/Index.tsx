@@ -1,439 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { VideoPlayer } from '@/components/VideoPlayer';
-import { VideoUrlInput } from '@/components/VideoUrlInput';
-import { EmbedCodeGenerator } from '@/components/EmbedCodeGenerator';
-import { TimedButton } from '@/components/TimedButton';
-import { PlayButtonCustomizer } from '@/components/PlayButtonCustomizer';
-import { ExternalVideoScript } from '@/components/ExternalVideoScript';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthProvider';
-import { supabase } from '@/integrations/supabase/client';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Instagram, ArrowLeft } from 'lucide-react';
-
-interface Campaign {
-  id: string;
-  name: string;
-  video_type: string;
-  video_url: string | null;
-  youtube_title: string | null;
-  html_script: string;
-  javascript_script: string;
-  start_time: number | null;
-  end_time: number | null;
-  created_at: string;
-  updated_at: string;
-}
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { Video, Users, BarChart } from "lucide-react";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useTrialInfo } from "@/hooks/useTrialInfo";
+import { TrialOnboarding } from "@/components/TrialOnboarding";
 
 const Index = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const editCampaignId = searchParams.get('edit');
-  const isEditMode = !!editCampaignId;
-  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
-  const [currentVideo, setCurrentVideo] = useState<string | null>(null);
-  const [startTime, setStartTime] = useState<number | undefined>(undefined);
-  const [endTime, setEndTime] = useState<number | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(false);
-  const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
-  const [playButtonSize, setPlayButtonSize] = useState(96);
-  const [showCustomizer, setShowCustomizer] = useState(false);
-  const [overlayButtonConfig] = useState({
-    enabled: false,
-    text: 'Get Started Now!',
-    url: 'https://example.com',
-    delay: 3,
-    position: 'center' as const,
-    width: '300px',
-    height: '50px',
-    backgroundColor: '#3b82f6',
-    textColor: '#ffffff',
-    fontSize: '16px'
-  });
-  const { toast } = useToast();
-  const { role, session } = useAuth();
-  const [showRestrictedDialog, setShowRestrictedDialog] = useState(false);
-  const [restrictionType, setRestrictionType] = useState<'unauthenticated' | 'interested' | null>(null);
-
-  // Load campaign data if in edit mode
-  useEffect(() => {
-    if (editCampaignId && session) {
-      fetchCampaignForEdit();
-    }
-  }, [editCampaignId, session]);
-
-  // Check for video parameter in URL on component mount
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoParam = urlParams.get('video');
-    const colorParam = urlParams.get('playButtonColor');
-    const sizeParam = urlParams.get('playButtonSize');
-    
-    if (videoParam) {
-      setCurrentVideo(decodeURIComponent(videoParam));
-    }
-    if (colorParam) {
-      setPlayButtonColor(decodeURIComponent(colorParam));
-    }
-    if (sizeParam) {
-      setPlayButtonSize(parseInt(sizeParam) || 96);
-    }
-  }, []);
-
-  const fetchCampaignForEdit = async () => {
-    console.log('Fetching campaign for edit:', editCampaignId);
-    try {
-      const { data, error } = await supabase
-        .from('campaigns')
-        .select('*')
-        .eq('id', editCampaignId)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      if (data) {
-        setEditingCampaign(data);
-        // Don't set currentVideo in edit mode - we want to show the input form
-        
-        // Use the stored start/end times from the database, or extract from HTML script as fallback
-        let startTimeValue = data.start_time;
-        let endTimeValue = data.end_time;
-        
-        if (!startTimeValue && !endTimeValue && data.html_script) {
-          // Extract from HTML script as fallback for older campaigns
-          const urlParams = new URLSearchParams(data.html_script.split('?')[1]?.split('"')[0] || '');
-          startTimeValue = urlParams.get('startTime') ? parseInt(urlParams.get('startTime')!) : null;
-          endTimeValue = urlParams.get('endTime') ? parseInt(urlParams.get('endTime')!) : null;
-          console.log('Extracted times from HTML script:', { startTimeValue, endTimeValue });
-        }
-        
-        setStartTime(startTimeValue || undefined);
-        setEndTime(endTimeValue || undefined);
-        setPlayButtonColor('#ff0000'); // Default for now
-        setPlayButtonSize(96); // Default for now
-      } else {
-        toast({
-          title: 'Campaign not found',
-          description: 'The campaign you are trying to edit was not found.',
-          variant: 'destructive',
-        });
-        navigate('/campaigns');
-      }
-    } catch (error) {
-      console.error('Error fetching campaign for edit:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch campaign details',
-        variant: 'destructive',
-      });
-      navigate('/campaigns');
-    }
-  };
-
-  const handleVideoSubmit = async (url: string, startTimeParam?: number, endTimeParam?: number) => {
-    if (!session) {
-      setRestrictionType('unauthenticated');
-      setShowRestrictedDialog(true);
-      return;
-    }
-    if (role === 'interested') {
-      setRestrictionType('interested');
-      setShowRestrictedDialog(true);
-      return;
-    }
-
-    setIsLoading(true);
-    
-    try {
-      const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
-      let campaignName = url;
-      
-      // Get YouTube video title
-      if (isYouTube) {
-        try {
-          campaignName = await getYouTubeTitle(url);
-        } catch (error) {
-          console.error('Error fetching YouTube title:', error);
-          campaignName = 'YouTube Video';
-        }
-      }
-      
-      const embedCode = generateEmbedCode(url, playButtonColor, playButtonSize, startTimeParam, endTimeParam);
-      const scriptCode = generateScriptCode(url, playButtonColor, playButtonSize);
-      
-      if (isEditMode && editingCampaign) {
-        // Update existing campaign
-        const { error } = await supabase
-          .from('campaigns')
-          .update({
-            name: campaignName,
-            video_type: isYouTube ? 'youtube' : 'self-hosted',
-            video_url: url,
-            youtube_title: isYouTube ? campaignName : null,
-            html_script: embedCode,
-            javascript_script: scriptCode,
-            start_time: startTimeParam || null,
-            end_time: endTimeParam || null
-          })
-          .eq('id', editingCampaign.id);
-
-        if (error) throw error;
-
-        toast({
-          title: "Campaign updated successfully!",
-          description: "Your campaign changes have been saved.",
-        });
-      } else {
-        // Create new campaign
-        const { error } = await supabase
-          .from('campaigns')
-          .insert({
-            name: campaignName,
-            video_type: isYouTube ? 'youtube' : 'self-hosted',
-            video_url: url,
-            youtube_title: isYouTube ? campaignName : null,
-            html_script: embedCode,
-            javascript_script: scriptCode,
-            start_time: startTimeParam || null,
-            end_time: endTimeParam || null,
-            user_id: session!.user.id
-          });
-
-        if (error) throw error;
-
-        toast({
-          title: "Campaign created successfully!",
-          description: "Your new campaign has been saved.",
-        });
-      }
-
-      setCurrentVideo(url);
-      setStartTime(startTimeParam);
-      setEndTime(endTimeParam);
-      
-      // If we were editing, redirect back to campaigns
-      if (isEditMode) {
-        setTimeout(() => navigate('/campaigns'), 1500);
-      }
-    } catch (error) {
-      console.error('Error creating/updating campaign:', error);
-      toast({
-        title: isEditMode ? "Error updating campaign" : "Error creating campaign",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getYouTubeTitle = async (url: string): Promise<string> => {
-    // Extract video ID from URL
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
-    if (!match) throw new Error('Invalid YouTube URL');
-    
-    const videoId = match[1];
-    
-    // Use YouTube oEmbed API to get title
-    const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-    if (!response.ok) throw new Error('Failed to fetch video title');
-    
-    const data = await response.json();
-    return data.title || 'YouTube Video';
-  };
-
-  const generateEmbedCode = (url: string, color: string, size: number, startTime?: number, endTime?: number) => {
-    const params = new URLSearchParams();
-    params.append('video', encodeURIComponent(url));
-    params.append('playButtonColor', encodeURIComponent(color));
-    params.append('playButtonSize', size.toString());
-    if (startTime !== undefined) params.append('startTime', startTime.toString());
-    if (endTime !== undefined) params.append('endTime', endTime.toString());
-    
-    return `<iframe src="${window.location.origin}/embed?${params.toString()}" width="800" height="600" frameborder="0" allowfullscreen></iframe>`;
-  };
-
-  const generateScriptCode = (url: string, color: string, size: number) => {
-    return `<script>
-// Watchables Embedded Player Script
-(function() {
-  const iframe = document.createElement('iframe');
-  iframe.src = '${window.location.origin}/embed?video=${encodeURIComponent(url)}&playButtonColor=${encodeURIComponent(color)}&playButtonSize=${size}';
-  iframe.style.cssText = \`
-    width: 100%;
-    height: 400px;
-    border: none;
-    border-radius: 8px;
-  \`;
-  iframe.setAttribute('allowfullscreen', 'true');
-  iframe.setAttribute('allow', 'autoplay; fullscreen');
+  const { session } = useAuth();
+  const { data: trialInfo } = useTrialInfo();
   
-  // Insert the iframe where the script is placed
-  const scripts = document.getElementsByTagName('script');
-  const currentScript = scripts[scripts.length - 1];
-  currentScript.parentNode.insertBefore(iframe, currentScript);
-})();
-</script>`;
-  };
-
-  const handleVideoError = (error: string) => {
-    toast({
-      title: "Video Error",
-      description: error,
-      variant: "destructive",
-    });
-  };
-
-  const handleBack = () => {
-    setCurrentVideo(null);
-    setStartTime(undefined);
-    setEndTime(undefined);
-  };
+  // Show trial onboarding for logged-in trial users
+  if (session && trialInfo?.role === 'TRIAL' && trialInfo.is_active) {
+    return <TrialOnboarding />;
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentVideo ? (
-        <div className="container mx-auto px-4 py-8">
-          {/* Back Button */}
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              onClick={handleBack}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Load Different Video
-            </Button>
-          </div>
-
-          {/* Video Player */}
-          <div className="max-w-6xl mx-auto">
-            <VideoPlayer 
-              src={currentVideo} 
-              onError={handleVideoError}
-              playButtonColor={playButtonColor}
-              playButtonSize={playButtonSize}
-              overlayButtonConfig={overlayButtonConfig}
-              startTime={startTime}
-              endTime={endTime}
-            />
-          </div>
-
-          {/* Customization & Embed Options */}
-          <div className="max-w-4xl mx-auto mt-8 space-y-6">
-            {/* 1. Customize Play Button */}
-            <PlayButtonCustomizer
-              color={playButtonColor}
-              size={playButtonSize}
-              onColorChange={setPlayButtonColor}
-              onSizeChange={setPlayButtonSize}
-              isOpen={showCustomizer}
-              onToggle={setShowCustomizer}
-            />
-            
-            {/* 2. Embed This Video */}
-            <EmbedCodeGenerator 
-              videoUrl={currentVideo} 
-              playButtonColor={playButtonColor}
-              playButtonSize={playButtonSize}
-              startTime={startTime}
-              endTime={endTime}
-            />
-            
-            {/* 3. Add Overlay Button to Your Website */}
-            <ExternalVideoScript />
-            
-            {/* 4. Timed Button */}
-            <TimedButton />
-          </div>
-
-          {/* Instructions */}
-          <div className="max-w-4xl mx-auto mt-8 text-center">
-            <div className="bg-card border border-player-border rounded-lg p-6">
-              <h3 className="text-lg font-medium mb-4 text-foreground">
-                Keyboard Shortcuts
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center justify-center gap-2">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">Space</kbd>
-                  <span>Play / Pause</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">F</kbd>
-                  <span>Fullscreen</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs font-mono">M</kbd>
-                  <span>Mute / Unmute</span>
-                </div>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="container mx-auto px-6 py-24 relative">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-primary to-primary-foreground bg-clip-text text-transparent mb-6">
+              Create Watchable Videos
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
+              Transform your videos into interactive experiences with custom overlays, timed buttons, and advanced analytics.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              {session ? (
+                <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+                  <Link to="/campaigns">Go to Dashboard</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+                    <Link to="/register">Start Free Trial</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
-      ) : (
-        <div className="flex items-center justify-center min-h-screen p-4">
-          {isEditMode && !editingCampaign ? (
-            <div>Loading campaign data...</div>
-          ) : (
-            (() => {
-              console.log('Rendering VideoUrlInput with:', { 
-                initialUrl: editingCampaign?.video_url, 
-                initialStartTime: startTime, 
-                initialEndTime: endTime,
-                editingCampaign 
-              });
-              return (
-                <VideoUrlInput 
-                  onVideoSubmit={handleVideoSubmit}
-                  isLoading={isLoading}
-                  isEditing={isEditMode}
-                  initialUrl={editingCampaign?.video_url || ''}
-                  initialStartTime={startTime}
-                  initialEndTime={endTime}
-                />
-              );
-            })()
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-card/50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Everything you need to create engaging videos
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Powerful tools to enhance your video content and drive better engagement
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                <Video className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Interactive Videos</h3>
+              <p className="text-muted-foreground">
+                Add custom play buttons, overlays, and timed interactions to any video
+              </p>
+            </div>
+
+            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                <Users className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Easy Embedding</h3>
+              <p className="text-muted-foreground">
+                Generate embed codes and JavaScript snippets for seamless integration
+              </p>
+            </div>
+
+            <div className="text-center p-8 rounded-lg bg-card border hover:shadow-lg transition-shadow">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                <BarChart className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Analytics</h3>
+              <p className="text-muted-foreground">
+                Track engagement, view times, and interaction rates
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Ready to get started?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Join thousands of creators who are already using Watchables to enhance their video content.
+          </p>
+          {!session && (
+            <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+              <Link to="/register">Start Your Free Trial</Link>
+            </Button>
           )}
         </div>
-      )}
-      <Dialog open={showRestrictedDialog} onOpenChange={setShowRestrictedDialog}>
-        <DialogContent className="sm:max-w-md border border-border shadow-player">
-          <DialogHeader>
-            {restrictionType === 'unauthenticated' ? (
-              <>
-                <DialogTitle>Create a free account to continue</DialogTitle>
-                <DialogDescription>
-                  Please create a free account to load and customize videos.
-                </DialogDescription>
-              </>
-            ) : (
-              <>
-                <DialogTitle>Feature available to users only</DialogTitle>
-                <DialogDescription>
-                  To load and customize videos, please upgrade to a user account. For full access, contact us on Instagram.
-                </DialogDescription>
-              </>
-            )}
-          </DialogHeader>
-          <DialogFooter className="sm:justify-between">
-            <Button variant="outline" onClick={() => setShowRestrictedDialog(false)}>
-              Close
-            </Button>
-            {restrictionType === 'unauthenticated' ? (
-              <Button variant="hero" onClick={() => navigate('/register')}>
-                Create free account
-              </Button>
-            ) : (
-              <Button variant="hero" onClick={() => window.open('https://www.instagram.com/askmoshbari/', '_blank', 'noopener,noreferrer')}>
-                <Instagram className="mr-2 h-4 w-4" aria-hidden="true" />
-                Contact on Instagram
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </section>
     </div>
   );
 };

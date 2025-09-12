@@ -93,10 +93,10 @@ const EditCampaign = () => {
       setShowRestrictedDialog(true);
       return;
     }
-    if (role === 'interested') {
-      setRestrictionType('interested');
-      setShowRestrictedDialog(true);
-      return;
+    if (role === 'TRIAL') {
+      // Check if user can create campaigns based on trial limits
+      // For now, we'll allow editing existing campaigns for trial users
+      // You might want to add additional logic here
     }
 
     setIsLoading(true);

@@ -4,6 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { TrialCountdown } from "@/components/TrialCountdown";
+import { SuspendedAccountModal } from "@/components/SuspendedAccountModal";
+import { useTrialInfo } from "@/hooks/useTrialInfo";
+import { useUpgradeToast } from "@/hooks/useUpgradeToast";
 import Index from "./pages/Index";
 import Embed from "./pages/Embed";
 import PageBuilder from "./pages/PageBuilder";
@@ -27,7 +31,11 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
+  const { data: trialInfo } = useTrialInfo();
+  useUpgradeToast(); // Handle upgrade success notifications
   const isEmbedRoute = location.pathname === '/embed';
+  const hideHeader = ['/login', '/register', '/forgot-password', '/reset-password'].includes(location.pathname);
+  const isSuspended = trialInfo?.role === 'SUSPENDED';
   const isDynamicPage = location.pathname !== '/' && 
                         location.pathname !== '/embed' && 
                         !location.pathname.startsWith('/login') &&
@@ -43,8 +51,10 @@ const AppContent = () => {
                         !location.pathname.startsWith('/404');
 
   return (
-    <>
+    <div className="min-h-screen bg-background">
+      {!hideHeader && !isEmbedRoute && <TrialCountdown />}
       {!isEmbedRoute && !isDynamicPage && <Header />}
+      <SuspendedAccountModal isOpen={isSuspended} />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/embed" element={<Embed />} />
@@ -65,7 +75,7 @@ const AppContent = () => {
         {/* Catch-all route - this must be last */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </div>
   );
 };
 
