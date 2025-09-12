@@ -114,7 +114,7 @@ const Index = () => {
           
           <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <div className="p-8 rounded-lg bg-card border shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold mb-4 text-foreground">⚡ Launch in Under 60 Seconds</h3>
+              <h3 className="text-xl font-bold mb-4 text-foreground">⚡ Launch in 60 Seconds</h3>
               <p className="text-muted-foreground mb-4 leading-relaxed">
                 Just pick a headline template, paste in a video, add your link, and click publish.
               </p>
