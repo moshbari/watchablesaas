@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-interface Row { id: string; email: string; role: "admin"|"user"|"interested"; created_at: string }
+interface Row { id: string; email: string; role: "TRIAL"|"UNLIMITED"|"SUSPENDED"|"admin"; created_at: string }
 
 const Admin: React.FC = () => {
   const { role } = useAuth();
@@ -79,8 +79,9 @@ const Admin: React.FC = () => {
                   <Select value={row.role} onValueChange={(v) => updateRole(row.id, v as Row["role"]) }>
                     <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="interested">interested</SelectItem>
-                      <SelectItem value="user">user</SelectItem>
+                      <SelectItem value="TRIAL">TRIAL</SelectItem>
+                      <SelectItem value="UNLIMITED">UNLIMITED</SelectItem>
+                      <SelectItem value="SUSPENDED">SUSPENDED</SelectItem>
                       <SelectItem value="admin">admin</SelectItem>
                     </SelectContent>
                   </Select>
