@@ -25,7 +25,7 @@ const Index = () => {
               🚀 Stop Perfecting. Start Profiting.
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
-              Launch money-making pages in under 60 seconds—without tech skills, endless tools, or expensive hosting.
+              Launch money pages in under 59 seconds—without tech skills, endless tools, or expensive hosting.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {session ? (
@@ -114,7 +114,7 @@ const Index = () => {
           
           <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <div className="p-8 rounded-lg bg-card border shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold mb-4 text-foreground">⚡ Launch in 60 Seconds</h3>
+              <h3 className="text-xl font-bold mb-4 text-foreground">⚡ Launch in 59 Seconds</h3>
               <p className="text-muted-foreground mb-4 leading-relaxed">
                 Just pick a headline template, paste in a video, add your link, and click publish.
               </p>
