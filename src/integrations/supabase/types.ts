@@ -355,7 +355,7 @@ export type Database = {
         }
       }
       can_create_campaign: {
-        Args: { campaign_type: string; user_id: string }
+        Args: { _campaign_type: string; _user_id: string }
         Returns: boolean
       }
       cleanup_deleted_campaigns: {
