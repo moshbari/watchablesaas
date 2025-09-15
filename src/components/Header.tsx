@@ -18,7 +18,7 @@ const Header: React.FC = () => {
           )}
           {session && (
             <>
-              <Link to="/campaigns"><Button variant="ghost">Campaigns</Button></Link>
+              <Link to="/campaigns"><Button variant="ghost">Video Hosting</Button></Link>
               <Link to="/page-builder"><Button variant="ghost">Page Builder</Button></Link>
               <Link to="/account"><Button variant="ghost">Account</Button></Link>
               {profile?.role === "admin" && (
