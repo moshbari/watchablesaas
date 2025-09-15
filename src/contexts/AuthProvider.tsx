@@ -79,15 +79,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Attempting to sign in...", { 
         supabaseUrl: "https://kjabpmcsiluvtxmbbfbg.supabase.co",
         userAgent: navigator.userAgent,
-        location: window.location.href 
+        location: window.location.href,
+        origin: window.location.origin
       });
       
       cleanupAuthState();
       try { await supabase.auth.signOut({ scope: "global" }); } catch {}
       
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password
+      });
+      
       if (error) {
         console.error("Supabase sign in error:", error);
+        
+        // Check for specific authentication URL errors
+        if (error.message.includes('invalid_request') || error.message.includes('redirect')) {
+          return { 
+            error: `Authentication URL configuration error. Please check that your current URL (${window.location.origin}) is configured in Supabase authentication settings. Error: ${error.message}` 
+          };
+        }
+        
         return { error: error.message };
       }
       return {};
@@ -97,7 +110,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         message: e?.message,
         stack: e?.stack,
         name: e?.name,
-        supabaseUrl: "https://kjabpmcsiluvtxmbbfbg.supabase.co"
+        supabaseUrl: "https://kjabpmcsiluvtxmbbfbg.supabase.co",
+        currentOrigin: window.location.origin
       });
       
       // More specific error messages for network issues
@@ -115,9 +129,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log("Attempting custom signup with Mandrill email...");
       
+      // Get the current origin for redirect URL
+      const redirectUrl = `${window.location.origin}/`;
+      console.log("Using redirect URL:", redirectUrl);
+      
       // Use our custom signup function that bypasses Supabase rate limits
       const { data, error } = await supabase.functions.invoke('custom-signup', {
-        body: { email, password }
+        body: { 
+          email, 
+          password,
+          redirectUrl // Pass the redirect URL to the edge function
+        }
       });
 
       if (error) {
