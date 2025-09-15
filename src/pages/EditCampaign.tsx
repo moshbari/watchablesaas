@@ -287,7 +287,7 @@ const EditCampaign = () => {
           </div>
 
             <div className="mb-6">
-              <h1 className="text-2xl font-bold">{id ? `Edit Campaign: ${campaign.name}` : 'Create New Campaign'}</h1>
+              <h1 className="text-2xl font-bold">{id ? `Edit Campaign: ${campaign?.name || 'Loading...'}` : 'Create New Campaign'}</h1>
             </div>
 
           {/* Video Player */}
@@ -341,14 +341,14 @@ const EditCampaign = () => {
             </div>
             
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-center">{id ? `Edit Campaign: ${campaign.name}` : 'Create New Campaign'}</h1>
+              <h1 className="text-2xl font-bold text-center">{id ? `Edit Campaign: ${campaign?.name || 'Loading...'}` : 'Create New Campaign'}</h1>
             </div>
             
             <VideoUrlInput 
               onVideoSubmit={handleVideoSubmit}
               isLoading={isLoading}
               isEditing={true}
-              initialUrl={campaign.video_url || ''}
+              initialUrl={campaign?.video_url || ''}
               initialStartTime={startTime}
               initialEndTime={endTime}
             />
