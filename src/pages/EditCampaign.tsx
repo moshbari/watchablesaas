@@ -56,8 +56,8 @@ const EditCampaign = () => {
   useEffect(() => {
     if (id && session) {
       fetchCampaign();
-    } else if (!id && session) {
-      // This is a new campaign, set up default state
+    } else if (!id) {
+      // This is a new campaign, set up default state immediately
       setCampaign({
         id: '',
         name: 'New Campaign',
@@ -260,7 +260,7 @@ const EditCampaign = () => {
     navigate('/campaigns');
   };
 
-  if (!campaign && id) {
+  if (!campaign) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
