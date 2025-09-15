@@ -41,12 +41,12 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
 
   const [url, setUrl] = useState(initialUrl);
   const [urlType, setUrlType] = useState<'youtube' | 'direct'>('youtube');
-  const [startHour, setStartHour] = useState('');
-  const [startMinute, setStartMinute] = useState('');
-  const [startSecond, setStartSecond] = useState('');
-  const [endHour, setEndHour] = useState('');
-  const [endMinute, setEndMinute] = useState('');
-  const [endSecond, setEndSecond] = useState('');
+  const [startHour, setStartHour] = useState(initialStart.hours);
+  const [startMinute, setStartMinute] = useState(initialStart.minutes);
+  const [startSecond, setStartSecond] = useState(initialStart.seconds);
+  const [endHour, setEndHour] = useState(initialEnd.hours);
+  const [endMinute, setEndMinute] = useState(initialEnd.minutes);
+  const [endSecond, setEndSecond] = useState(initialEnd.seconds);
 
   const validateUrl = (input: string): boolean => {
     try {
@@ -124,17 +124,108 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
             </TabsList>
 
             <TabsContent value="youtube" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="youtube-url">YouTube Video URL</Label>
-                <Input
-                  id="youtube-url"
-                  type="url"
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="bg-input border-player-border"
-                />
-              </div>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="youtube-url">YouTube Video URL</Label>
+                  <Input
+                    id="youtube-url"
+                    type="url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="bg-input border-player-border"
+                  />
+                </div>
+                
+                {/* Time Controls */}
+                <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-player-border">
+                  <Label className="text-sm font-medium">Time Range (Optional)</Label>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Start Time</Label>
+                      <div className="flex gap-1 items-center">
+                        <Input
+                          type="number"
+                          placeholder="HH"
+                          min="0"
+                          max="23"
+                          value={startHour}
+                          onChange={(e) => setStartHour(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="MM"
+                          min="0"
+                          max="59"
+                          value={startMinute}
+                          onChange={(e) => setStartMinute(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="SS"
+                          min="0"
+                          max="59"
+                          value={startSecond}
+                          onChange={(e) => setStartSecond(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">End Time</Label>
+                      <div className="flex gap-1 items-center">
+                        <Input
+                          type="number"
+                          placeholder="HH"
+                          min="0"
+                          max="23"
+                          value={endHour}
+                          onChange={(e) => setEndHour(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="MM"
+                          min="0"
+                          max="59"
+                          value={endMinute}
+                          onChange={(e) => setEndMinute(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="SS"
+                          min="0"
+                          max="59"
+                          value={endSecond}
+                          onChange={(e) => setEndSecond(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to play the full video. End time must be after start time.
+                  </p>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
+                  disabled={isLoading || !url.trim()}
+                >
+                  {isLoading ? (isEditing ? 'Saving Changes...' : 'Creating Campaign...') : (isEditing ? 'Save Changes' : 'Create Campaign')}
+                </Button>
+              </form>
 
               <div className="text-sm text-muted-foreground">
                 <p className="mb-2">Supported YouTube formats:</p>
@@ -150,17 +241,108 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
             </TabsContent>
 
             <TabsContent value="direct" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="direct-url">Direct Video File URL</Label>
-                <Input
-                  id="direct-url"
-                  type="url"
-                  placeholder="https://example.com/video.mp4"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="bg-input border-player-border"
-                />
-              </div>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="direct-url">Direct Video File URL</Label>
+                  <Input
+                    id="direct-url"
+                    type="url"
+                    placeholder="https://example.com/video.mp4"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="bg-input border-player-border"
+                  />
+                </div>
+                
+                {/* Time Controls */}
+                <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-player-border">
+                  <Label className="text-sm font-medium">Time Range (Optional)</Label>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Start Time</Label>
+                      <div className="flex gap-1 items-center">
+                        <Input
+                          type="number"
+                          placeholder="HH"
+                          min="0"
+                          max="23"
+                          value={startHour}
+                          onChange={(e) => setStartHour(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="MM"
+                          min="0"
+                          max="59"
+                          value={startMinute}
+                          onChange={(e) => setStartMinute(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="SS"
+                          min="0"
+                          max="59"
+                          value={startSecond}
+                          onChange={(e) => setStartSecond(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">End Time</Label>
+                      <div className="flex gap-1 items-center">
+                        <Input
+                          type="number"
+                          placeholder="HH"
+                          min="0"
+                          max="23"
+                          value={endHour}
+                          onChange={(e) => setEndHour(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="MM"
+                          min="0"
+                          max="59"
+                          value={endMinute}
+                          onChange={(e) => setEndMinute(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                        <span className="text-muted-foreground">:</span>
+                        <Input
+                          type="number"
+                          placeholder="SS"
+                          min="0"
+                          max="59"
+                          value={endSecond}
+                          onChange={(e) => setEndSecond(e.target.value)}
+                          className="w-14 text-center bg-input border-player-border text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to play the full video. End time must be after start time.
+                  </p>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
+                  disabled={isLoading || !url.trim()}
+                >
+                  {isLoading ? (isEditing ? 'Saving Changes...' : 'Creating Campaign...') : (isEditing ? 'Save Changes' : 'Create Campaign')}
+                </Button>
+              </form>
 
               <div className="text-sm text-muted-foreground">
                 <p className="mb-2">Supported formats: MP4, WebM, OGV</p>
@@ -176,97 +358,6 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
               </div>
             </TabsContent>
           </Tabs>
-
-          <form onSubmit={handleSubmit} className="space-y-4 mt-6">
-            {/* Time Controls */}
-            <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-player-border">
-              <Label className="text-sm font-medium">Time Range (Optional)</Label>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Start Time</Label>
-                  <div className="flex gap-1 items-center">
-                    <Input
-                      type="number"
-                      placeholder="HH"
-                      min="0"
-                      max="23"
-                      value={startHour}
-                      onChange={(e) => setStartHour(e.target.value)}
-                      className="w-14 text-center bg-input border-player-border text-xs"
-                    />
-                    <span className="text-muted-foreground">:</span>
-                    <Input
-                      type="number"
-                      placeholder="MM"
-                      min="0"
-                      max="59"
-                      value={startMinute}
-                      onChange={(e) => setStartMinute(e.target.value)}
-                      className="w-14 text-center bg-input border-player-border text-xs"
-                    />
-                    <span className="text-muted-foreground">:</span>
-                    <Input
-                      type="number"
-                      placeholder="SS"
-                      min="0"
-                      max="59"
-                      value={startSecond}
-                      onChange={(e) => setStartSecond(e.target.value)}
-                      className="w-14 text-center bg-input border-player-border text-xs"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">End Time</Label>
-                  <div className="flex gap-1 items-center">
-                    <Input
-                      type="number"
-                      placeholder="HH"
-                      min="0"
-                      max="23"
-                      value={endHour}
-                      onChange={(e) => setEndHour(e.target.value)}
-                      className="w-14 text-center bg-input border-player-border text-xs"
-                    />
-                    <span className="text-muted-foreground">:</span>
-                    <Input
-                      type="number"
-                      placeholder="MM"
-                      min="0"
-                      max="59"
-                      value={endMinute}
-                      onChange={(e) => setEndMinute(e.target.value)}
-                      className="w-14 text-center bg-input border-player-border text-xs"
-                    />
-                    <span className="text-muted-foreground">:</span>
-                    <Input
-                      type="number"
-                      placeholder="SS"
-                      min="0"
-                      max="59"
-                      value={endSecond}
-                      onChange={(e) => setEndSecond(e.target.value)}
-                      className="w-14 text-center bg-input border-player-border text-xs"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <p className="text-xs text-muted-foreground">
-                Leave empty to play the full video. End time must be after start time.
-              </p>
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
-              disabled={isLoading || !url.trim()}
-            >
-              {isLoading ? (isEditing ? 'Saving Changes...' : 'Creating Campaign...') : (isEditing ? 'Save Changes' : 'Create Campaign')}
-            </Button>
-          </form>
 
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <h4 className="font-medium text-sm mb-2 text-foreground">Features:</h4>
