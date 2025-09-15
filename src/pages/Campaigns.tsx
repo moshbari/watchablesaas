@@ -281,12 +281,12 @@ const Campaigns: React.FC = () => {
                              <Copy className="w-3 h-3" />
                              HTML
                            </Button>
-                           <Button
-                             variant="outline"
-                             size="sm"
-                             onClick={() => navigate(`/?edit=${campaign.id}`)}
-                             title="Edit Campaign"
-                           >
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(`/campaigns/${campaign.id}/edit`)}
+                              title="Edit Campaign"
+                            >
                              <Edit className="w-3 h-3" />
                            </Button>
                            <AlertDialog>
