@@ -144,71 +144,83 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">Start Time</Label>
-                      <div className="flex gap-1 items-center">
-                        <Input
-                          type="number"
-                          placeholder="HH"
-                          min="0"
-                          max="23"
-                          value={startHour}
-                          onChange={(e) => setStartHour(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="MM"
-                          min="0"
-                          max="59"
-                          value={startMinute}
-                          onChange={(e) => setStartMinute(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="SS"
-                          min="0"
-                          max="59"
-                          value={startSecond}
-                          onChange={(e) => setStartSecond(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-1 items-center">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={startHour}
+                            onChange={(e) => setStartHour(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={startMinute}
+                            onChange={(e) => setStartMinute(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={startSecond}
+                            onChange={(e) => setStartSecond(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                        </div>
+                        <div className="flex gap-1 items-center text-xs text-muted-foreground">
+                          <span className="w-14 text-center">HH</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">MM</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">SS</span>
+                        </div>
                       </div>
                     </div>
                     
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">End Time</Label>
-                      <div className="flex gap-1 items-center">
-                        <Input
-                          type="number"
-                          placeholder="HH"
-                          min="0"
-                          max="23"
-                          value={endHour}
-                          onChange={(e) => setEndHour(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="MM"
-                          min="0"
-                          max="59"
-                          value={endMinute}
-                          onChange={(e) => setEndMinute(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="SS"
-                          min="0"
-                          max="59"
-                          value={endSecond}
-                          onChange={(e) => setEndSecond(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-1 items-center">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={endHour}
+                            onChange={(e) => setEndHour(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={endMinute}
+                            onChange={(e) => setEndMinute(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={endSecond}
+                            onChange={(e) => setEndSecond(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                        </div>
+                        <div className="flex gap-1 items-center text-xs text-muted-foreground">
+                          <span className="w-14 text-center">HH</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">MM</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">SS</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -261,71 +273,83 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">Start Time</Label>
-                      <div className="flex gap-1 items-center">
-                        <Input
-                          type="number"
-                          placeholder="HH"
-                          min="0"
-                          max="23"
-                          value={startHour}
-                          onChange={(e) => setStartHour(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="MM"
-                          min="0"
-                          max="59"
-                          value={startMinute}
-                          onChange={(e) => setStartMinute(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="SS"
-                          min="0"
-                          max="59"
-                          value={startSecond}
-                          onChange={(e) => setStartSecond(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-1 items-center">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={startHour}
+                            onChange={(e) => setStartHour(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={startMinute}
+                            onChange={(e) => setStartMinute(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={startSecond}
+                            onChange={(e) => setStartSecond(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                        </div>
+                        <div className="flex gap-1 items-center text-xs text-muted-foreground">
+                          <span className="w-14 text-center">HH</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">MM</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">SS</span>
+                        </div>
                       </div>
                     </div>
                     
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">End Time</Label>
-                      <div className="flex gap-1 items-center">
-                        <Input
-                          type="number"
-                          placeholder="HH"
-                          min="0"
-                          max="23"
-                          value={endHour}
-                          onChange={(e) => setEndHour(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="MM"
-                          min="0"
-                          max="59"
-                          value={endMinute}
-                          onChange={(e) => setEndMinute(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
-                        <span className="text-muted-foreground">:</span>
-                        <Input
-                          type="number"
-                          placeholder="SS"
-                          min="0"
-                          max="59"
-                          value={endSecond}
-                          onChange={(e) => setEndSecond(e.target.value)}
-                          className="w-14 text-center bg-input border-player-border text-xs"
-                        />
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-1 items-center">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={endHour}
+                            onChange={(e) => setEndHour(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={endMinute}
+                            onChange={(e) => setEndMinute(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                          <span className="text-muted-foreground">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={endSecond}
+                            onChange={(e) => setEndSecond(e.target.value)}
+                            className="w-14 text-center bg-input border-player-border text-xs"
+                          />
+                        </div>
+                        <div className="flex gap-1 items-center text-xs text-muted-foreground">
+                          <span className="w-14 text-center">HH</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">MM</span>
+                          <span className="opacity-0">:</span>
+                          <span className="w-14 text-center">SS</span>
+                        </div>
                       </div>
                     </div>
                   </div>
