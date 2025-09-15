@@ -56,6 +56,19 @@ const EditCampaign = () => {
   useEffect(() => {
     if (id && session) {
       fetchCampaign();
+    } else if (!id && session) {
+      // This is a new campaign, set up default state
+      setCampaign({
+        id: '',
+        name: 'New Campaign',
+        video_type: '',
+        video_url: null,
+        youtube_title: null,
+        html_script: '',
+        javascript_script: '',
+        created_at: '',
+        updated_at: ''
+      });
     }
   }, [id, session]);
 
@@ -118,32 +131,66 @@ const EditCampaign = () => {
       const embedCode = generateEmbedCode(url, playButtonColor, playButtonSize, startTimeParam, endTimeParam);
       const scriptCode = generateScriptCode(url, playButtonColor, playButtonSize);
       
-      const { error } = await supabase
-        .from('campaigns')
-        .update({
-          name: campaignName,
-          video_type: isYouTube ? 'youtube' : 'self-hosted',
-          video_url: url,
-          youtube_title: isYouTube ? campaignName : null,
-          html_script: embedCode,
-          javascript_script: scriptCode
-        })
-        .eq('id', id);
+      if (id) {
+        // Update existing campaign
+        const { error } = await supabase
+          .from('campaigns')
+          .update({
+            name: campaignName,
+            video_type: isYouTube ? 'youtube' : 'self-hosted',
+            video_url: url,
+            youtube_title: isYouTube ? campaignName : null,
+            html_script: embedCode,
+            javascript_script: scriptCode,
+            start_time: startTimeParam,
+            end_time: endTimeParam
+          })
+          .eq('id', id);
 
-      if (error) throw error;
+        if (error) throw error;
+        
+        toast({
+          title: "Campaign updated successfully!",
+          description: "Your campaign changes have been saved.",
+        });
+      } else {
+        // Create new campaign
+        const { data, error } = await supabase
+          .from('campaigns')
+          .insert({
+            name: campaignName,
+            video_type: isYouTube ? 'youtube' : 'self-hosted',
+            video_url: url,
+            youtube_title: isYouTube ? campaignName : null,
+            html_script: embedCode,
+            javascript_script: scriptCode,
+            start_time: startTimeParam,
+            end_time: endTimeParam,
+            user_id: session.user.id
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        
+        toast({
+          title: "Campaign created successfully!",
+          description: "Your new campaign has been saved.",
+        });
+        
+        // Navigate to the edit page for the newly created campaign
+        navigate(`/campaigns/${data.id}/edit`);
+        return;
+      }
 
       setCurrentVideo(url);
       setStartTime(startTimeParam);
       setEndTime(endTimeParam);
       
-      toast({
-        title: "Campaign updated successfully!",
-        description: "Your campaign changes have been saved.",
-      });
     } catch (error) {
-      console.error('Error updating campaign:', error);
+      console.error('Error saving campaign:', error);
       toast({
-        title: "Error updating campaign",
+        title: id ? "Error updating campaign" : "Error creating campaign",
         description: "Please try again later.",
         variant: "destructive",
       });
@@ -213,7 +260,7 @@ const EditCampaign = () => {
     navigate('/campaigns');
   };
 
-  if (!campaign) {
+  if (!campaign && id) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
@@ -239,9 +286,9 @@ const EditCampaign = () => {
             </Button>
           </div>
 
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Edit Campaign: {campaign.name}</h1>
-          </div>
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold">{id ? `Edit Campaign: ${campaign.name}` : 'Create New Campaign'}</h1>
+            </div>
 
           {/* Video Player */}
           <div className="max-w-6xl mx-auto">
@@ -294,7 +341,7 @@ const EditCampaign = () => {
             </div>
             
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-center">Edit Campaign: {campaign.name}</h1>
+              <h1 className="text-2xl font-bold text-center">{id ? `Edit Campaign: ${campaign.name}` : 'Create New Campaign'}</h1>
             </div>
             
             <VideoUrlInput 
