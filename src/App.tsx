@@ -63,6 +63,7 @@ const AppContent = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/campaigns" element={<RequireAuth><Campaigns /></RequireAuth>} />
+        <Route path="/campaigns/new" element={<RequireAuth><EditCampaign /></RequireAuth>} />
         <Route path="/campaigns/:id/edit" element={<RequireAuth><EditCampaign /></RequireAuth>} />
         <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="/admin" element={<RequireRole allow={["admin"]}><Admin /></RequireRole>} />

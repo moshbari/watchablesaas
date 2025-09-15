@@ -42,7 +42,7 @@ export const TrialOnboarding: React.FC = () => {
                 className="w-full" 
                 size="lg"
                 disabled={!canCreateVideo}
-                onClick={() => navigate('/campaigns')}
+                onClick={() => navigate('/campaigns/new')}
               >
                 Create Video Campaign
               </Button>

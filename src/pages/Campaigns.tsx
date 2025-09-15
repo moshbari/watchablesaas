@@ -145,7 +145,7 @@ const Campaigns: React.FC = () => {
         <h1 className="text-3xl font-bold">My Campaigns</h1>
         <TrialLimitTooltip disabled={!canCreateVideo}>
           <Button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/campaigns/new')}
             disabled={!canCreateVideo}
           >
             <Plus className="w-4 h-4 mr-2" />
