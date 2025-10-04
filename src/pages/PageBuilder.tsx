@@ -55,9 +55,9 @@ const PageBuilder = () => {
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [formData, setFormData] = useState({
     slug: '',
-    title: '',
-    headline: '',
-    sub_headline: '',
+    title: "Let's Do This Habibi",
+    headline: 'Template#1',
+    sub_headline: 'Template#1',
     video_url: '',
     video_type: 'youtube',
     button_text: 'Click Here To Secure Your Spot Now',
@@ -270,9 +270,9 @@ const PageBuilder = () => {
   const resetForm = () => {
     setFormData({
       slug: '',
-      title: '',
-      headline: '',
-      sub_headline: '',
+      title: "Let's Do This Habibi",
+      headline: 'Template#1',
+      sub_headline: 'Template#1',
       video_url: '',
       video_type: 'youtube',
       button_text: 'Click Here To Secure Your Spot Now',
