@@ -33,6 +33,9 @@ interface Page {
   earnings_disclaimer_text?: string;
   start_time?: number;
   end_time?: number;
+  fake_progress_enabled?: boolean;
+  fake_progress_color?: string;
+  fake_progress_thickness?: number;
 }
 
 const DynamicPage = () => {
@@ -161,6 +164,9 @@ const DynamicPage = () => {
                     playButtonSize={120}
                     startTime={page.start_time}
                     endTime={page.end_time}
+                    fakeProgressEnabled={page.fake_progress_enabled ?? true}
+                    fakeProgressColor={page.fake_progress_color || '#ef4444'}
+                    fakeProgressThickness={page.fake_progress_thickness || 4}
                   />
                 </div>
               </section>

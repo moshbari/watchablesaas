@@ -43,6 +43,9 @@ interface Page {
   earnings_disclaimer_text?: string;
   start_time?: number;
   end_time?: number;
+  fake_progress_enabled?: boolean;
+  fake_progress_color?: string;
+  fake_progress_thickness?: number;
   created_at: string;
 }
 
@@ -74,7 +77,10 @@ const PageBuilder = () => {
     legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
     earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
     start_time: undefined,
-    end_time: undefined
+    end_time: undefined,
+    fake_progress_enabled: true,
+    fake_progress_color: '#ef4444',
+    fake_progress_thickness: 4
   });
   const [timeInputs, setTimeInputs] = useState({
     startHour: '',
@@ -286,7 +292,10 @@ const PageBuilder = () => {
       legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
       earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
       start_time: undefined,
-      end_time: undefined
+      end_time: undefined,
+      fake_progress_enabled: true,
+      fake_progress_color: '#ef4444',
+      fake_progress_thickness: 4
     });
     setTimeInputs({
       startHour: '',
@@ -325,7 +334,10 @@ const PageBuilder = () => {
       legal_disclaimer_text: page.legal_disclaimer_text || 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
       earnings_disclaimer_text: page.earnings_disclaimer_text || '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
       start_time: page.start_time,
-      end_time: page.end_time
+      end_time: page.end_time,
+      fake_progress_enabled: page.fake_progress_enabled ?? true,
+      fake_progress_color: page.fake_progress_color || '#ef4444',
+      fake_progress_thickness: page.fake_progress_thickness || 4
     });
 
     // Set time inputs based on existing times
@@ -575,6 +587,62 @@ const PageBuilder = () => {
                       <p className="text-xs text-muted-foreground">
                         Leave empty to play the full video. End time must be after start time.
                       </p>
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  {/* Fake Progress Bar Settings */}
+                  {formData.video_url && (
+                    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="fake_progress_enabled"
+                          checked={formData.fake_progress_enabled}
+                          onCheckedChange={(checked) => setFormData(prev => ({ ...prev, fake_progress_enabled: checked }))}
+                        />
+                        <Label htmlFor="fake_progress_enabled">Enable Fake Progress Bar</Label>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        Creates a psychological effect of speed by progressing fast initially, then gradually slowing down to match video duration
+                      </p>
+
+                      {formData.fake_progress_enabled && (
+                        <>
+                          <div>
+                            <Label htmlFor="fake_progress_color">Progress Bar Color</Label>
+                            <div className="flex gap-2 mt-2">
+                              <Input
+                                id="fake_progress_color"
+                                type="color"
+                                value={formData.fake_progress_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, fake_progress_color: e.target.value }))}
+                                className="w-16 h-10 p-1 border"
+                              />
+                              <Input
+                                value={formData.fake_progress_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, fake_progress_color: e.target.value }))}
+                                placeholder="#ef4444"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label htmlFor="fake_progress_thickness">Thickness: {formData.fake_progress_thickness}px</Label>
+                            <Slider
+                              id="fake_progress_thickness"
+                              min={2}
+                              max={10}
+                              step={1}
+                              value={[formData.fake_progress_thickness]}
+                              onValueChange={(value) => setFormData(prev => ({ ...prev, fake_progress_thickness: value[0] }))}
+                              className="mt-2"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
 

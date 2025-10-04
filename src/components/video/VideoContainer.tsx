@@ -8,6 +8,7 @@ import { ResumeModal } from '../ResumeModal';
 import { OverlayButton, type OverlayButtonConfig } from '../VideoOverlayButton';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { extractVideoUrl, isYouTubeUrl, getYouTubeId } from '@/lib/videoUtils';
+import { FakeProgressBar } from './FakeProgressBar';
 
 interface VideoContainerProps {
   src: string;
@@ -17,6 +18,9 @@ interface VideoContainerProps {
   overlayButtonConfig?: OverlayButtonConfig;
   startTime?: number;
   endTime?: number;
+  fakeProgressEnabled?: boolean;
+  fakeProgressColor?: string;
+  fakeProgressThickness?: number;
 }
 
 export const VideoContainer: React.FC<VideoContainerProps> = ({ 
@@ -26,11 +30,15 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   playButtonSize = 96,
   overlayButtonConfig,
   startTime,
-  endTime 
+  endTime,
+  fakeProgressEnabled = false,
+  fakeProgressColor = '#ef4444',
+  fakeProgressThickness = 4
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [videoDuration, setVideoDuration] = useState<number>(0);
   
   // Extract the actual video URL (handles URLs with video parameters)
   const actualVideoUrl = useMemo(() => extractVideoUrl(src), [src]);
@@ -183,6 +191,14 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     const handleLoadedData = () => {
       setLoading(false);
       
+      // Calculate and set video duration
+      if (video.duration) {
+        const effectiveDuration = endTime 
+          ? endTime - (startTime || 0)
+          : video.duration - (startTime || 0);
+        setVideoDuration(effectiveDuration);
+      }
+      
       if (!hasInitialized) {
         setHasInitialized(true);
         
@@ -282,6 +298,16 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           <OverlayButton 
             config={overlayButtonConfig} 
             onVideoContainer={true}
+          />
+        )}
+
+        {/* Fake Progress Bar */}
+        {fakeProgressEnabled && videoDuration > 0 && (
+          <FakeProgressBar
+            videoDuration={videoDuration}
+            isPlaying={state.isPlaying}
+            color={fakeProgressColor}
+            thickness={fakeProgressThickness}
           />
         )}
       </div>
