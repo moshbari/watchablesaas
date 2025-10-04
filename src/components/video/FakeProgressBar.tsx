@@ -22,12 +22,14 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
 
   // Debug logging
   useEffect(() => {
-    console.log('🎬 FakeProgressBar mounted with:', { videoDuration, isPlaying, color, thickness });
-  }, []);
-  
-  useEffect(() => {
-    console.log('🎬 FakeProgressBar state changed:', { videoDuration, isPlaying, progress });
-  }, [videoDuration, isPlaying, progress]);
+    console.log('🎯 FakeProgressBar RENDERED with:', { 
+      videoDuration, 
+      isPlaying, 
+      color, 
+      thickness,
+      progress 
+    });
+  }, [videoDuration, isPlaying, color, thickness, progress]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -90,19 +92,27 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
 
   return (
     <div 
-      className="absolute bottom-0 left-0 right-0 pointer-events-none"
+      className="absolute bottom-0 left-0 right-0 pointer-events-none rounded-b-lg overflow-hidden"
       style={{ 
         height: `${thickness}px`,
-        zIndex: 50,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)' // Dark semi-transparent track
+        zIndex: 9999
       }}
     >
+      {/* Track background - always visible */}
       <div 
-        className="h-full transition-all duration-200 ease-linear"
+        className="absolute inset-0"
         style={{
-          width: `${Math.max(progress, 5)}%`, // Always show at least 5%
+          backgroundColor: 'rgba(255, 255, 255, 0.15)'
+        }}
+      />
+      {/* Progress indicator */}
+      <div 
+        className="absolute inset-0 transition-all duration-100 ease-linear"
+        style={{
+          width: `${progress}%`,
           backgroundColor: color,
-          boxShadow: `0 0 10px ${color}`
+          boxShadow: `0 0 15px ${color}, 0 0 5px ${color}`,
+          minWidth: '10px' // Always show at least 10px
         }}
       />
     </div>
