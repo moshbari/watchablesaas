@@ -58,26 +58,35 @@ const PageBuilder = () => {
   const generateDefaultSlug = () => {
     const now = new Date();
     
-    // Convert to Dubai timezone
-    const dubaiTime = new Intl.DateTimeFormat('en-US', {
+    // Get Dubai date/time components
+    const dubaiFormatter = new Intl.DateTimeFormat('en-US', {
       timeZone: 'Asia/Dubai',
       day: 'numeric',
       month: 'short',
       year: '2-digit',
       hour: 'numeric',
+      minute: '2-digit',
       hour12: true
-    }).format(now);
+    });
     
-    // Parse the formatted string to extract components
-    const parts = dubaiTime.match(/(\w+)\s+(\d+),\s+(\d+)\s+at\s+(\d+)\s+(\w+)/);
-    if (parts) {
-      const [, month, day, year, hour, period] = parts;
-      // Format: letsdothisat-4oct25-3pm
-      return `letsdothisat-${day}${month.toLowerCase()}${year}-${hour}${period.toLowerCase()}`;
-    }
+    const parts = dubaiFormatter.formatToParts(now);
+    const dateObj: Record<string, string> = {};
+    parts.forEach(part => {
+      if (part.type !== 'literal') {
+        dateObj[part.type] = part.value;
+      }
+    });
     
-    // Fallback if parsing fails
-    return `letsdothisat-${Date.now()}`;
+    // Format: letsdothis-4oct25-1037am-randomnumber
+    const day = dateObj.day;
+    const month = dateObj.month.toLowerCase();
+    const year = dateObj.year;
+    const hour = dateObj.hour.padStart(2, '0');
+    const minute = dateObj.minute;
+    const period = dateObj.dayPeriod.toLowerCase();
+    const random = Math.floor(Math.random() * 10000);
+    
+    return `letsdothis-${day}${month}${year}-${hour}${minute}${period}-${random}`;
   };
   
   const [formData, setFormData] = useState({
