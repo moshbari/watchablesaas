@@ -870,6 +870,9 @@ const PageBuilder = () => {
                             onError={() => {}}
                             playButtonColor="#ff0000"
                             playButtonSize={96}
+                            fakeProgressEnabled={formData.fake_progress_enabled}
+                            fakeProgressColor={formData.fake_progress_color}
+                            fakeProgressThickness={formData.fake_progress_thickness}
                           />
                         </div>
                       )}

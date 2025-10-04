@@ -75,6 +75,9 @@ export type Database = {
           earnings_disclaimer_text: string | null
           earnings_disclaimer_url: string | null
           end_time: number | null
+          fake_progress_color: string | null
+          fake_progress_enabled: boolean | null
+          fake_progress_thickness: number | null
           footer_enabled: boolean | null
           headline: string
           headline_font_size: number | null
@@ -105,6 +108,9 @@ export type Database = {
           earnings_disclaimer_text?: string | null
           earnings_disclaimer_url?: string | null
           end_time?: number | null
+          fake_progress_color?: string | null
+          fake_progress_enabled?: boolean | null
+          fake_progress_thickness?: number | null
           footer_enabled?: boolean | null
           headline: string
           headline_font_size?: number | null
@@ -135,6 +141,9 @@ export type Database = {
           earnings_disclaimer_text?: string | null
           earnings_disclaimer_url?: string | null
           end_time?: number | null
+          fake_progress_color?: string | null
+          fake_progress_enabled?: boolean | null
+          fake_progress_thickness?: number | null
           footer_enabled?: boolean | null
           headline?: string
           headline_font_size?: number | null
