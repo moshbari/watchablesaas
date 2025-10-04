@@ -20,6 +20,15 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   const pausedTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
 
+  // Debug logging
+  useEffect(() => {
+    console.log('🎬 FakeProgressBar mounted with:', { videoDuration, isPlaying, color, thickness });
+  }, []);
+  
+  useEffect(() => {
+    console.log('🎬 FakeProgressBar state changed:', { videoDuration, isPlaying, progress });
+  }, [videoDuration, isPlaying, progress]);
+
   useEffect(() => {
     if (!isPlaying) {
       if (animationFrameRef.current) {

@@ -303,9 +303,9 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
         )}
 
         {/* Fake Progress Bar */}
-        {fakeProgressEnabled && videoDuration > 0 && (
+        {fakeProgressEnabled && (
           <FakeProgressBar
-            videoDuration={videoDuration}
+            videoDuration={videoDuration || 100}
             isPlaying={state.isPlaying}
             color={fakeProgressColor}
             thickness={fakeProgressThickness}
