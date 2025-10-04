@@ -15,7 +15,7 @@ import { TrialLimitTooltip } from '@/components/TrialLimitTooltip';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
-import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight, Clipboard } from 'lucide-react';
 
 interface Page {
   id: string;
@@ -415,6 +415,39 @@ const PageBuilder = () => {
     }
   };
 
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        setFormData(prev => ({ ...prev, video_url: text }));
+        toast({
+          title: "Pasted",
+          description: "Video URL pasted from clipboard",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Paste Failed",
+        description: "Please allow clipboard access or paste manually",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Auto-preview video when URL changes
+  useEffect(() => {
+    if (formData.video_url) {
+      const validation = validateVideoUrl(formData.video_url);
+      if (validation.isValid) {
+        setPreviewVideo(formData.video_url);
+      } else {
+        setPreviewVideo(null);
+      }
+    } else {
+      setPreviewVideo(null);
+    }
+  }, [formData.video_url]);
+
   if (isCreating || editingPage) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -537,8 +570,9 @@ const PageBuilder = () => {
                         onChange={(e) => setFormData(prev => ({ ...prev, video_url: e.target.value }))}
                         placeholder="https://www.youtube.com/watch?v=..."
                       />
-                      <Button type="button" variant="outline" onClick={handleVideoPreview}>
-                        Preview
+                      <Button type="button" variant="outline" onClick={handlePaste}>
+                        <Clipboard className="w-4 h-4 mr-2" />
+                        Paste
                       </Button>
                     </div>
                   </div>
