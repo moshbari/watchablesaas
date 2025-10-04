@@ -126,6 +126,11 @@ const PageBuilder = () => {
     endMinute: '',
     endSecond: ''
   });
+  const [buttonDelayInputs, setButtonDelayInputs] = useState({
+    hours: '0',
+    minutes: '0',
+    seconds: '5'
+  });
   const [loading, setLoading] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
   const { toast } = useToast();
@@ -231,9 +236,16 @@ const PageBuilder = () => {
       // Format slug
       const slug = formData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
 
+      // Calculate button delay from separate inputs
+      const buttonDelaySeconds = 
+        (parseInt(buttonDelayInputs.hours) || 0) * 3600 +
+        (parseInt(buttonDelayInputs.minutes) || 0) * 60 +
+        (parseInt(buttonDelayInputs.seconds) || 0);
+
       const pageData = {
         ...formData,
         slug,
+        button_delay: buttonDelaySeconds,
         start_time: startTime,
         end_time: endTime,
         user_id: (await supabase.auth.getUser()).data.user?.id
@@ -331,7 +343,7 @@ const PageBuilder = () => {
       end_time: undefined,
       fake_progress_enabled: true,
       fake_progress_color: '#ef4444',
-      fake_progress_thickness: 4
+      fake_progress_thickness: 8
     });
     setTimeInputs({
       startHour: '',
@@ -340,6 +352,11 @@ const PageBuilder = () => {
       endHour: '',
       endMinute: '',
       endSecond: ''
+    });
+    setButtonDelayInputs({
+      hours: '0',
+      minutes: '0',
+      seconds: '5'
     });
     setPreviewVideo(null);
   };
@@ -395,6 +412,14 @@ const PageBuilder = () => {
         endSecond: endTime.seconds
       }));
     }
+
+    // Set button delay inputs based on existing button delay
+    const buttonDelayTime = secondsToTime(page.button_delay || 5);
+    setButtonDelayInputs({
+      hours: buttonDelayTime.hours,
+      minutes: buttonDelayTime.minutes,
+      seconds: buttonDelayTime.seconds
+    });
 
     setPreviewVideo(page.video_url || null);
     setIsCreating(true);
@@ -752,15 +777,47 @@ const PageBuilder = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="button_delay">Button Delay (seconds)</Label>
-                          <Input
-                            id="button_delay"
-                            type="number"
-                            min="0"
-                            max="60"
-                            value={formData.button_delay}
-                            onChange={(e) => setFormData(prev => ({ ...prev, button_delay: parseInt(e.target.value) || 0 }))}
-                          />
+                          <Label>Button Delay</Label>
+                          <div className="grid grid-cols-3 gap-2 mt-2">
+                            <div>
+                              <Label htmlFor="button_delay_hours" className="text-xs text-muted-foreground">Hours</Label>
+                              <Input
+                                id="button_delay_hours"
+                                type="number"
+                                min="0"
+                                value={buttonDelayInputs.hours}
+                                onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, hours: e.target.value }))}
+                                placeholder="0"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="button_delay_minutes" className="text-xs text-muted-foreground">Minutes</Label>
+                              <Input
+                                id="button_delay_minutes"
+                                type="number"
+                                min="0"
+                                max="59"
+                                value={buttonDelayInputs.minutes}
+                                onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, minutes: e.target.value }))}
+                                placeholder="0"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="button_delay_seconds" className="text-xs text-muted-foreground">Seconds</Label>
+                              <Input
+                                id="button_delay_seconds"
+                                type="number"
+                                min="0"
+                                max="59"
+                                value={buttonDelayInputs.seconds}
+                                onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, seconds: e.target.value }))}
+                                placeholder="0"
+                              />
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Total delay: {(parseInt(buttonDelayInputs.hours) || 0) * 3600 + (parseInt(buttonDelayInputs.minutes) || 0) * 60 + (parseInt(buttonDelayInputs.seconds) || 0)} seconds
+                          </p>
                         </div>
 
                         <div className="space-y-4 mt-4">
