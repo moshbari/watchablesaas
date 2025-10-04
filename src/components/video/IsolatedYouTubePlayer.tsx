@@ -13,6 +13,7 @@ interface IsolatedYouTubePlayerProps {
   onProgressUpdate?: (currentTime: number) => void;
   shouldSeekTo?: number;
   onSeekComplete?: () => void;
+  onDurationChange?: (duration: number) => void;
 }
 
 declare global {
@@ -31,7 +32,8 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   endTime,
   onProgressUpdate,
   shouldSeekTo,
-  onSeekComplete
+  onSeekComplete,
+  onDurationChange
 }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
@@ -79,6 +81,15 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
               setIsLoading(false);
               if (ytPlayerRef.current) {
                 ytPlayerRef.current.setVolume(volume);
+                
+                // Get and report video duration
+                const duration = ytPlayerRef.current.getDuration();
+                if (duration && onDurationChange) {
+                  const effectiveDuration = endTime 
+                    ? endTime - (startTime || 0)
+                    : duration - (startTime || 0);
+                  onDurationChange(effectiveDuration);
+                }
               }
             },
             onStateChange: (event: any) => {

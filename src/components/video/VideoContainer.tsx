@@ -269,6 +269,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onProgressUpdate={saveProgress}
             shouldSeekTo={state.shouldSeekTo}
             onSeekComplete={() => setShouldSeekTo(undefined)}
+            onDurationChange={setVideoDuration}
           />
         ) : (
           <>

@@ -81,8 +81,11 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
 
   return (
     <div 
-      className="absolute bottom-0 left-0 right-0 z-50"
-      style={{ height: `${thickness}px` }}
+      className="absolute bottom-0 left-0 right-0 pointer-events-none"
+      style={{ 
+        height: `${thickness}px`,
+        zIndex: 9999
+      }}
     >
       <div 
         className="h-full transition-all duration-200 ease-linear"
