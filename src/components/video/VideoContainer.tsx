@@ -248,16 +248,16 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
 
   return (
     <center>
-      <div 
-        ref={containerRef}
-        className={cn(
-          "relative w-full aspect-video bg-player-bg border border-player-border rounded-lg shadow-player group",
-          state.isFullscreen && "rounded-none"
-        )}
-        style={{ overflow: 'visible' }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div className="relative w-full">
+        <div 
+          ref={containerRef}
+          className={cn(
+            "relative w-full aspect-video bg-player-bg border border-player-border rounded-lg overflow-hidden shadow-player group",
+            state.isFullscreen && "rounded-none"
+          )}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
         {/* Video Element */}
         {isYoutube && youtubeId ? (
           <IsolatedYouTubePlayer
@@ -302,17 +302,20 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onVideoContainer={true}
           />
         )}
+      </div>
 
-        {/* Fake Progress Bar */}
-        {fakeProgressEnabled && (
+      {/* Fake Progress Bar - Outside video container to avoid clipping */}
+      {fakeProgressEnabled && (
+        <div className="relative w-full" style={{ marginTop: '-4px' }}>
           <FakeProgressBar
             videoDuration={videoDuration || 100}
             isPlaying={state.isPlaying}
             color={fakeProgressColor}
             thickness={fakeProgressThickness}
           />
-        )}
-      </div>
+        </div>
+      )}
+    </div>
 
       {/* Resume Modal - Works for both YouTube and HTML5 videos */}
       {showResumeModal && savedProgress && (
