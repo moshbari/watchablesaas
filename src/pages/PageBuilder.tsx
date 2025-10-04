@@ -116,7 +116,7 @@ const PageBuilder = () => {
     end_time: undefined,
     fake_progress_enabled: true,
     fake_progress_color: '#ef4444',
-    fake_progress_thickness: 4
+    fake_progress_thickness: 6
   });
   const [timeInputs, setTimeInputs] = useState({
     startHour: '',

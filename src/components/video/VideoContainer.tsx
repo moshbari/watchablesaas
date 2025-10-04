@@ -302,19 +302,17 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onVideoContainer={true}
           />
         )}
-      </div>
 
-      {/* Fake Progress Bar - Outside video container to avoid clipping */}
-      {fakeProgressEnabled && (
-        <div className="relative w-full" style={{ marginTop: '-4px' }}>
+        {/* Fake Progress Bar */}
+        {fakeProgressEnabled && (
           <FakeProgressBar
             videoDuration={videoDuration || 100}
             isPlaying={state.isPlaying}
             color={fakeProgressColor}
             thickness={fakeProgressThickness}
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
 
       {/* Resume Modal - Works for both YouTube and HTML5 videos */}
