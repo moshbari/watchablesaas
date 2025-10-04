@@ -12,7 +12,7 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   videoDuration,
   isPlaying,
   color = '#ef4444',
-  thickness = 4,
+  thickness = 8,
   onComplete
 }) => {
   const [progress, setProgress] = useState(0);
@@ -116,7 +116,9 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
           width: `${progress || 1}%`,
           transition: 'width 0.1s linear',
           boxShadow: `0 0 15px ${color}`,
-          background: color
+          background: color,
+          transformOrigin: 'left',
+          marginLeft: 0
         }}
       />
     </div>
