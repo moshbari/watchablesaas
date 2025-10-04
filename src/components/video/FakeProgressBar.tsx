@@ -92,27 +92,21 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
 
   return (
     <div 
-      className="absolute bottom-0 left-0 right-0 pointer-events-none rounded-b-lg overflow-hidden"
+      className="w-full pointer-events-none"
       style={{ 
         height: `${thickness}px`,
-        zIndex: 9999
+        background: 'linear-gradient(90deg, #ef4444 0%, #ef4444 10%, rgba(255,255,255,0.2) 10%)',
+        borderRadius: '0 0 8px 8px',
+        zIndex: 50
       }}
     >
-      {/* Track background - always visible */}
       <div 
-        className="absolute inset-0"
+        className="h-full bg-red-500"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.15)'
-        }}
-      />
-      {/* Progress indicator */}
-      <div 
-        className="absolute inset-0 transition-all duration-100 ease-linear"
-        style={{
-          width: `${progress}%`,
-          backgroundColor: color,
-          boxShadow: `0 0 15px ${color}, 0 0 5px ${color}`,
-          minWidth: '10px' // Always show at least 10px
+          width: `${Math.max(progress, 10)}%`,
+          transition: 'width 0.1s linear',
+          boxShadow: '0 0 20px #ef4444',
+          background: '#ef4444'
         }}
       />
     </div>
