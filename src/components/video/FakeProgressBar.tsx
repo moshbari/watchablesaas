@@ -16,40 +16,36 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   onComplete
 }) => {
   const [progress, setProgress] = useState(0);
-  const [autoPlaying, setAutoPlaying] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
-
-  // Auto-start when video duration is set
-  useEffect(() => {
-    if (videoDuration > 0 && !autoPlaying) {
-      setAutoPlaying(true);
-      console.log('🎯 Auto-starting fake progress bar');
-    }
-  }, [videoDuration, autoPlaying]);
+  const hasStartedRef = useRef(false);
 
   // Debug logging
   useEffect(() => {
-    console.log('🎯 FakeProgressBar RENDERED with:', { 
+    console.log('🎯 FakeProgressBar state:', { 
       videoDuration, 
       isPlaying,
-      autoPlaying,
-      color, 
-      thickness,
-      progress 
+      progress,
+      hasStarted: hasStartedRef.current
     });
-  }, [videoDuration, isPlaying, autoPlaying, color, thickness, progress]);
+  }, [videoDuration, isPlaying, progress]);
 
   useEffect(() => {
-    // Start animating when video is playing OR when auto-playing
-    const shouldAnimate = isPlaying || autoPlaying;
+    // Always animate when there's a valid duration (auto-play the fake bar)
+    const shouldAnimate = videoDuration > 0;
     
     if (!shouldAnimate) {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
       return;
+    }
+
+    // Mark as started
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      console.log('🎯 Starting fake progress animation for duration:', videoDuration);
     }
 
     // Calculate progress using an easing function that creates the illusion of speed
@@ -94,14 +90,14 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
         pausedTimeRef.current = performance.now() - startTimeRef.current;
       }
     };
-  }, [isPlaying, autoPlaying, videoDuration, onComplete]);
+  }, [videoDuration, onComplete]);
 
   // Reset when video duration changes
   useEffect(() => {
     setProgress(0);
-    setAutoPlaying(false);
     startTimeRef.current = null;
     pausedTimeRef.current = 0;
+    hasStartedRef.current = false;
   }, [videoDuration]);
 
   return (
