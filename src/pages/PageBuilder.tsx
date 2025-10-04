@@ -56,8 +56,8 @@ const PageBuilder = () => {
   const [formData, setFormData] = useState({
     slug: '',
     title: "Let's Do This Habibi",
-    headline: 'Template#1',
-    sub_headline: 'Template#1',
+    headline: 'How [Target Audience] [Achieve Desired Result] In [Time Frame] Without [Common Obstacle]',
+    sub_headline: 'The proven [Number]-step system that [Specific Benefit] - even if [Common Objection]',
     video_url: '',
     video_type: 'youtube',
     button_text: 'Click Here To Secure Your Spot Now',
@@ -271,8 +271,8 @@ const PageBuilder = () => {
     setFormData({
       slug: '',
       title: "Let's Do This Habibi",
-      headline: 'Template#1',
-      sub_headline: 'Template#1',
+      headline: 'How [Target Audience] [Achieve Desired Result] In [Time Frame] Without [Common Obstacle]',
+      sub_headline: 'The proven [Number]-step system that [Specific Benefit] - even if [Common Objection]',
       video_url: '',
       video_type: 'youtube',
       button_text: 'Click Here To Secure Your Spot Now',
