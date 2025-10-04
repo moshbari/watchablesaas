@@ -107,7 +107,9 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
         height: `${thickness}px`,
         backgroundColor: 'rgba(255, 255, 255, 0.15)',
         borderRadius: '0 0 8px 8px',
-        zIndex: 50
+        zIndex: 50,
+        textAlign: 'left',
+        display: 'block'
       }}
     >
       <div 
@@ -117,8 +119,8 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
           transition: 'width 0.1s linear',
           boxShadow: `0 0 15px ${color}`,
           background: color,
-          transformOrigin: 'left',
-          marginLeft: 0
+          float: 'left',
+          clear: 'both'
         }}
       />
     </div>
