@@ -16,23 +16,36 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   onComplete
 }) => {
   const [progress, setProgress] = useState(0);
+  const [autoPlaying, setAutoPlaying] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
+
+  // Auto-start when video duration is set
+  useEffect(() => {
+    if (videoDuration > 0 && !autoPlaying) {
+      setAutoPlaying(true);
+      console.log('🎯 Auto-starting fake progress bar');
+    }
+  }, [videoDuration, autoPlaying]);
 
   // Debug logging
   useEffect(() => {
     console.log('🎯 FakeProgressBar RENDERED with:', { 
       videoDuration, 
-      isPlaying, 
+      isPlaying,
+      autoPlaying,
       color, 
       thickness,
       progress 
     });
-  }, [videoDuration, isPlaying, color, thickness, progress]);
+  }, [videoDuration, isPlaying, autoPlaying, color, thickness, progress]);
 
   useEffect(() => {
-    if (!isPlaying) {
+    // Start animating when video is playing OR when auto-playing
+    const shouldAnimate = isPlaying || autoPlaying;
+    
+    if (!shouldAnimate) {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -81,32 +94,33 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
         pausedTimeRef.current = performance.now() - startTimeRef.current;
       }
     };
-  }, [isPlaying, videoDuration, onComplete]);
+  }, [isPlaying, autoPlaying, videoDuration, onComplete]);
 
   // Reset when video duration changes
   useEffect(() => {
     setProgress(0);
+    setAutoPlaying(false);
     startTimeRef.current = null;
     pausedTimeRef.current = 0;
   }, [videoDuration]);
 
   return (
     <div 
-      className="w-full pointer-events-none"
+      className="w-full pointer-events-none overflow-hidden"
       style={{ 
         height: `${thickness}px`,
-        background: 'linear-gradient(90deg, #ef4444 0%, #ef4444 10%, rgba(255,255,255,0.2) 10%)',
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
         borderRadius: '0 0 8px 8px',
         zIndex: 50
       }}
     >
       <div 
-        className="h-full bg-red-500"
+        className="h-full"
         style={{
-          width: `${Math.max(progress, 10)}%`,
+          width: `${progress || 1}%`,
           transition: 'width 0.1s linear',
-          boxShadow: '0 0 20px #ef4444',
-          background: '#ef4444'
+          boxShadow: `0 0 15px ${color}`,
+          background: color
         }}
       />
     </div>
