@@ -19,34 +19,26 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
-  const hasStartedRef = useRef(false);
 
   // Debug logging
   useEffect(() => {
     console.log('🎯 FakeProgressBar state:', { 
       videoDuration, 
       isPlaying,
-      progress,
-      hasStarted: hasStartedRef.current
+      progress
     });
   }, [videoDuration, isPlaying, progress]);
 
   useEffect(() => {
-    // Always animate when there's a valid duration (auto-play the fake bar)
-    const shouldAnimate = videoDuration > 0;
-    
-    if (!shouldAnimate) {
+    // Only animate when video is actually playing
+    if (!isPlaying || videoDuration <= 0) {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
       return;
     }
 
-    // Mark as started
-    if (!hasStartedRef.current) {
-      hasStartedRef.current = true;
-      console.log('🎯 Starting fake progress animation for duration:', videoDuration);
-    }
+    console.log('🎯 Starting fake progress animation for duration:', videoDuration);
 
     // Calculate progress using an easing function that creates the illusion of speed
     const calculateProgress = (elapsedTime: number): number => {
@@ -90,14 +82,13 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
         pausedTimeRef.current = performance.now() - startTimeRef.current;
       }
     };
-  }, [videoDuration, onComplete]);
+  }, [isPlaying, videoDuration, onComplete]);
 
   // Reset when video duration changes
   useEffect(() => {
     setProgress(0);
     startTimeRef.current = null;
     pausedTimeRef.current = 0;
-    hasStartedRef.current = false;
   }, [videoDuration]);
 
   return (
