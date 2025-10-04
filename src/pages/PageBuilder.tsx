@@ -53,8 +53,35 @@ const PageBuilder = () => {
   const [pages, setPages] = useState<Page[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
+  
+  // Generate default slug with Dubai date and time
+  const generateDefaultSlug = () => {
+    const now = new Date();
+    
+    // Convert to Dubai timezone
+    const dubaiTime = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Dubai',
+      day: 'numeric',
+      month: 'short',
+      year: '2-digit',
+      hour: 'numeric',
+      hour12: true
+    }).format(now);
+    
+    // Parse the formatted string to extract components
+    const parts = dubaiTime.match(/(\w+)\s+(\d+),\s+(\d+)\s+at\s+(\d+)\s+(\w+)/);
+    if (parts) {
+      const [, month, day, year, hour, period] = parts;
+      // Format: letsdothisat-4oct25-3pm
+      return `letsdothisat-${day}${month.toLowerCase()}${year}-${hour}${period.toLowerCase()}`;
+    }
+    
+    // Fallback if parsing fails
+    return `letsdothisat-${Date.now()}`;
+  };
+  
   const [formData, setFormData] = useState({
-    slug: '',
+    slug: generateDefaultSlug(),
     title: "Let's Do This Habibi",
     headline: 'How [Target Audience] [Achieve Desired Result] In [Time Frame] Without [Common Obstacle]',
     sub_headline: 'The proven [Number]-step system that [Specific Benefit] - even if [Common Objection]',
@@ -269,7 +296,7 @@ const PageBuilder = () => {
 
   const resetForm = () => {
     setFormData({
-      slug: '',
+      slug: generateDefaultSlug(),
       title: "Let's Do This Habibi",
       headline: 'How [Target Audience] [Achieve Desired Result] In [Time Frame] Without [Common Obstacle]',
       sub_headline: 'The proven [Number]-step system that [Specific Benefit] - even if [Common Objection]',
