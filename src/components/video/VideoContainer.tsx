@@ -251,9 +251,10 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       <div 
         ref={containerRef}
         className={cn(
-          "relative w-full aspect-video bg-player-bg border border-player-border rounded-lg overflow-hidden shadow-player group",
+          "relative w-full aspect-video bg-player-bg border border-player-border rounded-lg shadow-player group",
           state.isFullscreen && "rounded-none"
         )}
+        style={{ overflow: 'visible' }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >

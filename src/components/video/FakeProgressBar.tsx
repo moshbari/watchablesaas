@@ -93,13 +93,14 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
       className="absolute bottom-0 left-0 right-0 pointer-events-none"
       style={{ 
         height: `${thickness}px`,
-        zIndex: 9999
+        zIndex: 9999,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)' // Visible track background
       }}
     >
       <div 
         className="h-full transition-all duration-200 ease-linear"
         style={{
-          width: `${progress}%`,
+          width: `${Math.max(progress, 0.5)}%`, // Minimum 0.5% to always be visible
           backgroundColor: color,
           boxShadow: `0 0 8px ${color}80`
         }}
