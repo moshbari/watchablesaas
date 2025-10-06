@@ -338,12 +338,9 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
 
               <div className="flex-1" />
 
-              {/* Hide fullscreen button on iOS (doesn't work due to platform limitations) */}
-              {!isIOS && (
-                <Button variant="ghost" size="icon" onClick={handleFullscreen}>
-                  <Maximize className="w-5 h-5" />
-                </Button>
-              )}
+              <Button variant="ghost" size="icon" onClick={handleFullscreen}>
+                <Maximize className="w-5 h-5" />
+              </Button>
             </div>
           </div>
         </div>
