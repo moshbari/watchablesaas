@@ -758,7 +758,7 @@ const PageBuilder = () => {
                       </div>
                       
                       <p className="text-xs text-muted-foreground">
-                        Allows the video to play in fullscreen mode on mobile devices for better viewing experience
+                        Allows fullscreen mode on mobile devices. <strong>Note:</strong> For YouTube videos on iOS Safari, fullscreen is not available due to platform limitations (would expose YouTube links).
                       </p>
                     </div>
                   )}
