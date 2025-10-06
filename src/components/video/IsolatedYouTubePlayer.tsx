@@ -14,6 +14,7 @@ interface IsolatedYouTubePlayerProps {
   shouldSeekTo?: number;
   onSeekComplete?: () => void;
   onDurationChange?: (duration: number) => void;
+  mobileFullscreenEnabled?: boolean;
 }
 
 declare global {
@@ -33,7 +34,8 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   onProgressUpdate,
   shouldSeekTo,
   onSeekComplete,
-  onDurationChange
+  onDurationChange,
+  mobileFullscreenEnabled = true
 }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
@@ -55,6 +57,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
       console.log('Creating isolated YouTube player for:', videoId);
       
       try {
+        const isMobile = window.innerWidth < 768;
         ytPlayerRef.current = new window.YT.Player(playerRef.current, {
           videoId: videoId,
           width: '100%',
@@ -62,7 +65,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
           playerVars: {
             controls: 0,
             disablekb: 1,
-            fs: 0,
+            fs: isMobile && mobileFullscreenEnabled ? 1 : 0,
             modestbranding: 1,
             rel: 0,
             showinfo: 0,
@@ -261,6 +264,35 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   };
 
   const handleFullscreen = () => {
+    console.log('🎬 Fullscreen button clicked, mobile enabled:', mobileFullscreenEnabled);
+    const isMobile = window.innerWidth < 768;
+    
+    // For mobile with fullscreen enabled, try YouTube's native fullscreen first
+    if (isMobile && mobileFullscreenEnabled && ytPlayerRef.current) {
+      try {
+        console.log('🎬 Attempting YouTube iframe fullscreen on mobile');
+        const iframe = ytPlayerRef.current.getIframe?.();
+        if (iframe) {
+          // Try webkit fullscreen for iOS
+          if ('webkitEnterFullscreen' in iframe && typeof (iframe as any).webkitEnterFullscreen === 'function') {
+            console.log('🎬 Using webkitEnterFullscreen');
+            (iframe as any).webkitEnterFullscreen();
+            return;
+          }
+          // Try standard fullscreen API
+          if (iframe.requestFullscreen) {
+            console.log('🎬 Using requestFullscreen');
+            iframe.requestFullscreen();
+            return;
+          }
+        }
+      } catch (error) {
+        console.log('🎬 YouTube native fullscreen failed:', error);
+      }
+    }
+    
+    // Fallback to container fullscreen
+    console.log('🎬 Using container fullscreen');
     if (!document.fullscreenElement && playerRef.current?.parentElement) {
       playerRef.current.parentElement.requestFullscreen();
     } else if (document.fullscreenElement) {

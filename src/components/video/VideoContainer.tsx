@@ -103,26 +103,34 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   }, [setVolume, isYoutube]);
 
   const handleFullscreen = useCallback(() => {
+    console.log('🎬 HTML5 Fullscreen clicked, mobile enabled:', mobileFullscreenEnabled);
+    const isMobile = window.innerWidth < 768;
+    
     // For mobile devices with native fullscreen support
-    if (mobileFullscreenEnabled && videoRef.current && window.innerWidth < 768) {
+    if (mobileFullscreenEnabled && videoRef.current && isMobile) {
       const video = videoRef.current;
+      console.log('🎬 Attempting mobile video fullscreen');
+      
       // iOS Safari uses webkitEnterFullscreen
       if ('webkitEnterFullscreen' in video && typeof (video as any).webkitEnterFullscreen === 'function') {
         try {
+          console.log('🎬 Using webkitEnterFullscreen');
           (video as any).webkitEnterFullscreen();
           return;
         } catch (e) {
-          console.log('webkitEnterFullscreen not supported');
+          console.log('🎬 webkitEnterFullscreen failed:', e);
         }
       }
       // Try video element fullscreen API
       if (video.requestFullscreen) {
+        console.log('🎬 Using video.requestFullscreen');
         video.requestFullscreen();
         return;
       }
     }
     
     // Desktop or fallback to container fullscreen
+    console.log('🎬 Using container fullscreen');
     if (!document.fullscreenElement && containerRef.current) {
       containerRef.current.requestFullscreen();
     } else {
@@ -293,6 +301,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             shouldSeekTo={state.shouldSeekTo}
             onSeekComplete={() => setShouldSeekTo(undefined)}
             onDurationChange={setVideoDuration}
+            mobileFullscreenEnabled={mobileFullscreenEnabled}
           />
         ) : (
           <>
@@ -302,7 +311,6 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
               className="w-full h-full object-contain"
               preload="metadata"
               playsInline
-              webkit-playsinline="true"
             />
 
             <VideoControls
