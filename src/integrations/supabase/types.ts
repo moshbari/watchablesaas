@@ -84,6 +84,7 @@ export type Database = {
           id: string
           is_published: boolean | null
           legal_disclaimer_text: string | null
+          mobile_fullscreen_enabled: boolean | null
           privacy_policy_url: string | null
           slug: string
           start_time: number | null
@@ -117,6 +118,7 @@ export type Database = {
           id?: string
           is_published?: boolean | null
           legal_disclaimer_text?: string | null
+          mobile_fullscreen_enabled?: boolean | null
           privacy_policy_url?: string | null
           slug: string
           start_time?: number | null
@@ -150,6 +152,7 @@ export type Database = {
           id?: string
           is_published?: boolean | null
           legal_disclaimer_text?: string | null
+          mobile_fullscreen_enabled?: boolean | null
           privacy_policy_url?: string | null
           slug?: string
           start_time?: number | null

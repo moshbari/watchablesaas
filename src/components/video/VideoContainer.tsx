@@ -21,6 +21,7 @@ interface VideoContainerProps {
   fakeProgressEnabled?: boolean;
   fakeProgressColor?: string;
   fakeProgressThickness?: number;
+  mobileFullscreenEnabled?: boolean;
 }
 
 export const VideoContainer: React.FC<VideoContainerProps> = ({ 
@@ -33,7 +34,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   endTime,
   fakeProgressEnabled = false,
   fakeProgressColor = '#ef4444',
-  fakeProgressThickness = 4
+  fakeProgressThickness = 4,
+  mobileFullscreenEnabled = true
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -101,12 +103,32 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   }, [setVolume, isYoutube]);
 
   const handleFullscreen = useCallback(() => {
+    // For mobile devices with native fullscreen support
+    if (mobileFullscreenEnabled && videoRef.current && window.innerWidth < 768) {
+      const video = videoRef.current;
+      // iOS Safari uses webkitEnterFullscreen
+      if ('webkitEnterFullscreen' in video && typeof (video as any).webkitEnterFullscreen === 'function') {
+        try {
+          (video as any).webkitEnterFullscreen();
+          return;
+        } catch (e) {
+          console.log('webkitEnterFullscreen not supported');
+        }
+      }
+      // Try video element fullscreen API
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+        return;
+      }
+    }
+    
+    // Desktop or fallback to container fullscreen
     if (!document.fullscreenElement && containerRef.current) {
       containerRef.current.requestFullscreen();
     } else {
       document.exitFullscreen();
     }
-  }, []);
+  }, [mobileFullscreenEnabled]);
 
   const handleResumeChoice = useCallback((shouldResume: boolean) => {
     console.log('🎬 Resume choice made:', shouldResume, 'saved progress:', savedProgress);
@@ -280,6 +302,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
               className="w-full h-full object-contain"
               preload="metadata"
               playsInline
+              webkit-playsinline="true"
             />
 
             <VideoControls

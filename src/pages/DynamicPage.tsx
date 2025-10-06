@@ -36,6 +36,7 @@ interface Page {
   fake_progress_enabled?: boolean;
   fake_progress_color?: string;
   fake_progress_thickness?: number;
+  mobile_fullscreen_enabled?: boolean;
 }
 
 const DynamicPage = () => {
@@ -167,6 +168,7 @@ const DynamicPage = () => {
                     fakeProgressEnabled={page.fake_progress_enabled ?? true}
                     fakeProgressColor={page.fake_progress_color || '#ef4444'}
                     fakeProgressThickness={page.fake_progress_thickness || 4}
+                    mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
                   />
                 </div>
               </section>

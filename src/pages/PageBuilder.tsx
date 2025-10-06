@@ -46,6 +46,7 @@ interface Page {
   fake_progress_enabled?: boolean;
   fake_progress_color?: string;
   fake_progress_thickness?: number;
+  mobile_fullscreen_enabled?: boolean;
   created_at: string;
 }
 
@@ -112,12 +113,13 @@ const PageBuilder = () => {
     earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
     legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
     earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
-    start_time: undefined,
-    end_time: undefined,
-    fake_progress_enabled: true,
-    fake_progress_color: '#ef4444',
-    fake_progress_thickness: 8
-  });
+      start_time: undefined,
+      end_time: undefined,
+      fake_progress_enabled: true,
+      fake_progress_color: '#ef4444',
+      fake_progress_thickness: 8,
+      mobile_fullscreen_enabled: true
+    });
   const [timeInputs, setTimeInputs] = useState({
     startHour: '',
     startMinute: '',
@@ -343,7 +345,8 @@ const PageBuilder = () => {
       end_time: undefined,
       fake_progress_enabled: true,
       fake_progress_color: '#ef4444',
-      fake_progress_thickness: 8
+      fake_progress_thickness: 8,
+      mobile_fullscreen_enabled: true
     });
     setTimeInputs({
       startHour: '',
@@ -390,7 +393,8 @@ const PageBuilder = () => {
       end_time: page.end_time,
       fake_progress_enabled: page.fake_progress_enabled ?? true,
       fake_progress_color: page.fake_progress_color || '#ef4444',
-      fake_progress_thickness: page.fake_progress_thickness || 4
+      fake_progress_thickness: page.fake_progress_thickness || 4,
+      mobile_fullscreen_enabled: page.mobile_fullscreen_enabled ?? true
     });
 
     // Set time inputs based on existing times
@@ -738,6 +742,24 @@ const PageBuilder = () => {
                           </div>
                         </>
                       )}
+                    </div>
+                  )}
+
+                  {/* Mobile Fullscreen Setting */}
+                  {formData.video_url && (
+                    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="mobile_fullscreen_enabled"
+                          checked={formData.mobile_fullscreen_enabled}
+                          onCheckedChange={(checked) => setFormData(prev => ({ ...prev, mobile_fullscreen_enabled: checked }))}
+                        />
+                        <Label htmlFor="mobile_fullscreen_enabled">Enable Mobile Fullscreen</Label>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        Allows the video to play in fullscreen mode on mobile devices for better viewing experience
+                      </p>
                     </div>
                   )}
 
