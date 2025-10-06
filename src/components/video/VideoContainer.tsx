@@ -311,6 +311,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
               className="w-full h-full object-contain"
               preload="metadata"
               playsInline
+              controls={mobileFullscreenEnabled && /iPhone|iPad|iPod/i.test(navigator.userAgent)}
             />
 
             <VideoControls

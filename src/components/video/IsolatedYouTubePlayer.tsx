@@ -46,6 +46,10 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   const [showControls, setShowControls] = useState(true);
   const progressIntervalRef = useRef<NodeJS.Timeout>();
   const initializeTimeoutRef = useRef<NodeJS.Timeout>();
+  
+  // Detect iOS
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const shouldShowCustomControls = !isIOS || !mobileFullscreenEnabled;
 
   // Load YouTube API and initialize player
   useEffect(() => {
@@ -57,15 +61,18 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
       console.log('Creating isolated YouTube player for:', videoId);
       
       try {
-        const isMobile = window.innerWidth < 768;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        
         ytPlayerRef.current = new window.YT.Player(playerRef.current, {
           videoId: videoId,
           width: '100%',
           height: '100%',
           playerVars: {
-            controls: 0,
+            // On iOS, we must show native controls for fullscreen to work
+            controls: (isIOS && mobileFullscreenEnabled) ? 1 : 0,
             disablekb: 1,
-            fs: isMobile && mobileFullscreenEnabled ? 1 : 0,
+            fs: 1, // Always enable fullscreen button
             modestbranding: 1,
             rel: 0,
             showinfo: 0,
@@ -312,8 +319,8 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
         </div>
       )}
 
-      {/* Custom Controls */}
-      {showControls && (
+      {/* Custom Controls - Hide on iOS when mobile fullscreen is enabled */}
+      {shouldShowCustomControls && showControls && (
         <div className="absolute inset-0 transition-opacity duration-300">
           {/* Center Play Button */}
           {!isPlaying && !isLoading && (
@@ -369,6 +376,15 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
               </Button>
             </div>
           </div>
+        </div>
+      )}
+      
+      {/* iOS Notice */}
+      {isIOS && mobileFullscreenEnabled && !isLoading && (
+        <div className="absolute bottom-16 left-0 right-0 text-center">
+          <p className="text-xs text-white/80 bg-black/50 px-4 py-2 rounded inline-block">
+            Tap the fullscreen button in the video controls
+          </p>
         </div>
       )}
     </div>
