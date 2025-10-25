@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { OverlayButtonConfig } from '@/components/VideoOverlayButton';
-import { ArrowRight } from 'lucide-react';
 
 interface VideoActionButtonProps {
   config: OverlayButtonConfig;
@@ -46,7 +45,7 @@ export const VideoActionButton: React.FC<VideoActionButtonProps> = ({ config }) 
           }}
         >
           <span className="flex-shrink break-words">{config.text}</span>
-          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse flex-shrink-0" />
+          <span className="flex-shrink-0" style={{ fontSize: '0.8em' }}>→</span>
         </a>
       </Button>
     </div>
