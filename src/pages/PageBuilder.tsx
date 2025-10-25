@@ -15,6 +15,7 @@ import { TrialLimitTooltip } from '@/components/TrialLimitTooltip';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
+import { TimedButton } from '@/components/TimedButton';
 import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight, Clipboard } from 'lucide-react';
 
 interface Page {
@@ -884,6 +885,11 @@ const PageBuilder = () => {
                       </>
                     )}
                   </div>
+
+                  <Separator />
+
+                  {/* Timed Button Section */}
+                  <TimedButton />
 
                   <Separator />
 

@@ -70,6 +70,7 @@ export const TimedButton: React.FC = () => {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       width: ${config.width};
       height: ${config.height};
       max-width: 90vw;
@@ -90,7 +91,7 @@ export const TimedButton: React.FC = () => {
     " 
     onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.2)'"
     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
-    >${config.text}</a>
+    >${config.text}<span style="font-size: 0.8em;">→</span></a>
   </div>
 </div>
 
@@ -507,6 +508,7 @@ const TimedButtonPreview: React.FC<{ config: TimedButtonConfig }> = ({ config })
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
+          gap: '8px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           transition: 'all 0.3s ease',
           whiteSpace: 'nowrap',
@@ -516,6 +518,7 @@ const TimedButtonPreview: React.FC<{ config: TimedButtonConfig }> = ({ config })
         className="hover:scale-105 hover:shadow-lg"
       >
         {config.text}
+        <span style={{ fontSize: '0.8em' }}>→</span>
       </a>
       </div>
     </div>
