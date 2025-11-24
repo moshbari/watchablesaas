@@ -51,7 +51,18 @@ export const getYouTubeId = (url: string): string | null => {
   return match && match[2].length === 11 ? match[2] : null;
 };
 
-export const validateVideoUrl = (url: string): { isValid: boolean; type: 'youtube' | 'direct' | 'unknown'; extractedUrl?: string } => {
+export const isGoogleDriveUrl = (url: string): boolean => {
+  return /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=)/.test(url);
+};
+
+export const getGoogleDriveId = (url: string): string | null => {
+  // Matches both /file/d/FILE_ID and open?id=FILE_ID formats
+  const regExp = /(?:\/file\/d\/|open\?id=)([^/&?]+)/;
+  const match = url.match(regExp);
+  return match ? match[1] : null;
+};
+
+export const validateVideoUrl = (url: string): { isValid: boolean; type: 'youtube' | 'googledrive' | 'direct' | 'unknown'; extractedUrl?: string } => {
   try {
     new URL(url); // Basic URL validation
     
@@ -59,6 +70,10 @@ export const validateVideoUrl = (url: string): { isValid: boolean; type: 'youtub
     
     if (isYouTubeUrl(extractedUrl)) {
       return { isValid: true, type: 'youtube', extractedUrl };
+    }
+    
+    if (isGoogleDriveUrl(extractedUrl)) {
+      return { isValid: true, type: 'googledrive', extractedUrl };
     }
     
     if (isVideoFileUrl(extractedUrl) || extractedUrl !== url) {
