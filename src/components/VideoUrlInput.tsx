@@ -40,7 +40,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
   const initialEnd = secondsToTime(initialEndTime);
 
   const [url, setUrl] = useState(initialUrl);
-  const [urlType, setUrlType] = useState<'youtube' | 'direct'>('youtube');
+  const [urlType, setUrlType] = useState<'youtube' | 'googledrive' | 'direct'>('youtube');
   const [startHour, setStartHour] = useState(initialStart.hours);
   const [startMinute, setStartMinute] = useState(initialStart.minutes);
   const [startSecond, setStartSecond] = useState(initialStart.seconds);
@@ -90,6 +90,10 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
       'https://youtu.be/dQw4w9WgXcQ',
       'https://www.youtube.com/embed/dQw4w9WgXcQ'
     ],
+    googledrive: [
+      'https://drive.google.com/file/d/1ABC123XYZ/view',
+      'https://drive.google.com/open?id=1ABC123XYZ'
+    ],
     direct: [
       'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
       'https://sample-videos.com/zip/10/mp4/SampleVideo_720x480_1mb.mp4',
@@ -106,20 +110,24 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
             Distraction-Free Video Player
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            Enter a YouTube URL, direct video file, or video player page - we'll automatically extract the video
+            Enter a YouTube URL, Google Drive video, direct video file, or video player page - we'll automatically extract the video
           </CardDescription>
         </CardHeader>
         
         <CardContent>
-          <Tabs value={urlType} onValueChange={(value) => setUrlType(value as 'youtube' | 'direct')}>
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+          <Tabs value={urlType} onValueChange={(value) => setUrlType(value as 'youtube' | 'googledrive' | 'direct')}>
+            <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="youtube" className="flex items-center gap-2">
                 <Link className="w-4 h-4" />
-                YouTube URL
+                YouTube
+              </TabsTrigger>
+              <TabsTrigger value="googledrive" className="flex items-center gap-2">
+                <Upload className="w-4 h-4" />
+                Google Drive
               </TabsTrigger>
               <TabsTrigger value="direct" className="flex items-center gap-2">
                 <Upload className="w-4 h-4" />
-                Direct Video File
+                Direct File
               </TabsTrigger>
             </TabsList>
 
@@ -249,6 +257,48 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
                     </li>
                   ))}
                 </ul>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="googledrive" className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="googledrive-url">Google Drive Video URL</Label>
+                  <Input
+                    id="googledrive-url"
+                    type="url"
+                    placeholder="https://drive.google.com/file/d/..."
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="bg-input border-player-border"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Note: The video must be publicly accessible (shared with "Anyone with the link")
+                  </p>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-player-accent hover:bg-player-accent/90 text-player-bg"
+                  disabled={isLoading || !url.trim()}
+                >
+                  {isLoading ? (isEditing ? 'Saving Changes...' : 'Creating Campaign...') : (isEditing ? 'Save Changes' : 'Create Campaign')}
+                </Button>
+              </form>
+
+              <div className="text-sm text-muted-foreground">
+                <p className="mb-2">Supported Google Drive formats:</p>
+                <ul className="space-y-1 text-xs">
+                  {exampleUrls.googledrive.map((example, i) => (
+                    <li key={i} className="font-mono bg-muted p-2 rounded cursor-pointer hover:bg-player-controls-hover transition-colors"
+                        onClick={() => setUrl(example)}>
+                      {example}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-4 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded p-2">
+                  <strong>Important:</strong> Make sure your Google Drive video is shared with "Anyone with the link" for it to play.
+                </p>
               </div>
             </TabsContent>
 

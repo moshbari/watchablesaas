@@ -4,10 +4,11 @@ import { VideoControls } from './VideoControls';
 import { useVideoState } from './useVideoState';
 import { useVideoEvents } from './useVideoEvents';
 import { IsolatedYouTubePlayer } from './IsolatedYouTubePlayer';
+import { GoogleDrivePlayer } from './GoogleDrivePlayer';
 import { ResumeModal } from '../ResumeModal';
 import { OverlayButton, type OverlayButtonConfig } from '../VideoOverlayButton';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
-import { extractVideoUrl, isYouTubeUrl, getYouTubeId } from '@/lib/videoUtils';
+import { extractVideoUrl, isYouTubeUrl, getYouTubeId, isGoogleDriveUrl, getGoogleDriveId } from '@/lib/videoUtils';
 import { FakeProgressBar } from './FakeProgressBar';
 
 interface VideoContainerProps {
@@ -47,9 +48,11 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   
   const { savedProgress, saveProgress, clearProgress, showResumeModal, setShowResumeModal } = useVideoProgress(actualVideoUrl);
   
-  // Detect if source is YouTube using the extracted URL
+  // Detect if source is YouTube or Google Drive using the extracted URL
   const isYoutube = useMemo(() => isYouTubeUrl(actualVideoUrl), [actualVideoUrl]);
   const youtubeId = useMemo(() => isYoutube ? getYouTubeId(actualVideoUrl) : null, [isYoutube, actualVideoUrl]);
+  const isGoogleDrive = useMemo(() => isGoogleDriveUrl(actualVideoUrl), [actualVideoUrl]);
+  const googleDriveId = useMemo(() => isGoogleDrive ? getGoogleDriveId(actualVideoUrl) : null, [isGoogleDrive, actualVideoUrl]);
 
   const {
     state,
@@ -64,7 +67,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
 
   // Video event handlers for regular HTML5 videos
   const handlePlay = useCallback(() => {
-    if (isYoutube) return; // YouTube handles its own play/pause
+    if (isYoutube || isGoogleDrive) return; // YouTube/Google Drive handle their own play/pause
     
     if (videoRef.current) {
       if (state.isPlaying) {
@@ -79,20 +82,20 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
         videoRef.current.play();
       }
     }
-  }, [state.isPlaying, isYoutube, startTime, endTime]);
+  }, [state.isPlaying, isYoutube, isGoogleDrive, startTime, endTime]);
 
   const handleVolumeToggle = useCallback(() => {
-    if (isYoutube) return; // YouTube handles its own volume
+    if (isYoutube || isGoogleDrive) return; // YouTube/Google Drive handle their own volume
     
     if (videoRef.current) {
       const newMuted = !state.isMuted;
       videoRef.current.muted = newMuted;
       setVolume(state.volume, newMuted);
     }
-  }, [state.isMuted, state.volume, setVolume, isYoutube]);
+  }, [state.isMuted, state.volume, setVolume, isYoutube, isGoogleDrive]);
 
   const handleVolumeChange = useCallback((value: number[]) => {
-    if (isYoutube) return; // YouTube handles its own volume
+    if (isYoutube || isGoogleDrive) return; // YouTube/Google Drive handle their own volume
     
     const volume = value[0] / 100;
     if (videoRef.current) {
@@ -100,7 +103,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       videoRef.current.muted = volume === 0;
       setVolume(volume, volume === 0);
     }
-  }, [setVolume, isYoutube]);
+  }, [setVolume, isYoutube, isGoogleDrive]);
 
   const handleFullscreen = useCallback(() => {
     console.log('🎬 HTML5 Fullscreen clicked, mobile enabled:', mobileFullscreenEnabled);
@@ -145,12 +148,12 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       if (isYoutube) {
         console.log('🎬 Setting shouldSeekTo for YouTube:', savedProgress);
         setShouldSeekTo(savedProgress);
-      } else if (videoRef.current) {
+      } else if (videoRef.current && !isGoogleDrive) {
         console.log('🎬 Setting currentTime for HTML5 video:', savedProgress);
         videoRef.current.currentTime = savedProgress;
       }
     }
-  }, [savedProgress, isYoutube, setShouldSeekTo, setShowResumeModal]);
+  }, [savedProgress, isYoutube, isGoogleDrive, setShouldSeekTo, setShowResumeModal]);
 
   // YouTube player event handlers - simplified to prevent feedback loops
   const handleYouTubeStateChange = useCallback((isPlaying: boolean) => {
@@ -174,7 +177,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     onPlay: handlePlay,
     onVolumeToggle: handleVolumeToggle,
     onFullscreen: handleFullscreen,
-    isYoutube
+    isYoutube: isYoutube || isGoogleDrive
   });
 
   // Fullscreen change listener
@@ -189,7 +192,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
 
   // Video event listeners for HTML5 videos
   useEffect(() => {
-    if (isYoutube) return; // Skip for YouTube videos
+    if (isYoutube || isGoogleDrive) return; // Skip for YouTube and Google Drive videos
     
     const video = videoRef.current;
     if (!video) return;
@@ -256,14 +259,14 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       video.removeEventListener('error', handleError);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [saveProgress, onError, isYoutube, startTime, endTime, hasInitialized, setLoading, setPlaying, setError]);
+  }, [saveProgress, onError, isYoutube, isGoogleDrive, startTime, endTime, hasInitialized, setLoading, setPlaying, setError]);
 
   // Initialize volume for HTML5 videos
   useEffect(() => {
-    if (videoRef.current && !isYoutube) {
+    if (videoRef.current && !isYoutube && !isGoogleDrive) {
       videoRef.current.volume = state.volume;
     }
-  }, [state.volume, isYoutube]);
+  }, [state.volume, isYoutube, isGoogleDrive]);
 
   if (state.error) {
     return (
@@ -302,6 +305,11 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onSeekComplete={() => setShouldSeekTo(undefined)}
             onDurationChange={setVideoDuration}
             mobileFullscreenEnabled={mobileFullscreenEnabled}
+          />
+        ) : isGoogleDrive && googleDriveId ? (
+          <GoogleDrivePlayer
+            fileId={googleDriveId}
+            onError={onError}
           />
         ) : (
           <>
