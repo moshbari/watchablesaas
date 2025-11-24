@@ -365,15 +365,18 @@ export type Database = {
           trial_ends_at: string | null
           trial_started_at: string | null
         }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       can_create_campaign: {
         Args: { campaign_type: string; user_id: string }
         Returns: boolean
       }
-      cleanup_deleted_campaigns: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_deleted_campaigns: { Args: never; Returns: undefined }
       get_trial_info: {
         Args: { user_id: string }
         Returns: {
@@ -383,22 +386,10 @@ export type Database = {
           trial_started_at: string
         }[]
       }
-      is_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
-      is_sp_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
-      is_trial_active: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      suspend_expired_trials: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_sp_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_trial_active: { Args: { user_id: string }; Returns: boolean }
+      suspend_expired_trials: { Args: never; Returns: number }
     }
     Enums: {
       user_role: "TRIAL" | "UNLIMITED" | "SUSPENDED" | "admin"
