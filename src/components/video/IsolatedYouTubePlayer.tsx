@@ -275,7 +275,10 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div 
+      className="relative w-full h-full"
+      onTouchStart={() => setShowControls(true)}
+    >
       {/* YouTube Player Container */}
       <div ref={playerRef} className="w-full h-full" />
 
