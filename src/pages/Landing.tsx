@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import youtubeDistractionsImage from '@/assets/youtube_player_distractions.jpg';
 import cleanPlayerAfter from '@/assets/clean_player_after.png';
+import watchableInterface from '@/assets/watchable_interface.png';
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255)
@@ -218,7 +219,7 @@ export default function Landing() {
         <div className="landing-container">
           <div className="landing-solution-split">
             <div className="landing-solution-image">
-              <img src="https://placehold.co/600x400/0A2463/FFFFFF?text=Watchable+Interface" alt="Watchable voice-powered interface" />
+              <img src={watchableInterface} alt="Watchable voice-powered interface" />
             </div>
 
             <div className="landing-solution-content">
