@@ -4,6 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Copy, Clipboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface InputWithClipboardProps extends React.InputHTMLAttributes<HTMLInputElement> {
   value: string;
@@ -13,6 +14,7 @@ interface InputWithClipboardProps extends React.InputHTMLAttributes<HTMLInputEle
 export const InputWithClipboard: React.FC<InputWithClipboardProps> = ({ 
   value, 
   onValueChange,
+  className,
   ...inputProps 
 }) => {
   const { toast } = useToast();
@@ -58,7 +60,7 @@ export const InputWithClipboard: React.FC<InputWithClipboardProps> = ({
         {...inputProps}
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
-        className="flex-1"
+        className={cn("flex-1", className)}
       />
       <Button 
         type="button" 
@@ -90,6 +92,7 @@ interface TextareaWithClipboardProps extends React.TextareaHTMLAttributes<HTMLTe
 export const TextareaWithClipboard: React.FC<TextareaWithClipboardProps> = ({ 
   value, 
   onValueChange,
+  className,
   ...textareaProps 
 }) => {
   const { toast } = useToast();
@@ -135,6 +138,7 @@ export const TextareaWithClipboard: React.FC<TextareaWithClipboardProps> = ({
         {...textareaProps}
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
+        className={className}
       />
       <div className="flex gap-2">
         <Button 
