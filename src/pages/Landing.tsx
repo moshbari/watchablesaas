@@ -485,47 +485,99 @@ export default function Landing() {
         <div className="landing-container">
           <h2 className="landing-text-center landing-mb-xl">Simple, Honest Pricing</h2>
 
-          <div className="landing-pricing-card">
-            <div className="landing-popular-badge">Most Popular</div>
-
-            <div className="landing-price">
-              $27<span className="landing-price-period">/month</span>
-            </div>
-
-            <ul className="landing-features-list">
-              {[
-                "Unlimited pages",
-                "Voice-powered AI builder",
-                "Mobile + Desktop creation",
-                "Locked video player",
-                "Analytics dashboard",
-                "Priority support"
-              ].map((feature, index) => (
-                <li key={index}>
-                  <span className="landing-checkmark">✓</span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-
-            <Button className="landing-btn-primary landing-btn-large landing-btn-block" onClick={() => document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' })}>
-              Start 17-Day Free Trial
-            </Button>
-
-            <p className="landing-text-center landing-text-small landing-mt-xs" style={{ color: 'var(--landing-gray-medium)' }}>
-              No credit card required
-            </p>
-
-            <div className="landing-urgency-box">
-              <p className="landing-urgency-text">
-                ⚡ Lock in $27 before price increases to $47
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', maxWidth: '900px', margin: '0 auto' }}>
+            {/* Monthly Plan */}
+            <div className="landing-pricing-card">
+              <p style={{ textAlign: 'center', fontSize: '18px', fontWeight: '600', marginBottom: '24px', color: 'hsl(var(--landing-navy-deep))' }}>
+                Paid Monthly
               </p>
+
+              <div className="landing-price">
+                $47<span className="landing-price-period">/month</span>
+              </div>
+
+              <ul className="landing-features-list">
+                {[
+                  "Unlimited pages",
+                  "Voice-powered AI builder",
+                  "Mobile + Desktop creation",
+                  "Locked video player",
+                  "Analytics dashboard",
+                  "Priority support"
+                ].map((feature, index) => (
+                  <li key={index}>
+                    <span className="landing-checkmark">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button className="landing-btn-primary landing-btn-large landing-btn-block" onClick={() => document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' })}>
+                Start 17-Day Free Trial
+              </Button>
+
+              <p className="landing-text-center landing-text-small landing-mt-xs" style={{ color: 'var(--landing-gray-medium)' }}>
+                No credit card required
+              </p>
+
+              <div className="landing-trust-badges-row" style={{ marginTop: '24px' }}>
+                <span>🔒 256-bit SSL</span>
+                <span>💳 Secure Payment</span>
+                <span>↩️ Cancel Anytime</span>
+              </div>
             </div>
 
-            <div className="landing-trust-badges-row">
-              <span>🔒 256-bit SSL</span>
-              <span>💳 Secure Payment</span>
-              <span>↩️ Cancel Anytime</span>
+            {/* Annual Plan */}
+            <div className="landing-pricing-card" style={{ position: 'relative' }}>
+              <div className="landing-popular-badge">Most Popular</div>
+              
+              <p style={{ textAlign: 'center', fontSize: '18px', fontWeight: '600', marginBottom: '24px', color: 'hsl(var(--landing-navy-deep))' }}>
+                Paid Annually
+              </p>
+
+              <div className="landing-price">
+                $27<span className="landing-price-period">/month</span>
+              </div>
+
+              <p style={{ textAlign: 'center', fontSize: '14px', color: 'hsl(var(--landing-orange-warm))', fontWeight: '600', marginTop: '8px' }}>
+                Save 43% • $324/year
+              </p>
+
+              <ul className="landing-features-list">
+                {[
+                  "Unlimited pages",
+                  "Voice-powered AI builder",
+                  "Mobile + Desktop creation",
+                  "Locked video player",
+                  "Analytics dashboard",
+                  "Priority support"
+                ].map((feature, index) => (
+                  <li key={index}>
+                    <span className="landing-checkmark">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button className="landing-btn-primary landing-btn-large landing-btn-block" onClick={() => document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' })}>
+                Start 17-Day Free Trial
+              </Button>
+
+              <p className="landing-text-center landing-text-small landing-mt-xs" style={{ color: 'var(--landing-gray-medium)' }}>
+                No credit card required
+              </p>
+
+              <div className="landing-urgency-box">
+                <p className="landing-urgency-text">
+                  ⚡ Lock in $27 before price increases to $47
+                </p>
+              </div>
+
+              <div className="landing-trust-badges-row">
+                <span>🔒 256-bit SSL</span>
+                <span>💳 Secure Payment</span>
+                <span>↩️ Cancel Anytime</span>
+              </div>
             </div>
           </div>
         </div>
