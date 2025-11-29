@@ -7,6 +7,7 @@ import { type OverlayButtonConfig } from '@/components/VideoOverlayButton';
 import { LeadOptinModal } from '@/components/LeadOptinModal';
 import { useToast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
+import { formatText } from '@/lib/textFormatting';
 
 interface Page {
   id: string;
@@ -25,6 +26,10 @@ interface Page {
   sub_headline_font_size?: number;
   button_bg_color?: string;
   button_text_color?: string;
+  text_highlight?: string;
+  text_bold?: string;
+  text_italic?: string;
+  text_underline?: string;
   user_id?: string;
   lead_optin_enabled?: boolean;
   lead_optin_mandatory?: boolean;
@@ -173,7 +178,12 @@ const DynamicPage = () => {
                 className="font-bold text-gray-900 leading-tight"
                 style={{ fontSize: `${page.headline_font_size || 48}px` }}
               >
-                {page.headline}
+                {formatText(page.headline, {
+                  highlight: page.text_highlight,
+                  bold: page.text_bold,
+                  italic: page.text_italic,
+                  underline: page.text_underline
+                })}
               </h1>
               
               {page.sub_headline && (
@@ -181,7 +191,12 @@ const DynamicPage = () => {
                   className="text-gray-600 max-w-3xl mx-auto leading-relaxed"
                   style={{ fontSize: `${page.sub_headline_font_size || 20}px` }}
                 >
-                  {page.sub_headline}
+                  {formatText(page.sub_headline, {
+                    highlight: page.text_highlight,
+                    bold: page.text_bold,
+                    italic: page.text_italic,
+                    underline: page.text_underline
+                  })}
                 </p>
               )}
             </section>

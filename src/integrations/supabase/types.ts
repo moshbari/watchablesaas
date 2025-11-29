@@ -169,6 +169,10 @@ export type Database = {
           sub_headline: string | null
           sub_headline_font_size: number | null
           terms_conditions_url: string | null
+          text_bold: string | null
+          text_highlight: string | null
+          text_italic: string | null
+          text_underline: string | null
           title: string
           updated_at: string
           user_id: string
@@ -216,6 +220,10 @@ export type Database = {
           sub_headline?: string | null
           sub_headline_font_size?: number | null
           terms_conditions_url?: string | null
+          text_bold?: string | null
+          text_highlight?: string | null
+          text_italic?: string | null
+          text_underline?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -263,6 +271,10 @@ export type Database = {
           sub_headline?: string | null
           sub_headline_font_size?: number | null
           terms_conditions_url?: string | null
+          text_bold?: string | null
+          text_highlight?: string | null
+          text_italic?: string | null
+          text_underline?: string | null
           title?: string
           updated_at?: string
           user_id?: string
