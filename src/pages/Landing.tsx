@@ -300,7 +300,7 @@ export default function Landing() {
 
           <div className="landing-comparison">
             <div className="landing-comparison-card">
-              <p className="landing-comparison-label landing-before">BEFORE:</p>
+              <p className="landing-comparison-label landing-before" style={{ textAlign: 'center', fontSize: '32px', fontWeight: '700' }}>BEFORE:</p>
               <div className="landing-comparison-image">
                 <img 
                   src={youtubeDistractionsImage} 
@@ -318,7 +318,7 @@ export default function Landing() {
             <div className="landing-vs-divider">VS</div>
 
             <div className="landing-comparison-card">
-              <p className="landing-comparison-label landing-after">AFTER:</p>
+              <p className="landing-comparison-label landing-after" style={{ textAlign: 'center', fontSize: '32px', fontWeight: '700' }}>AFTER:</p>
               <div className="landing-comparison-image">
                 <img 
                   src={cleanPlayerAfter} 
