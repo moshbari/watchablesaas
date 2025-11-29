@@ -66,27 +66,53 @@ serve(async (req) => {
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
 
-    console.log('Generated text:', generatedText);
+    console.log('Full AI response:', generatedText);
 
-    // Parse the JSON response
+    // Parse the JSON response - try multiple approaches
     let parsedResult;
     try {
-      // Try to extract JSON from the response (in case there's extra text)
-      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        parsedResult = JSON.parse(jsonMatch[0]);
+      // First, try to find JSON in markdown code blocks
+      const codeBlockMatch = generatedText.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      if (codeBlockMatch) {
+        parsedResult = JSON.parse(codeBlockMatch[1]);
+        console.log('Parsed from code block');
       } else {
-        parsedResult = JSON.parse(generatedText);
+        // Try to extract any JSON object from the text
+        const jsonMatch = generatedText.match(/\{[^{}]*"headline"[^{}]*"subHeadline"[^{}]*\}/);
+        if (jsonMatch) {
+          parsedResult = JSON.parse(jsonMatch[0]);
+          console.log('Parsed from inline JSON');
+        } else {
+          // Last resort: try parsing the whole string
+          parsedResult = JSON.parse(generatedText.trim());
+          console.log('Parsed whole response');
+        }
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', generatedText);
-      throw new Error('AI returned invalid format');
+      console.error('Parse error:', parseError.message);
+      
+      // Fallback: try to extract headline and subheadline manually
+      const headlineMatch = generatedText.match(/["']?headline["']?\s*:\s*["']([^"']+)["']/i);
+      const subHeadlineMatch = generatedText.match(/["']?(?:subHeadline|sub_headline|subheadline)["']?\s*:\s*["']([^"']+)["']/i);
+      
+      if (headlineMatch && subHeadlineMatch) {
+        parsedResult = {
+          headline: headlineMatch[1],
+          subHeadline: subHeadlineMatch[1]
+        };
+        console.log('Extracted via regex fallback');
+      } else {
+        throw new Error('AI returned invalid format. Response: ' + generatedText.substring(0, 200));
+      }
     }
+
+    console.log('Final parsed result:', parsedResult);
 
     return new Response(
       JSON.stringify({ 
-        headline: parsedResult.headline,
-        subHeadline: parsedResult.subHeadline 
+        headline: parsedResult.headline || parsedResult.Headline,
+        subHeadline: parsedResult.subHeadline || parsedResult.SubHeadline || parsedResult.sub_headline
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
