@@ -912,6 +912,18 @@ html, body {
   .landing-email-input,
   .landing-btn-large {
     height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+  }
+  
+  .landing-cta-form input[type="email"] {
+    height: 60px !important;
+    min-height: 60px !important;
+  }
+  
+  .landing-cta-form button {
+    height: 60px !important;
+    min-height: 60px !important;
   }
 
   .landing-trust-points {
