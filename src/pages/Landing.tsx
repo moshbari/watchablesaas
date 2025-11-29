@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import youtubeDistractionsImage from '@/assets/youtube_player_distractions.jpg';
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255)
@@ -295,6 +296,14 @@ export default function Landing() {
       <section className="landing-section landing-section-dark">
         <div className="landing-container">
           <h2 className="landing-text-center landing-mb-xl" style={{ color: 'white' }}>The Feature That Changes Everything</h2>
+
+          <div className="landing-text-center landing-mb-l">
+            <img 
+              src={youtubeDistractionsImage} 
+              alt="YouTube player distractions - showing distracting links, suggestions, and progress bar" 
+              style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px', margin: '0 auto' }}
+            />
+          </div>
 
           <div className="landing-comparison">
             <div className="landing-comparison-card">
