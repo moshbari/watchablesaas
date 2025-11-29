@@ -15,8 +15,9 @@ import { TrialLimitTooltip } from '@/components/TrialLimitTooltip';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
+import { AIHeadlineGenerator } from '@/components/AIHeadlineGenerator';
 import { TimedButton } from '@/components/TimedButton';
-import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight, Clipboard, Sparkles } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight, Clipboard } from 'lucide-react';
 import { InputWithClipboard, TextareaWithClipboard } from '@/components/InputWithClipboard';
 
 interface Page {
@@ -162,7 +163,6 @@ const PageBuilder = () => {
     seconds: '5'
   });
   const [loading, setLoading] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
   const { toast } = useToast();
   const { canCreatePage } = useCampaignLimits();
@@ -221,40 +221,6 @@ const PageBuilder = () => {
         description: "Failed to fetch pages",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleAIGenerate = async () => {
-    setAiLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-headline', {
-        body: { context: formData.title }
-      });
-
-      if (error) throw error;
-
-      if (data?.headline && data?.subHeadline) {
-        setFormData(prev => ({
-          ...prev,
-          headline: data.headline,
-          sub_headline: data.subHeadline
-        }));
-        toast({
-          title: "Success",
-          description: "AI generated headline and sub-headline",
-        });
-      } else {
-        throw new Error('Invalid response from AI');
-      }
-    } catch (error: any) {
-      console.error('AI generation error:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate with AI",
-        variant: "destructive",
-      });
-    } finally {
-      setAiLoading(false);
     }
   };
 
@@ -625,22 +591,15 @@ const PageBuilder = () => {
                     <div className="flex items-center justify-between mb-2">
                       <Label htmlFor="headline">Headline</Label>
                       <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleAIGenerate}
-                          disabled={aiLoading}
-                        >
-                          {aiLoading ? (
-                            <>Generating...</>
-                          ) : (
-                            <>
-                              <Sparkles className="w-4 h-4 mr-1" />
-                              Use AI
-                            </>
-                          )}
-                        </Button>
+                        <AIHeadlineGenerator
+                          onSelect={(headline, subHeadline) => {
+                            setFormData(prev => ({ 
+                              ...prev, 
+                              headline: headline,
+                              sub_headline: subHeadline
+                            }));
+                          }}
+                        />
                         <HeadlineTemplateSelector 
                           onTemplateSelect={(headline, subHeadline) => {
                             setFormData(prev => ({ 
