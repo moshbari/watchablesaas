@@ -81,23 +81,23 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Landing Page Colors */
-    --landing-navy-deep: 10 36 99;
-    --landing-navy-light: 26 58 107;
-    --landing-blue-soft: 62 146 204;
-    --landing-gray-light: 244 246 248;
-    --landing-gray-medium: 139 149 165;
-    --landing-charcoal: 45 49 66;
-    --landing-border-gray: 229 233 237;
-    --landing-orange-warm: 255 107 53;
-    --landing-orange-dark: 229 90 43;
-    --landing-orange-darker: 204 79 34;
-    --landing-green-success: 82 183 136;
-    --landing-yellow-alert: 255 182 39;
-    --landing-yellow-bg: 255 249 230;
-    --landing-red-alert: 230 57 70;
-    --landing-blue-light-bg: 240 247 255;
-    --landing-orange-light-bg: 255 244 230;
+    /* Landing Page Colors - All in HSL format */
+    --landing-navy-deep: 217 82% 21%;
+    --landing-navy-light: 217 61% 26%;
+    --landing-blue-soft: 204 59% 53%;
+    --landing-gray-light: 210 17% 96%;
+    --landing-gray-medium: 217 11% 60%;
+    --landing-charcoal: 228 18% 22%;
+    --landing-border-gray: 213 16% 91%;
+    --landing-orange-warm: 14 100% 60%;
+    --landing-orange-dark: 14 76% 54%;
+    --landing-orange-darker: 14 72% 47%;
+    --landing-green-success: 150 44% 52%;
+    --landing-yellow-alert: 41 100% 58%;
+    --landing-yellow-bg: 48 100% 95%;
+    --landing-red-alert: 356 75% 56%;
+    --landing-blue-light-bg: 212 100% 97%;
+    --landing-orange-light-bg: 33 100% 95%;
 
     --sidebar-background: 0 0% 98%;
 
