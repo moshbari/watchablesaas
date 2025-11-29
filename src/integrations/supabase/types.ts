@@ -145,6 +145,7 @@ export type Database = {
           fake_progress_thickness: number | null
           footer_enabled: boolean | null
           headline: string
+          headline_color: string | null
           headline_font_size: number | null
           id: string
           is_published: boolean | null
@@ -167,6 +168,7 @@ export type Database = {
           slug: string
           start_time: number | null
           sub_headline: string | null
+          sub_headline_color: string | null
           sub_headline_font_size: number | null
           terms_conditions_url: string | null
           text_bold: string | null
@@ -197,6 +199,7 @@ export type Database = {
           fake_progress_thickness?: number | null
           footer_enabled?: boolean | null
           headline: string
+          headline_color?: string | null
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
@@ -219,6 +222,7 @@ export type Database = {
           slug: string
           start_time?: number | null
           sub_headline?: string | null
+          sub_headline_color?: string | null
           sub_headline_font_size?: number | null
           terms_conditions_url?: string | null
           text_bold?: string | null
@@ -249,6 +253,7 @@ export type Database = {
           fake_progress_thickness?: number | null
           footer_enabled?: boolean | null
           headline?: string
+          headline_color?: string | null
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
@@ -271,6 +276,7 @@ export type Database = {
           slug?: string
           start_time?: number | null
           sub_headline?: string | null
+          sub_headline_color?: string | null
           sub_headline_font_size?: number | null
           terms_conditions_url?: string | null
           text_bold?: string | null

@@ -34,7 +34,9 @@ interface Page {
   button_enabled: boolean;
   is_published: boolean;
   headline_font_size: number;
+  headline_color: string;
   sub_headline_font_size: number;
+  sub_headline_color: string;
   button_bg_color: string;
   button_text_color: string;
   text_highlight?: string;
@@ -123,9 +125,11 @@ const PageBuilder = () => {
     button_delay: 5,
     button_enabled: false,
     is_published: false,
-    headline_font_size: 28,
-    sub_headline_font_size: 16,
-    button_bg_color: '#007bc7',
+      headline_font_size: 28,
+      headline_color: '#000000',
+      sub_headline_font_size: 16,
+      sub_headline_color: '#000000',
+      button_bg_color: '#007bc7',
     button_text_color: '#ffffff',
     text_highlight: '',
     text_highlight_color: '#ef4444',
@@ -370,7 +374,9 @@ const PageBuilder = () => {
       button_enabled: false,
       is_published: false,
       headline_font_size: 28,
+      headline_color: '#000000',
       sub_headline_font_size: 16,
+      sub_headline_color: '#000000',
       button_bg_color: '#007bc7',
       button_text_color: '#ffffff',
       text_highlight: '',
@@ -436,7 +442,9 @@ const PageBuilder = () => {
       button_enabled: page.button_enabled,
       is_published: page.is_published,
       headline_font_size: page.headline_font_size || 28,
+      headline_color: page.headline_color || '#000000',
       sub_headline_font_size: page.sub_headline_font_size || 16,
+      sub_headline_color: page.sub_headline_color || '#000000',
       button_bg_color: page.button_bg_color || '#007bc7',
       button_text_color: page.button_text_color || '#ffffff',
       text_highlight: page.text_highlight || '',
@@ -634,6 +642,25 @@ const PageBuilder = () => {
                         className="mt-2"
                       />
                     </div>
+                    <div className="mt-3">
+                      <Label htmlFor="headline_color">Headline Color</Label>
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          type="color"
+                          id="headline_color"
+                          value={formData.headline_color}
+                          onChange={(e) => setFormData(prev => ({ ...prev, headline_color: e.target.value }))}
+                          className="h-10 w-16 rounded border cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={formData.headline_color}
+                          onChange={(e) => setFormData(prev => ({ ...prev, headline_color: e.target.value }))}
+                          placeholder="#000000"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div>
@@ -657,6 +684,25 @@ const PageBuilder = () => {
                         onValueChange={(value) => setFormData(prev => ({ ...prev, sub_headline_font_size: value[0] }))}
                         className="mt-2"
                       />
+                    </div>
+                    <div className="mt-3">
+                      <Label htmlFor="sub_headline_color">Sub-headline Color</Label>
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          type="color"
+                          id="sub_headline_color"
+                          value={formData.sub_headline_color}
+                          onChange={(e) => setFormData(prev => ({ ...prev, sub_headline_color: e.target.value }))}
+                          className="h-10 w-16 rounded border cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={formData.sub_headline_color}
+                          onChange={(e) => setFormData(prev => ({ ...prev, sub_headline_color: e.target.value }))}
+                          placeholder="#000000"
+                          className="flex-1"
+                        />
+                      </div>
                     </div>
                   </div>
 
