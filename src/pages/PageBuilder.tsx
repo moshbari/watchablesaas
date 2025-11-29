@@ -555,6 +555,7 @@ const PageBuilder = () => {
                       }}
                       placeholder="My Landing Page"
                       required
+                      className="border-2 border-foreground/80 rounded-lg"
                     />
                   </div>
 
@@ -566,6 +567,7 @@ const PageBuilder = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                       placeholder="Auto-generated from title..."
                       required
+                      className="border-2 border-foreground/80 rounded-lg"
                     />
                     <p className="text-sm text-muted-foreground mt-1">
                       Your page will be available at: /{formData.slug || 'auto-generated-slug'}
@@ -591,6 +593,7 @@ const PageBuilder = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, headline: e.target.value }))}
                       placeholder="Transform Your Business Today"
                       required
+                      className="border-2 border-foreground/80 rounded-lg"
                     />
                     <div className="mt-3">
                       <Label htmlFor="headline_font_size">Font Size: {formData.headline_font_size}px</Label>
@@ -614,6 +617,7 @@ const PageBuilder = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, sub_headline: e.target.value }))}
                       placeholder="Discover the proven system that's helped thousands..."
                       rows={2}
+                      className="border-2 border-foreground/80 rounded-lg"
                     />
                     <div className="mt-3">
                       <Label htmlFor="sub_headline_font_size">Font Size: {formData.sub_headline_font_size}px</Label>
@@ -639,6 +643,7 @@ const PageBuilder = () => {
                         value={formData.video_url}
                         onChange={(e) => setFormData(prev => ({ ...prev, video_url: e.target.value }))}
                         placeholder="https://www.youtube.com/watch?v=..."
+                        className="border-2 border-foreground/80 rounded-lg"
                       />
                       <Button type="button" variant="outline" onClick={handlePaste}>
                         <Clipboard className="w-4 h-4 mr-2" />
@@ -764,7 +769,7 @@ const PageBuilder = () => {
                                 value={formData.fake_progress_color}
                                 onChange={(e) => setFormData(prev => ({ ...prev, fake_progress_color: e.target.value }))}
                                 placeholder="#ef4444"
-                                className="flex-1"
+                                className="flex-1 border-2 border-foreground/80 rounded-lg"
                               />
                             </div>
                           </div>
@@ -825,6 +830,7 @@ const PageBuilder = () => {
                             value={formData.button_text}
                             onChange={(e) => setFormData(prev => ({ ...prev, button_text: e.target.value }))}
                             placeholder="Get Started Now"
+                            className="border-2 border-foreground/80 rounded-lg"
                           />
                         </div>
 
@@ -836,6 +842,7 @@ const PageBuilder = () => {
                             onChange={(e) => setFormData(prev => ({ ...prev, button_url: e.target.value }))}
                             placeholder="https://ultimateonlinemastery.org/"
                             type="url"
+                            className="border-2 border-foreground/80 rounded-lg"
                           />
                         </div>
 
@@ -898,7 +905,7 @@ const PageBuilder = () => {
                                 value={formData.button_bg_color}
                                 onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
                                 placeholder="#0084ff"
-                                className="flex-1"
+                                className="flex-1 border-2 border-foreground/80 rounded-lg"
                               />
                             </div>
                           </div>
@@ -917,7 +924,7 @@ const PageBuilder = () => {
                                 value={formData.button_text_color}
                                 onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
                                 placeholder="#ffffff"
-                                className="flex-1"
+                                className="flex-1 border-2 border-foreground/80 rounded-lg"
                               />
                             </div>
                           </div>
@@ -959,6 +966,7 @@ const PageBuilder = () => {
                               value={formData.lead_optin_headline}
                               onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_headline: e.target.value }))}
                               placeholder="Become a Member"
+                              className="border-2 border-foreground/80 rounded-lg"
                             />
                           </div>
 
@@ -970,6 +978,7 @@ const PageBuilder = () => {
                               onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_description: e.target.value }))}
                               placeholder="Enter your information to watch this exclusive video"
                               rows={2}
+                              className="border-2 border-foreground/80 rounded-lg"
                             />
                           </div>
 
@@ -980,6 +989,7 @@ const PageBuilder = () => {
                               value={formData.lead_optin_button_text}
                               onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text: e.target.value }))}
                               placeholder="Join to Watch Video"
+                              className="border-2 border-foreground/80 rounded-lg"
                             />
                           </div>
 
@@ -1081,6 +1091,7 @@ const PageBuilder = () => {
                             value={formData.copyright_text}
                             onChange={(e) => setFormData(prev => ({ ...prev, copyright_text: e.target.value }))}
                             placeholder="2025 Mosh Bari - Copyright© 2025. All Rights Reserved."
+                            className="border-2 border-foreground/80 rounded-lg"
                           />
                         </div>
 
@@ -1093,6 +1104,7 @@ const PageBuilder = () => {
                               onChange={(e) => setFormData(prev => ({ ...prev, privacy_policy_url: e.target.value }))}
                               placeholder="https://winarzapps.com/privacy-policy/"
                               type="url"
+                              className="border-2 border-foreground/80 rounded-lg"
                             />
                           </div>
 
@@ -1104,6 +1116,7 @@ const PageBuilder = () => {
                               onChange={(e) => setFormData(prev => ({ ...prev, terms_conditions_url: e.target.value }))}
                               placeholder="https://winarzapps.com/terms-of-service/"
                               type="url"
+                              className="border-2 border-foreground/80 rounded-lg"
                             />
                           </div>
 
@@ -1115,6 +1128,7 @@ const PageBuilder = () => {
                               onChange={(e) => setFormData(prev => ({ ...prev, earnings_disclaimer_url: e.target.value }))}
                               placeholder="https://winarzapps.com/earning-disclaimer"
                               type="url"
+                              className="border-2 border-foreground/80 rounded-lg"
                             />
                           </div>
                         </div>
@@ -1127,6 +1141,7 @@ const PageBuilder = () => {
                             onChange={(e) => setFormData(prev => ({ ...prev, legal_disclaimer_text: e.target.value }))}
                             placeholder="This site is not a part of the Facebook website..."
                             rows={3}
+                            className="border-2 border-foreground/80 rounded-lg"
                           />
                         </div>
 
@@ -1138,6 +1153,7 @@ const PageBuilder = () => {
                             onChange={(e) => setFormData(prev => ({ ...prev, earnings_disclaimer_text: e.target.value }))}
                             placeholder="*Earnings and income representations made by..."
                             rows={4}
+                            className="border-2 border-foreground/80 rounded-lg"
                           />
                         </div>
                       </div>
