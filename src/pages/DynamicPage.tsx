@@ -164,7 +164,7 @@ const DynamicPage = () => {
         <link rel="canonical" href={`${window.location.origin}/${page.slug}`} />
       </Helmet>
 
-      <div className="min-h-screen bg-white" onClick={handlePageClick}>
+      <div className="min-h-screen bg-white relative">
         <main className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto text-center">
             {/* Hero Section */}
@@ -190,42 +190,18 @@ const DynamicPage = () => {
             {page.video_url && (
               <section className="mb-12">
                 <div className="max-w-3xl mx-auto">
-                  {page.lead_optin_enabled && !hasOptedIn ? (
-                    <div 
-                      className="relative cursor-pointer"
-                    >
-                      <VideoPlayer 
-                        src={page.video_url} 
-                        onError={handleVideoError}
-                        playButtonColor="#ef4444"
-                        playButtonSize={120}
-                        startTime={page.start_time}
-                        endTime={page.end_time}
-                        fakeProgressEnabled={page.fake_progress_enabled ?? true}
-                        fakeProgressColor={page.fake_progress_color || '#ef4444'}
-                        fakeProgressThickness={page.fake_progress_thickness || 4}
-                        mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
-                      />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center pointer-events-none">
-                        <div className="text-white text-center">
-                          <p className="text-xl font-semibold">Click anywhere to become a member and watch</p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <VideoPlayer 
-                      src={page.video_url} 
-                      onError={handleVideoError}
-                      playButtonColor="#ef4444"
-                      playButtonSize={120}
-                      startTime={page.start_time}
-                      endTime={page.end_time}
-                      fakeProgressEnabled={page.fake_progress_enabled ?? true}
-                      fakeProgressColor={page.fake_progress_color || '#ef4444'}
-                      fakeProgressThickness={page.fake_progress_thickness || 4}
-                      mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
-                    />
-                  )}
+                  <VideoPlayer 
+                    src={page.video_url} 
+                    onError={handleVideoError}
+                    playButtonColor="#ef4444"
+                    playButtonSize={120}
+                    startTime={page.start_time}
+                    endTime={page.end_time}
+                    fakeProgressEnabled={page.fake_progress_enabled ?? true}
+                    fakeProgressColor={page.fake_progress_color || '#ef4444'}
+                    fakeProgressThickness={page.fake_progress_thickness || 4}
+                    mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
+                  />
                 </div>
               </section>
             )}
@@ -288,6 +264,14 @@ const DynamicPage = () => {
             )}
           </div>
         </main>
+
+        {/* Full page overlay when lead optin is required */}
+        {page.lead_optin_enabled && !hasOptedIn && (
+          <div 
+            className="fixed inset-0 bg-black/50 cursor-pointer z-50"
+            onClick={handlePageClick}
+          />
+        )}
 
         {/* Schema.org structured data */}
         <script type="application/ld+json">
