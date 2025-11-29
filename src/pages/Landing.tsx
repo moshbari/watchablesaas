@@ -485,7 +485,7 @@ export default function Landing() {
         <div className="landing-container">
           <h2 className="landing-text-center landing-mb-xl">Simple, Honest Pricing</h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', maxWidth: '900px', margin: '0 auto' }}>
+          <div className="landing-pricing-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', maxWidth: '900px', margin: '0 auto' }}>
             {/* Monthly Plan */}
             <div className="landing-pricing-card">
               <p style={{ textAlign: 'center', fontSize: '18px', fontWeight: '600', marginBottom: '24px', color: 'hsl(var(--landing-navy-deep))' }}>
