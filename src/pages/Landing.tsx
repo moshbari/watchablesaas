@@ -631,19 +631,19 @@ export default function Landing() {
           </form>
 
           <div className="landing-trust-points" style={{ color: 'white' }}>
-            <div className="landing-trust-point">
+            <div className="landing-trust-point" style={{ color: 'white' }}>
               <span className="landing-checkmark">✓</span>
               <span>17-day free trial</span>
             </div>
-            <div className="landing-trust-point">
+            <div className="landing-trust-point" style={{ color: 'white' }}>
               <span className="landing-checkmark">✓</span>
               <span>No credit card required</span>
             </div>
-            <div className="landing-trust-point">
+            <div className="landing-trust-point" style={{ color: 'white' }}>
               <span className="landing-checkmark">✓</span>
               <span>Cancel anytime</span>
             </div>
-            <div className="landing-trust-point">
+            <div className="landing-trust-point" style={{ color: 'white' }}>
               <span className="landing-checkmark">✓</span>
               <span>$27/month after trial</span>
             </div>
