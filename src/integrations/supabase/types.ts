@@ -127,6 +127,7 @@ export type Database = {
           lead_optin_email_required: boolean | null
           lead_optin_enabled: boolean | null
           lead_optin_headline: string | null
+          lead_optin_mandatory: boolean | null
           lead_optin_name_enabled: boolean | null
           lead_optin_name_required: boolean | null
           lead_optin_phone_enabled: boolean | null
@@ -171,6 +172,7 @@ export type Database = {
           lead_optin_email_required?: boolean | null
           lead_optin_enabled?: boolean | null
           lead_optin_headline?: string | null
+          lead_optin_mandatory?: boolean | null
           lead_optin_name_enabled?: boolean | null
           lead_optin_name_required?: boolean | null
           lead_optin_phone_enabled?: boolean | null
@@ -215,6 +217,7 @@ export type Database = {
           lead_optin_email_required?: boolean | null
           lead_optin_enabled?: boolean | null
           lead_optin_headline?: string | null
+          lead_optin_mandatory?: boolean | null
           lead_optin_name_enabled?: boolean | null
           lead_optin_name_required?: boolean | null
           lead_optin_phone_enabled?: boolean | null

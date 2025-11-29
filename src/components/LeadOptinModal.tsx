@@ -24,6 +24,7 @@ interface LeadOptinModalProps {
   emailRequired: boolean;
   phoneEnabled: boolean;
   phoneRequired: boolean;
+  isMandatory?: boolean;
   headline?: string;
   description?: string;
   buttonText?: string;
@@ -40,6 +41,7 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
   emailRequired,
   phoneEnabled,
   phoneRequired,
+  isMandatory = false,
   headline = 'Become a Member',
   description = 'Enter your information to watch this exclusive video',
   buttonText = 'Join to Watch Video'
@@ -133,8 +135,24 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => !loading && onClose()}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      // If mandatory, prevent closing unless loading is done
+      // If not mandatory, allow closing anytime (except during loading)
+      if (!open && !loading && !isMandatory) {
+        onClose();
+      }
+    }}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => {
+        // Prevent closing on outside click if mandatory
+        if (isMandatory) {
+          e.preventDefault();
+        }
+      }} onEscapeKeyDown={(e) => {
+        // Prevent closing on escape key if mandatory
+        if (isMandatory) {
+          e.preventDefault();
+        }
+      }}>
         <DialogHeader>
           <DialogTitle className="text-2xl">{headline}</DialogTitle>
           <DialogDescription className="text-base">

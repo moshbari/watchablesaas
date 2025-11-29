@@ -27,6 +27,7 @@ interface Page {
   button_text_color?: string;
   user_id?: string;
   lead_optin_enabled?: boolean;
+  lead_optin_mandatory?: boolean;
   lead_optin_name_enabled?: boolean;
   lead_optin_name_required?: boolean;
   lead_optin_email_enabled?: boolean;
@@ -318,6 +319,7 @@ const DynamicPage = () => {
             emailRequired={page.lead_optin_email_required ?? true}
             phoneEnabled={page.lead_optin_phone_enabled ?? false}
             phoneRequired={page.lead_optin_phone_required ?? false}
+            isMandatory={page.lead_optin_mandatory ?? false}
             headline={page.lead_optin_headline}
             description={page.lead_optin_description}
             buttonText={page.lead_optin_button_text}
