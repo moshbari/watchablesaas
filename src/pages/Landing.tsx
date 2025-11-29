@@ -496,6 +496,10 @@ export default function Landing() {
                 $47<span className="landing-price-period">/month</span>
               </div>
 
+              <p style={{ textAlign: 'center', fontSize: '14px', marginTop: '8px', height: '20px', visibility: 'hidden' }}>
+                Placeholder
+              </p>
+
               <ul className="landing-features-list">
                 {[
                   "Unlimited pages",
