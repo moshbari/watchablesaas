@@ -806,14 +806,14 @@ const PageBuilder = () => {
 
                   <Separator />
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="button_enabled"
                         checked={formData.button_enabled}
                         onCheckedChange={(checked) => setFormData(prev => ({ ...prev, button_enabled: checked }))}
                       />
-                      <Label htmlFor="button_enabled">Enable Call-to-Action Button</Label>
+                      <Label htmlFor="button_enabled" className="text-base font-semibold">Enable Call-to-Action Button</Label>
                     </div>
 
                     {formData.button_enabled && (
@@ -934,14 +934,14 @@ const PageBuilder = () => {
                   <Separator />
 
                   {/* Lead Optin Section */}
-                  <div className="space-y-4">
+                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="lead_optin_enabled"
                         checked={formData.lead_optin_enabled}
                         onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_enabled: checked }))}
                       />
-                      <Label htmlFor="lead_optin_enabled" className="text-lg font-semibold">
+                      <Label htmlFor="lead_optin_enabled" className="text-base font-semibold">
                         Enable Lead Optin Popup
                       </Label>
                     </div>
@@ -1062,14 +1062,14 @@ const PageBuilder = () => {
 
                   <Separator />
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="footer_enabled"
                         checked={formData.footer_enabled}
                         onCheckedChange={(checked) => setFormData(prev => ({ ...prev, footer_enabled: checked }))}
                       />
-                      <Label htmlFor="footer_enabled">Enable Footer & Legal Disclaimers</Label>
+                      <Label htmlFor="footer_enabled" className="text-base font-semibold">Enable Footer & Legal Disclaimers</Label>
                     </div>
 
                     {formData.footer_enabled && (
@@ -1146,13 +1146,13 @@ const PageBuilder = () => {
 
                   <Separator />
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 p-4 bg-muted/50 rounded-lg border">
                     <Switch
                       id="is_published"
                       checked={formData.is_published}
                       onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_published: checked }))}
                     />
-                    <Label htmlFor="is_published">Publish Page</Label>
+                    <Label htmlFor="is_published" className="text-base font-semibold">Publish Page</Label>
                   </div>
 
                   <Button type="submit" disabled={loading} className="w-full">
