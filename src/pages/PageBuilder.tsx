@@ -16,6 +16,7 @@ import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
 import { AIHeadlineGenerator } from '@/components/AIHeadlineGenerator';
+import { AIPageGenerator } from '@/components/AIPageGenerator';
 import { TimedButton } from '@/components/TimedButton';
 import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
 import { InputWithClipboard, TextareaWithClipboard } from '@/components/InputWithClipboard';
@@ -527,6 +528,88 @@ const PageBuilder = () => {
     }
   };
 
+  const handleAIConfigGenerated = (config: any) => {
+    setFormData(prev => {
+      const updated = { ...prev };
+      
+      // Only update fields that are present in the config
+      if (config.title !== undefined) updated.title = config.title;
+      if (config.slug !== undefined) updated.slug = config.slug;
+      if (config.headline !== undefined) updated.headline = config.headline;
+      if (config.headline_color !== undefined) updated.headline_color = config.headline_color;
+      if (config.headline_font_size !== undefined) updated.headline_font_size = config.headline_font_size;
+      if (config.sub_headline !== undefined) updated.sub_headline = config.sub_headline;
+      if (config.sub_headline_color !== undefined) updated.sub_headline_color = config.sub_headline_color;
+      if (config.sub_headline_font_size !== undefined) updated.sub_headline_font_size = config.sub_headline_font_size;
+      if (config.video_url !== undefined) updated.video_url = config.video_url;
+      if (config.button_enabled !== undefined) updated.button_enabled = config.button_enabled;
+      if (config.button_text !== undefined) updated.button_text = config.button_text;
+      if (config.button_url !== undefined) updated.button_url = config.button_url;
+      if (config.button_bg_color !== undefined) updated.button_bg_color = config.button_bg_color;
+      if (config.button_text_color !== undefined) updated.button_text_color = config.button_text_color;
+      if (config.text_highlight !== undefined) updated.text_highlight = config.text_highlight;
+      if (config.text_highlight_color !== undefined) updated.text_highlight_color = config.text_highlight_color;
+      if (config.text_bold !== undefined) updated.text_bold = config.text_bold;
+      if (config.text_italic !== undefined) updated.text_italic = config.text_italic;
+      if (config.text_underline !== undefined) updated.text_underline = config.text_underline;
+      if (config.lead_optin_enabled !== undefined) updated.lead_optin_enabled = config.lead_optin_enabled;
+      if (config.lead_optin_mandatory !== undefined) updated.lead_optin_mandatory = config.lead_optin_mandatory;
+      if (config.lead_optin_headline !== undefined) updated.lead_optin_headline = config.lead_optin_headline;
+      if (config.lead_optin_description !== undefined) updated.lead_optin_description = config.lead_optin_description;
+      if (config.lead_optin_button_text !== undefined) updated.lead_optin_button_text = config.lead_optin_button_text;
+      if (config.lead_optin_button_bg_color !== undefined) updated.lead_optin_button_bg_color = config.lead_optin_button_bg_color;
+      if (config.lead_optin_button_text_color !== undefined) updated.lead_optin_button_text_color = config.lead_optin_button_text_color;
+      if (config.lead_optin_name_enabled !== undefined) updated.lead_optin_name_enabled = config.lead_optin_name_enabled;
+      if (config.lead_optin_name_required !== undefined) updated.lead_optin_name_required = config.lead_optin_name_required;
+      if (config.lead_optin_email_enabled !== undefined) updated.lead_optin_email_enabled = config.lead_optin_email_enabled;
+      if (config.lead_optin_email_required !== undefined) updated.lead_optin_email_required = config.lead_optin_email_required;
+      if (config.lead_optin_phone_enabled !== undefined) updated.lead_optin_phone_enabled = config.lead_optin_phone_enabled;
+      if (config.lead_optin_phone_required !== undefined) updated.lead_optin_phone_required = config.lead_optin_phone_required;
+      if (config.footer_enabled !== undefined) updated.footer_enabled = config.footer_enabled;
+      if (config.copyright_text !== undefined) updated.copyright_text = config.copyright_text;
+      if (config.privacy_policy_url !== undefined) updated.privacy_policy_url = config.privacy_policy_url;
+      if (config.terms_conditions_url !== undefined) updated.terms_conditions_url = config.terms_conditions_url;
+      if (config.earnings_disclaimer_url !== undefined) updated.earnings_disclaimer_url = config.earnings_disclaimer_url;
+      if (config.legal_disclaimer_text !== undefined) updated.legal_disclaimer_text = config.legal_disclaimer_text;
+      if (config.earnings_disclaimer_text !== undefined) updated.earnings_disclaimer_text = config.earnings_disclaimer_text;
+      if (config.fake_progress_enabled !== undefined) updated.fake_progress_enabled = config.fake_progress_enabled;
+      if (config.fake_progress_color !== undefined) updated.fake_progress_color = config.fake_progress_color;
+      if (config.fake_progress_thickness !== undefined) updated.fake_progress_thickness = config.fake_progress_thickness;
+      if (config.mobile_fullscreen_enabled !== undefined) updated.mobile_fullscreen_enabled = config.mobile_fullscreen_enabled;
+      if (config.is_published !== undefined) updated.is_published = config.is_published;
+      
+      return updated;
+    });
+
+    // Handle button delay separately
+    if (config.button_delay_hours !== undefined || config.button_delay_minutes !== undefined || config.button_delay_seconds !== undefined) {
+      setButtonDelayInputs(prev => ({
+        hours: config.button_delay_hours !== undefined ? config.button_delay_hours.toString() : prev.hours,
+        minutes: config.button_delay_minutes !== undefined ? config.button_delay_minutes.toString() : prev.minutes,
+        seconds: config.button_delay_seconds !== undefined ? config.button_delay_seconds.toString() : prev.seconds,
+      }));
+    }
+
+    // Handle video time range separately
+    if (config.start_time_hours !== undefined || config.start_time_minutes !== undefined || config.start_time_seconds !== undefined) {
+      setTimeInputs(prev => ({
+        ...prev,
+        startHour: config.start_time_hours !== undefined ? config.start_time_hours.toString() : prev.startHour,
+        startMinute: config.start_time_minutes !== undefined ? config.start_time_minutes.toString() : prev.startMinute,
+        startSecond: config.start_time_seconds !== undefined ? config.start_time_seconds.toString() : prev.startSecond,
+      }));
+    }
+
+    if (config.end_time_hours !== undefined || config.end_time_minutes !== undefined || config.end_time_seconds !== undefined) {
+      setTimeInputs(prev => ({
+        ...prev,
+        endHour: config.end_time_hours !== undefined ? config.end_time_hours.toString() : prev.endHour,
+        endMinute: config.end_time_minutes !== undefined ? config.end_time_minutes.toString() : prev.endMinute,
+        endSecond: config.end_time_seconds !== undefined ? config.end_time_seconds.toString() : prev.endSecond,
+      }));
+    }
+  };
+
 
   // Auto-preview video when URL changes
   useEffect(() => {
@@ -560,7 +643,12 @@ const PageBuilder = () => {
                 <CardDescription>Configure your landing page settings</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* AI Page Generator - at the top */}
+                  <AIPageGenerator onConfigGenerated={handleAIConfigGenerated} />
+
+                  <Separator />
+
                   <div>
                     <Label htmlFor="title">Page Title</Label>
                     <InputWithClipboard
