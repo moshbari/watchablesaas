@@ -62,7 +62,18 @@ export const getGoogleDriveId = (url: string): string | null => {
   return match ? match[1] : null;
 };
 
-export const validateVideoUrl = (url: string): { isValid: boolean; type: 'youtube' | 'googledrive' | 'direct' | 'unknown'; extractedUrl?: string } => {
+export const isTellaUrl = (url: string): boolean => {
+  return /(?:tella\.tv\/video\/)/.test(url);
+};
+
+export const getTellaId = (url: string): string | null => {
+  // Matches tella.tv/video/VIDEO_ID or tella.tv/video/VIDEO_ID/embed
+  const regExp = /tella\.tv\/video\/([^/]+)/;
+  const match = url.match(regExp);
+  return match ? match[1] : null;
+};
+
+export const validateVideoUrl = (url: string): { isValid: boolean; type: 'youtube' | 'googledrive' | 'tella' | 'direct' | 'unknown'; extractedUrl?: string } => {
   try {
     new URL(url); // Basic URL validation
     
@@ -74,6 +85,10 @@ export const validateVideoUrl = (url: string): { isValid: boolean; type: 'youtub
     
     if (isGoogleDriveUrl(extractedUrl)) {
       return { isValid: true, type: 'googledrive', extractedUrl };
+    }
+    
+    if (isTellaUrl(extractedUrl)) {
+      return { isValid: true, type: 'tella', extractedUrl };
     }
     
     if (isVideoFileUrl(extractedUrl) || extractedUrl !== url) {
