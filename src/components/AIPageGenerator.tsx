@@ -188,7 +188,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
             setIsAiGenerated(false);
           }}
           rows={5}
-          className={`resize-none transition-all ${isAiGenerated ? 'border-2 border-accent shadow-ai' : ''}`}
+          className={`resize-none border-2 border-dark rounded-xl transition-all ${isAiGenerated ? 'border-accent shadow-ai' : ''}`}
           disabled={isGenerating || isRecording || isTranscribing}
         />
         <div className="flex flex-col sm:flex-row gap-2">
