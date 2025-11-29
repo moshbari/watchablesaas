@@ -151,7 +151,12 @@ export default function Landing() {
           </div>
 
           <div className="landing-hero-visual landing-fade-in">
-            <img src="https://placehold.co/800x450/3E92CC/FFFFFF?text=Watch+59-Second+Demo+Video" alt="Watchable Demo - Building a page in 59 seconds" />
+            <iframe 
+              src="https://www.tella.tv/video/59ssite-built-just-with-ai-b6dt/embed" 
+              allowFullScreen
+              style={{ width: '100%', height: '450px', border: 'none' }}
+              title="Watchable Demo - Building a page in 59 seconds"
+            />
           </div>
         </div>
       </section>
