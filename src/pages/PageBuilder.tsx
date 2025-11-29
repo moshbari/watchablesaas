@@ -17,7 +17,7 @@ import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
 import { AIHeadlineGenerator } from '@/components/AIHeadlineGenerator';
 import { TimedButton } from '@/components/TimedButton';
-import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight, Clipboard } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
 import { InputWithClipboard, TextareaWithClipboard } from '@/components/InputWithClipboard';
 
 interface Page {
@@ -499,24 +499,6 @@ const PageBuilder = () => {
     }
   };
 
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (text) {
-        setFormData(prev => ({ ...prev, video_url: text }));
-        toast({
-          title: "Pasted",
-          description: "Video URL pasted from clipboard",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Paste Failed",
-        description: "Please allow clipboard access or paste manually",
-        variant: "destructive",
-      });
-    }
-  };
 
   // Auto-preview video when URL changes
   useEffect(() => {
@@ -662,19 +644,13 @@ const PageBuilder = () => {
 
                   <div>
                     <Label htmlFor="video_url">Video URL (Optional)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="video_url"
-                        value={formData.video_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, video_url: e.target.value }))}
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        className="border-2 border-foreground/80 rounded-lg"
-                      />
-                      <Button type="button" variant="outline" onClick={handlePaste}>
-                        <Clipboard className="w-4 h-4 mr-2" />
-                        Paste
-                      </Button>
-                    </div>
+                    <InputWithClipboard
+                      id="video_url"
+                      value={formData.video_url}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, video_url: value }))}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="border-2 border-foreground/80 rounded-lg"
+                    />
                   </div>
 
                   {/* Time Range Controls */}
