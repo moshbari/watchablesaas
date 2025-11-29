@@ -95,6 +95,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
       'https://drive.google.com/open?id=1ABC123XYZ'
     ],
     direct: [
+      'https://www.tella.tv/video/59ssite-built-just-with-ai-b6dt',
       'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
       'https://sample-videos.com/zip/10/mp4/SampleVideo_720x480_1mb.mp4',
       'https://webinarkit.com/video/player?url=https%3A%2F%2Fexample.com%2Fvideo.mp4'
@@ -110,7 +111,7 @@ export const VideoUrlInput: React.FC<VideoUrlInputProps> = ({
             Distraction-Free Video Player
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            Enter a YouTube URL, Google Drive video, direct video file, or video player page - we'll automatically extract the video
+            Enter a YouTube URL, Google Drive video, Tella.tv video, direct video file, or video player page - we'll automatically extract the video
           </CardDescription>
         </CardHeader>
         
