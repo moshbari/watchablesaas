@@ -909,18 +909,18 @@ const PageBuilder = () => {
                         <div className="space-y-4 mt-4">
                           <div>
                             <Label htmlFor="button_bg_color">Button Background Color</Label>
-                            <div className="flex gap-2 mt-2">
+                            <div className="flex flex-col sm:flex-row gap-2 mt-2">
                               <Input
                                 id="button_bg_color"
                                 type="color"
                                 value={formData.button_bg_color}
                                 onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
-                                className="w-16 h-10 p-1 border"
+                                className="w-full sm:w-16 h-10 p-1 border"
                               />
                               <Input
                                 value={formData.button_bg_color}
                                 onChange={(e) => setFormData(prev => ({ ...prev, button_bg_color: e.target.value }))}
-                                placeholder="#0084ff"
+                                placeholder="#007bc7"
                                 className="flex-1 border-2 border-foreground/80 rounded-lg"
                               />
                             </div>
@@ -928,13 +928,13 @@ const PageBuilder = () => {
 
                           <div>
                             <Label htmlFor="button_text_color">Button Text Color</Label>
-                            <div className="flex gap-2 mt-2">
+                            <div className="flex flex-col sm:flex-row gap-2 mt-2">
                               <Input
                                 id="button_text_color"
                                 type="color"
                                 value={formData.button_text_color}
                                 onChange={(e) => setFormData(prev => ({ ...prev, button_text_color: e.target.value }))}
-                                className="w-16 h-10 p-1 border"
+                                className="w-full sm:w-16 h-10 p-1 border"
                               />
                               <Input
                                 value={formData.button_text_color}
@@ -1028,13 +1028,13 @@ const PageBuilder = () => {
                           <div className="space-y-4">
                             <div>
                               <Label htmlFor="lead_optin_button_bg_color">Button Background Color</Label>
-                              <div className="flex gap-2 mt-2">
+                              <div className="flex flex-col sm:flex-row gap-2 mt-2">
                                 <Input
                                   id="lead_optin_button_bg_color"
                                   type="color"
                                   value={formData.lead_optin_button_bg_color}
                                   onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_bg_color: e.target.value }))}
-                                  className="w-16 h-10 p-1 border"
+                                  className="w-full sm:w-16 h-10 p-1 border"
                                 />
                                 <Input
                                   value={formData.lead_optin_button_bg_color}
@@ -1047,13 +1047,13 @@ const PageBuilder = () => {
 
                             <div>
                               <Label htmlFor="lead_optin_button_text_color">Button Text Color</Label>
-                              <div className="flex gap-2 mt-2">
+                              <div className="flex flex-col sm:flex-row gap-2 mt-2">
                                 <Input
                                   id="lead_optin_button_text_color"
                                   type="color"
                                   value={formData.lead_optin_button_text_color}
                                   onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text_color: e.target.value }))}
-                                  className="w-16 h-10 p-1 border"
+                                  className="w-full sm:w-16 h-10 p-1 border"
                                 />
                                 <Input
                                   value={formData.lead_optin_button_text_color}
