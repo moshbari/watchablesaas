@@ -171,6 +171,7 @@ export type Database = {
           terms_conditions_url: string | null
           text_bold: string | null
           text_highlight: string | null
+          text_highlight_color: string | null
           text_italic: string | null
           text_underline: string | null
           title: string
@@ -222,6 +223,7 @@ export type Database = {
           terms_conditions_url?: string | null
           text_bold?: string | null
           text_highlight?: string | null
+          text_highlight_color?: string | null
           text_italic?: string | null
           text_underline?: string | null
           title: string
@@ -273,6 +275,7 @@ export type Database = {
           terms_conditions_url?: string | null
           text_bold?: string | null
           text_highlight?: string | null
+          text_highlight_color?: string | null
           text_italic?: string | null
           text_underline?: string | null
           title?: string

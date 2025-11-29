@@ -27,6 +27,7 @@ interface Page {
   button_bg_color?: string;
   button_text_color?: string;
   text_highlight?: string;
+  text_highlight_color?: string;
   text_bold?: string;
   text_italic?: string;
   text_underline?: string;
@@ -180,6 +181,7 @@ const DynamicPage = () => {
               >
                 {formatText(page.headline, {
                   highlight: page.text_highlight,
+                  highlightColor: page.text_highlight_color,
                   bold: page.text_bold,
                   italic: page.text_italic,
                   underline: page.text_underline
@@ -193,6 +195,7 @@ const DynamicPage = () => {
                 >
                   {formatText(page.sub_headline, {
                     highlight: page.text_highlight,
+                    highlightColor: page.text_highlight_color,
                     bold: page.text_bold,
                     italic: page.text_italic,
                     underline: page.text_underline
