@@ -1025,27 +1025,43 @@ const PageBuilder = () => {
                             />
                           </div>
 
-                          <div className="space-y-3">
+                          <div className="space-y-4">
                             <div>
                               <Label htmlFor="lead_optin_button_bg_color">Button Background Color</Label>
-                              <Input
-                                id="lead_optin_button_bg_color"
-                                type="color"
-                                value={formData.lead_optin_button_bg_color}
-                                onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_bg_color: e.target.value }))}
-                                className="h-14 cursor-pointer"
-                              />
+                              <div className="flex gap-2 mt-2">
+                                <Input
+                                  id="lead_optin_button_bg_color"
+                                  type="color"
+                                  value={formData.lead_optin_button_bg_color}
+                                  onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_bg_color: e.target.value }))}
+                                  className="w-16 h-10 p-1 border"
+                                />
+                                <Input
+                                  value={formData.lead_optin_button_bg_color}
+                                  onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_bg_color: e.target.value }))}
+                                  placeholder="#0084ff"
+                                  className="flex-1 border-2 border-foreground/80 rounded-lg"
+                                />
+                              </div>
                             </div>
 
                             <div>
                               <Label htmlFor="lead_optin_button_text_color">Button Text Color</Label>
-                              <Input
-                                id="lead_optin_button_text_color"
-                                type="color"
-                                value={formData.lead_optin_button_text_color}
-                                onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text_color: e.target.value }))}
-                                className="h-14 cursor-pointer"
-                              />
+                              <div className="flex gap-2 mt-2">
+                                <Input
+                                  id="lead_optin_button_text_color"
+                                  type="color"
+                                  value={formData.lead_optin_button_text_color}
+                                  onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text_color: e.target.value }))}
+                                  className="w-16 h-10 p-1 border"
+                                />
+                                <Input
+                                  value={formData.lead_optin_button_text_color}
+                                  onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text_color: e.target.value }))}
+                                  placeholder="#ffffff"
+                                  className="flex-1 border-2 border-foreground/80 rounded-lg"
+                                />
+                              </div>
                             </div>
                           </div>
 
