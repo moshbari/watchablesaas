@@ -36,6 +36,7 @@ const EditCampaign = () => {
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [showCustomizer, setShowCustomizer] = useState(false);
+  const [showVideoInput, setShowVideoInput] = useState(false);
   const [overlayButtonConfig] = useState({
     enabled: true,
     text: 'Get Started Now!',
@@ -186,6 +187,7 @@ const EditCampaign = () => {
       setCurrentVideo(url);
       setStartTime(startTimeParam);
       setEndTime(endTimeParam);
+      setShowVideoInput(false); // Hide video input after successful update
       
     } catch (error) {
       console.error('Error saving campaign:', error);
@@ -272,7 +274,7 @@ const EditCampaign = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {currentVideo ? (
+      {currentVideo && !showVideoInput ? (
         <div className="container mx-auto px-4 py-8">
           {/* Back Button */}
           <div className="mb-6">
@@ -286,8 +288,14 @@ const EditCampaign = () => {
             </Button>
           </div>
 
-            <div className="mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <h1 className="text-2xl font-bold">{id ? `Edit Campaign: ${campaign?.name || 'Loading...'}` : 'Create New Campaign'}</h1>
+              <Button
+                variant="outline"
+                onClick={() => setShowVideoInput(true)}
+              >
+                Change Video
+              </Button>
             </div>
 
           {/* Video Player */}
@@ -340,8 +348,16 @@ const EditCampaign = () => {
               </Button>
             </div>
             
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-center">{id ? `Edit Campaign: ${campaign?.name || 'Loading...'}` : 'Create New Campaign'}</h1>
+            <div className="mb-6 flex items-center justify-between">
+              <h1 className="text-2xl font-bold">{id ? `Edit Campaign: ${campaign?.name || 'Loading...'}` : 'Create New Campaign'}</h1>
+              {currentVideo && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowVideoInput(false)}
+                >
+                  Cancel
+                </Button>
+              )}
             </div>
             
             <VideoUrlInput 
