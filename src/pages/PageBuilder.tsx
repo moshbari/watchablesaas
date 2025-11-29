@@ -37,6 +37,10 @@ interface Page {
   sub_headline_font_size: number;
   button_bg_color: string;
   button_text_color: string;
+  text_highlight?: string;
+  text_bold?: string;
+  text_italic?: string;
+  text_underline?: string;
   lead_optin_enabled?: boolean;
   lead_optin_mandatory?: boolean;
   lead_optin_name_enabled?: boolean;
@@ -122,6 +126,10 @@ const PageBuilder = () => {
     sub_headline_font_size: 16,
     button_bg_color: '#007bc7',
     button_text_color: '#ffffff',
+    text_highlight: '',
+    text_bold: '',
+    text_italic: '',
+    text_underline: '',
     lead_optin_enabled: false,
     lead_optin_mandatory: false,
     lead_optin_name_enabled: true,
@@ -363,6 +371,10 @@ const PageBuilder = () => {
       sub_headline_font_size: 16,
       button_bg_color: '#007bc7',
       button_text_color: '#ffffff',
+      text_highlight: '',
+      text_bold: '',
+      text_italic: '',
+      text_underline: '',
       lead_optin_enabled: false,
       lead_optin_mandatory: false,
       lead_optin_name_enabled: true,
@@ -424,6 +436,10 @@ const PageBuilder = () => {
       sub_headline_font_size: page.sub_headline_font_size || 16,
       button_bg_color: page.button_bg_color || '#007bc7',
       button_text_color: page.button_text_color || '#ffffff',
+      text_highlight: page.text_highlight || '',
+      text_bold: page.text_bold || '',
+      text_italic: page.text_italic || '',
+      text_underline: page.text_underline || '',
       lead_optin_enabled: page.lead_optin_enabled ?? false,
       lead_optin_mandatory: page.lead_optin_mandatory ?? false,
       lead_optin_name_enabled: page.lead_optin_name_enabled ?? true,
@@ -636,6 +652,63 @@ const PageBuilder = () => {
                         value={[formData.sub_headline_font_size]}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, sub_headline_font_size: value[0] }))}
                         className="mt-2"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Text Formatting Section */}
+                  <div className="space-y-4 p-4 bg-accent/30 rounded-lg border border-border">
+                    <div>
+                      <h3 className="font-semibold text-sm mb-2">Text Formatting (Optional)</h3>
+                      <p className="text-xs text-muted-foreground mb-4">
+                        Enter words or phrases separated by commas. These will be formatted in your headline and sub-headline.
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="text_highlight">Highlight (Primary color + Bold)</Label>
+                      <Input
+                        id="text_highlight"
+                        value={formData.text_highlight}
+                        onChange={(e) => setFormData(prev => ({ ...prev, text_highlight: e.target.value }))}
+                        placeholder="word1, phrase two, word3"
+                        className="border-2 border-foreground/80 rounded-lg"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Text will be colored with your primary theme color and made bold
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="text_bold">Bold Only</Label>
+                      <Input
+                        id="text_bold"
+                        value={formData.text_bold}
+                        onChange={(e) => setFormData(prev => ({ ...prev, text_bold: e.target.value }))}
+                        placeholder="word1, phrase two, word3"
+                        className="border-2 border-foreground/80 rounded-lg"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="text_italic">Italic</Label>
+                      <Input
+                        id="text_italic"
+                        value={formData.text_italic}
+                        onChange={(e) => setFormData(prev => ({ ...prev, text_italic: e.target.value }))}
+                        placeholder="word1, phrase two, word3"
+                        className="border-2 border-foreground/80 rounded-lg"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="text_underline">Underline</Label>
+                      <Input
+                        id="text_underline"
+                        value={formData.text_underline}
+                        onChange={(e) => setFormData(prev => ({ ...prev, text_underline: e.target.value }))}
+                        placeholder="word1, phrase two, word3"
+                        className="border-2 border-foreground/80 rounded-lg"
                       />
                     </div>
                   </div>
