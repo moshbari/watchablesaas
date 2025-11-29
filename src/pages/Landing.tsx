@@ -151,12 +151,18 @@ export default function Landing() {
           </div>
 
           <div className="landing-hero-visual landing-fade-in">
-            <iframe 
-              src="https://www.tella.tv/video/59ssite-built-just-with-ai-b6dt/embed" 
-              allowFullScreen
-              style={{ width: '100%', height: '450px', border: 'none' }}
-              title="Watchable Demo - Building a page in 59 seconds"
-            />
+            <center>
+              <iframe 
+                src="https://59s.site/embed?video=https%3A%2F%2Fwww.tella.tv%2Fvideo%2F59ssite-built-just-with-ai-b6dt&playButtonColor=%23ff0000&playButtonSize=96" 
+                width="800" 
+                height="450" 
+                frameBorder="0" 
+                allowFullScreen 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                style={{ maxWidth: '100%', height: 'auto', aspectRatio: '16/9' }}
+                title="Watchable Demo - Building a page in 59 seconds"
+              />
+            </center>
           </div>
         </div>
       </section>
