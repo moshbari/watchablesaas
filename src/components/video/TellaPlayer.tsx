@@ -54,14 +54,14 @@ export const TellaPlayer: React.FC<TellaPlayerProps> = ({
         }}
         onClick={(e) => e.stopPropagation()}
       />
-      {/* Overlay to block Tella's controls at the bottom */}
+      {/* Overlay to block Tella's progress bar and controls at the bottom */}
       <div
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          height: '60px',
+          height: '80px',
           zIndex: 10,
           pointerEvents: 'auto',
           cursor: 'default'
