@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { VideoActionButton } from '@/components/VideoActionButton';
 import { type OverlayButtonConfig } from '@/components/VideoOverlayButton';
+import { LeadOptinModal } from '@/components/LeadOptinModal';
 import { useToast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
 
@@ -24,6 +25,17 @@ interface Page {
   sub_headline_font_size?: number;
   button_bg_color?: string;
   button_text_color?: string;
+  user_id?: string;
+  lead_optin_enabled?: boolean;
+  lead_optin_name_enabled?: boolean;
+  lead_optin_name_required?: boolean;
+  lead_optin_email_enabled?: boolean;
+  lead_optin_email_required?: boolean;
+  lead_optin_phone_enabled?: boolean;
+  lead_optin_phone_required?: boolean;
+  lead_optin_button_text?: string;
+  lead_optin_headline?: string;
+  lead_optin_description?: string;
   footer_enabled?: boolean;
   copyright_text?: string;
   privacy_policy_url?: string;
@@ -44,6 +56,8 @@ const DynamicPage = () => {
   const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [hasOptedIn, setHasOptedIn] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -54,6 +68,17 @@ const DynamicPage = () => {
       setLoading(false);
     }
   }, [slug]);
+
+  useEffect(() => {
+    if (page?.id && page.lead_optin_enabled) {
+      // Check if user has already opted in for this page
+      const optedIn = sessionStorage.getItem(`lead_optin_${page.id}`) === 'true';
+      setHasOptedIn(optedIn);
+      if (!optedIn) {
+        setShowLeadModal(true);
+      }
+    }
+  }, [page]);
 
   const fetchPage = async (pageSlug: string) => {
     try {
@@ -158,18 +183,43 @@ const DynamicPage = () => {
             {page.video_url && (
               <section className="mb-12">
                 <div className="max-w-3xl mx-auto">
-                  <VideoPlayer 
-                    src={page.video_url} 
-                    onError={handleVideoError}
-                    playButtonColor="#ef4444"
-                    playButtonSize={120}
-                    startTime={page.start_time}
-                    endTime={page.end_time}
-                    fakeProgressEnabled={page.fake_progress_enabled ?? true}
-                    fakeProgressColor={page.fake_progress_color || '#ef4444'}
-                    fakeProgressThickness={page.fake_progress_thickness || 4}
-                    mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
-                  />
+                  {page.lead_optin_enabled && !hasOptedIn ? (
+                    <div 
+                      className="relative cursor-pointer"
+                      onClick={() => setShowLeadModal(true)}
+                    >
+                      <VideoPlayer 
+                        src={page.video_url} 
+                        onError={handleVideoError}
+                        playButtonColor="#ef4444"
+                        playButtonSize={120}
+                        startTime={page.start_time}
+                        endTime={page.end_time}
+                        fakeProgressEnabled={page.fake_progress_enabled ?? true}
+                        fakeProgressColor={page.fake_progress_color || '#ef4444'}
+                        fakeProgressThickness={page.fake_progress_thickness || 4}
+                        mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <div className="text-white text-center">
+                          <p className="text-xl font-semibold">Click to become a member and watch</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <VideoPlayer 
+                      src={page.video_url} 
+                      onError={handleVideoError}
+                      playButtonColor="#ef4444"
+                      playButtonSize={120}
+                      startTime={page.start_time}
+                      endTime={page.end_time}
+                      fakeProgressEnabled={page.fake_progress_enabled ?? true}
+                      fakeProgressColor={page.fake_progress_color || '#ef4444'}
+                      fakeProgressThickness={page.fake_progress_thickness || 4}
+                      mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
+                    />
+                  )}
                 </div>
               </section>
             )}
@@ -251,6 +301,28 @@ const DynamicPage = () => {
             })
           })}
         </script>
+
+        {/* Lead Optin Modal */}
+        {page.lead_optin_enabled && (
+          <LeadOptinModal
+            isOpen={showLeadModal}
+            onClose={() => {
+              setShowLeadModal(false);
+              setHasOptedIn(true);
+            }}
+            pageId={page.id}
+            userId={page.user_id || ''}
+            nameEnabled={page.lead_optin_name_enabled ?? true}
+            nameRequired={page.lead_optin_name_required ?? false}
+            emailEnabled={page.lead_optin_email_enabled ?? true}
+            emailRequired={page.lead_optin_email_required ?? true}
+            phoneEnabled={page.lead_optin_phone_enabled ?? false}
+            phoneRequired={page.lead_optin_phone_required ?? false}
+            headline={page.lead_optin_headline}
+            description={page.lead_optin_description}
+            buttonText={page.lead_optin_button_text}
+          />
+        )}
       </div>
     </>
   );
