@@ -587,12 +587,13 @@ const PageBuilder = () => {
                         }}
                       />
                     </div>
-                    <Input
+                    <Textarea
                       id="headline"
                       value={formData.headline}
                       onChange={(e) => setFormData(prev => ({ ...prev, headline: e.target.value }))}
                       placeholder="Transform Your Business Today"
                       required
+                      rows={2}
                       className="border-2 border-foreground/80 rounded-lg"
                     />
                     <div className="mt-3">
