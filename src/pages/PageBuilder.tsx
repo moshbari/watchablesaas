@@ -17,6 +17,7 @@ import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
 import { TimedButton } from '@/components/TimedButton';
 import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight, Clipboard } from 'lucide-react';
+import { InputWithClipboard, TextareaWithClipboard } from '@/components/InputWithClipboard';
 
 interface Page {
   id: string;
@@ -551,11 +552,10 @@ const PageBuilder = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <Label htmlFor="title">Page Title</Label>
-                    <Input
+                    <InputWithClipboard
                       id="title"
                       value={formData.title}
-                      onChange={(e) => {
-                        const newTitle = e.target.value;
+                      onValueChange={(newTitle) => {
                         setFormData(prev => ({ 
                           ...prev, 
                           title: newTitle,
@@ -573,10 +573,10 @@ const PageBuilder = () => {
 
                   <div>
                     <Label htmlFor="slug">URL Slug</Label>
-                    <Input
+                    <InputWithClipboard
                       id="slug"
                       value={formData.slug}
-                      onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, slug: value }))}
                       placeholder="Auto-generated from title..."
                       required
                       className="border-2 border-foreground/80 rounded-lg"
@@ -599,10 +599,10 @@ const PageBuilder = () => {
                         }}
                       />
                     </div>
-                    <Textarea
+                    <TextareaWithClipboard
                       id="headline"
                       value={formData.headline}
-                      onChange={(e) => setFormData(prev => ({ ...prev, headline: e.target.value }))}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, headline: value }))}
                       placeholder="Transform Your Business Today"
                       required
                       rows={2}
@@ -624,10 +624,10 @@ const PageBuilder = () => {
 
                   <div>
                     <Label htmlFor="sub_headline">Sub-headline (Optional)</Label>
-                    <Textarea
+                    <TextareaWithClipboard
                       id="sub_headline"
                       value={formData.sub_headline}
-                      onChange={(e) => setFormData(prev => ({ ...prev, sub_headline: e.target.value }))}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, sub_headline: value }))}
                       placeholder="Discover the proven system that's helped thousands..."
                       rows={2}
                       className="border-2 border-foreground/80 rounded-lg"
@@ -838,10 +838,10 @@ const PageBuilder = () => {
                       <>
                         <div>
                           <Label htmlFor="button_text">Button Text</Label>
-                          <Input
+                          <InputWithClipboard
                             id="button_text"
-                            value={formData.button_text}
-                            onChange={(e) => setFormData(prev => ({ ...prev, button_text: e.target.value }))}
+                            value={formData.button_text || ''}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, button_text: value }))}
                             placeholder="Get Started Now"
                             className="border-2 border-foreground/80 rounded-lg"
                           />
@@ -849,10 +849,10 @@ const PageBuilder = () => {
 
                         <div>
                           <Label htmlFor="button_url">Button URL</Label>
-                          <Input
+                          <InputWithClipboard
                             id="button_url"
-                            value={formData.button_url}
-                            onChange={(e) => setFormData(prev => ({ ...prev, button_url: e.target.value }))}
+                            value={formData.button_url || ''}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, button_url: value }))}
                             placeholder="https://ultimateonlinemastery.org/"
                             type="url"
                             className="border-2 border-foreground/80 rounded-lg"
@@ -993,10 +993,10 @@ const PageBuilder = () => {
                         <div className="pl-8 space-y-4">
                           <div>
                             <Label htmlFor="lead_optin_headline">Popup Headline</Label>
-                            <Input
+                            <InputWithClipboard
                               id="lead_optin_headline"
-                              value={formData.lead_optin_headline}
-                              onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_headline: e.target.value }))}
+                              value={formData.lead_optin_headline || ''}
+                              onValueChange={(value) => setFormData(prev => ({ ...prev, lead_optin_headline: value }))}
                               placeholder="Become a Member"
                               className="border-2 border-foreground/80 rounded-lg"
                             />
@@ -1004,10 +1004,10 @@ const PageBuilder = () => {
 
                           <div>
                             <Label htmlFor="lead_optin_description">Popup Description</Label>
-                            <Textarea
+                            <TextareaWithClipboard
                               id="lead_optin_description"
-                              value={formData.lead_optin_description}
-                              onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_description: e.target.value }))}
+                              value={formData.lead_optin_description || ''}
+                              onValueChange={(value) => setFormData(prev => ({ ...prev, lead_optin_description: value }))}
                               placeholder="Enter your information to watch this exclusive video"
                               rows={2}
                               className="border-2 border-foreground/80 rounded-lg"
@@ -1016,10 +1016,10 @@ const PageBuilder = () => {
 
                           <div>
                             <Label htmlFor="lead_optin_button_text">Button Text</Label>
-                            <Input
+                            <InputWithClipboard
                               id="lead_optin_button_text"
-                              value={formData.lead_optin_button_text}
-                              onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text: e.target.value }))}
+                              value={formData.lead_optin_button_text || ''}
+                              onValueChange={(value) => setFormData(prev => ({ ...prev, lead_optin_button_text: value }))}
                               placeholder="Join to Watch Video"
                               className="border-2 border-foreground/80 rounded-lg"
                             />
