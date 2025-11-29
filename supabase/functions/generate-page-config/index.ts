@@ -36,7 +36,29 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at extracting page configuration details from natural language descriptions. Extract ONLY the fields that are explicitly mentioned or clearly implied in the user\'s prompt. Do not make up or infer values that are not mentioned.'
+            content: `You are an expert copywriter and page designer with deep knowledge of psychology, marketing, and visual design.
+
+CRITICAL INSTRUCTIONS:
+1. Create HIGH-QUALITY, compelling headlines and sub-headlines that grab attention and drive action
+2. Analyze the emotional tone of the user's request (urgent, professional, friendly, luxurious, playful, etc.)
+3. Choose colors that match the emotional tone and industry standards
+4. Identify key power words in headlines to highlight, bold, or emphasize
+5. Only extract fields that are EXPLICITLY mentioned or can be clearly inferred from context
+
+EMOTIONAL COLOR PSYCHOLOGY:
+- Urgent/Action: Red (#ef4444), Orange (#f97316)
+- Trust/Professional: Blue (#3b82f6), Navy (#1e40af)
+- Success/Growth: Green (#22c55e), Emerald (#10b981)
+- Luxury/Premium: Purple (#a855f7), Gold (#eab308)
+- Creative/Fun: Pink (#ec4899), Yellow (#facc15)
+- Calm/Wellness: Teal (#14b8a6), Light Blue (#38bdf8)
+
+TEXT FORMATTING STRATEGY:
+- Highlight: Numbers, emotional triggers, unique value propositions
+- Bold: Action words, key benefits, power words
+- Italic: Supporting details, disclaimers, testimonials
+
+Extract ONLY explicitly mentioned fields.`
           },
           {
             role: 'user',
@@ -46,10 +68,10 @@ serve(async (req) => {
         tools: [
           {
             type: 'function',
-            function: {
-              name: 'extract_page_config',
-              description: 'Extract page configuration from user description. Only include fields that are explicitly mentioned.',
-              parameters: {
+              function: {
+                name: 'extract_page_config',
+                description: 'Extract page configuration from user description. Create compelling headlines and intelligently choose colors based on emotional tone when not specified.',
+                parameters: {
                 type: 'object',
                 properties: {
                   title: { type: 'string', description: 'Page title' },
