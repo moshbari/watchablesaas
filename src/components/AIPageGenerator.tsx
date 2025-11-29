@@ -15,6 +15,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isAiGenerated, setIsAiGenerated] = useState(false);
   const { toast } = useToast();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -58,6 +59,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
 
       onConfigGenerated(data.config);
       setPrompt('');
+      setIsAiGenerated(false);
 
     } catch (error: any) {
       console.error('Generation error:', error);
@@ -146,6 +148,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
 
       if (data.text) {
         setPrompt(prev => prev ? `${prev} ${data.text}` : data.text);
+        setIsAiGenerated(true);
         toast({
           title: "Transcription Complete",
           description: "Your speech has been converted to text",
@@ -180,9 +183,12 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
         <Textarea
           placeholder="Example: Create an urgent sales page for my business coaching program. Make it feel professional but action-oriented. Include a video from https://youtube.com/watch?v=abc123, show a CTA button after 10 seconds, and require email capture. Target audience is entrepreneurs who want to scale fast."
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={(e) => {
+            setPrompt(e.target.value);
+            setIsAiGenerated(false);
+          }}
           rows={5}
-          className="resize-none"
+          className={`resize-none transition-all ${isAiGenerated ? 'border-2 border-accent shadow-ai' : ''}`}
           disabled={isGenerating || isRecording || isTranscribing}
         />
         <div className="flex flex-col sm:flex-row gap-2">
@@ -193,7 +199,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
                 variant="outline"
                 type="button"
                 disabled={isGenerating}
-                className="w-full sm:w-auto h-12 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="w-full sm:w-auto h-12 bg-gradient-yellow text-dark border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:opacity-90"
               >
                 <Mic className="mr-2 h-4 w-4" />
                 Voice Input
@@ -201,7 +207,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating || !prompt.trim()}
-                className="flex-1 w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                className="flex-1 w-full h-12 bg-gradient-ai text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:opacity-90"
               >
                 {isGenerating ? (
                   <>

@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Light Theme with Purple/Green/Orange Scheme */
+    /* Light Theme with Sky Blue/Yellow/Green/Red Scheme */
     --background: 0 0% 98%;
     --foreground: 240 10% 15%;
 
@@ -18,7 +18,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 15%;
 
-    --primary: 268 83% 58%;
+    --primary: 199 89% 48%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 142 76% 36%;
@@ -35,18 +35,29 @@ All colors MUST be HSL.
 
     --border: 240 5% 90%;
     --input: 240 5% 96%;
-    --ring: 268 83% 58%;
+    --ring: 199 89% 48%;
+
+    /* Yellow Highlight */
+    --warning: 48 96% 53%;
+    --warning-foreground: 0 0% 15%;
+
+    /* Black Accent */
+    --dark: 0 0% 10%;
+    --dark-foreground: 0 0% 100%;
 
     /* Orange CTA Button */
     --cta: 25 95% 53%;
     --cta-foreground: 0 0% 100%;
 
     /* Brand enhancements */
-    --primary-variant: 268 70% 65%;
+    --primary-variant: 199 89% 60%;
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
-    --gradient-purple: linear-gradient(135deg, hsl(268 83% 58%), hsl(280 75% 65%));
+    --gradient-sky: linear-gradient(135deg, hsl(199 89% 48%), hsl(199 89% 60%));
     --gradient-green: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 70% 45%));
+    --gradient-yellow: linear-gradient(135deg, hsl(48 96% 53%), hsl(45 93% 60%));
+    --gradient-ai: linear-gradient(135deg, hsl(199 89% 48%), hsl(142 76% 36%));
     --shadow-glow: 0 0 32px hsl(var(--primary) / 0.25);
+    --shadow-ai: 0 0 20px hsl(142 76% 36% / 0.3);
 
     /* Video Player Specific */
     --player-bg: 220 13% 9%;

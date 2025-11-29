@@ -44,6 +44,14 @@ export default {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))'
 				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
+				dark: {
+					DEFAULT: 'hsl(var(--dark))',
+					foreground: 'hsl(var(--dark-foreground))'
+				},
 				cta: {
 					DEFAULT: 'hsl(var(--cta))',
 					foreground: 'hsl(var(--cta-foreground))'
@@ -79,13 +87,16 @@ export default {
 				'gradient-controls': 'var(--gradient-controls)',
 				'gradient-overlay': 'var(--gradient-overlay)',
 				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-purple': 'var(--gradient-purple)',
-				'gradient-green': 'var(--gradient-green)'
+				'gradient-sky': 'var(--gradient-sky)',
+				'gradient-green': 'var(--gradient-green)',
+				'gradient-yellow': 'var(--gradient-yellow)',
+				'gradient-ai': 'var(--gradient-ai)'
 			},
 			boxShadow: {
 				'player': 'var(--shadow-player)',
 				'controls': 'var(--shadow-controls)',
-				'glow': 'var(--shadow-glow)'
+				'glow': 'var(--shadow-glow)',
+				'ai': 'var(--shadow-ai)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',
