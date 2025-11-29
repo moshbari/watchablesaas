@@ -308,7 +308,7 @@ export default function Landing() {
                   style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
                 />
               </div>
-              <ul className="landing-comparison-points" style={{ color: 'white' }}>
+              <ul className="landing-comparison-points" style={{ color: 'hsl(var(--landing-navy-deep))' }}>
                 <li><span className="landing-table-x">✗</span> Visitors click away</li>
                 <li><span className="landing-table-x">✗</span> You lose the sale</li>
                 <li><span className="landing-table-x">✗</span> Distracted viewers</li>
@@ -326,7 +326,7 @@ export default function Landing() {
                   style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
                 />
               </div>
-              <ul className="landing-comparison-points" style={{ color: 'white' }}>
+              <ul className="landing-comparison-points" style={{ color: 'hsl(var(--landing-navy-deep))' }}>
                 <li><span className="landing-table-check">✓</span> Visitors watch full video</li>
                 <li><span className="landing-table-check">✓</span> You make the sale</li>
                 <li><span className="landing-table-check">✓</span> Zero distractions</li>
