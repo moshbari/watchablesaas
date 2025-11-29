@@ -290,6 +290,9 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           )}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
+          onTouchStart={handleMouseMove}
+          onTouchMove={handleMouseMove}
+          onTouchEnd={handleMouseLeave}
         >
         {/* Video Element */}
         {isYoutube && youtubeId ? (
@@ -319,6 +322,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
               className="w-full h-full object-contain"
               preload="metadata"
               playsInline
+              webkit-playsinline="true"
+              x-webkit-airplay="allow"
             />
 
             <VideoControls
