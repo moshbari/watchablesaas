@@ -909,6 +909,10 @@ html, body {
     flex-direction: column;
   }
 
+  .landing-email-input {
+    height: 56px !important;
+  }
+
   .landing-trust-points {
     flex-direction: column;
     align-items: flex-start;
