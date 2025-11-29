@@ -171,13 +171,14 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
           <CardTitle>AI Page Generator</CardTitle>
         </div>
         <CardDescription>
-          Describe your page in natural language and AI will automatically fill in all the fields for you.
-          Only fields you mention will be updated.
+          Describe your page in natural language and AI will automatically create high-quality headlines, 
+          intelligent color schemes based on emotion, and smart text formatting. 
+          One prompt builds your entire page!
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Textarea
-          placeholder="Example: Create a page with a red headline 'Transform Your Business Today', blue sub-headline 'Get started in minutes', add a YouTube video from https://youtube.com/watch?v=abc123, make the CTA button green saying 'Start Now' appearing after 10 seconds, enable lead capture with email required..."
+          placeholder="Example: Create an urgent sales page for my business coaching program. Make it feel professional but action-oriented. Include a video from https://youtube.com/watch?v=abc123, show a CTA button after 10 seconds, and require email capture. Target audience is entrepreneurs who want to scale fast."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           rows={5}
@@ -234,8 +235,9 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          💡 Tip: Be specific! Mention colors (red, blue, #FF0000), button delays (5 seconds, 1 minute), 
-          lead capture requirements, video URLs, and any other details you want configured.
+          💡 Tip: Describe the emotion/tone (urgent, professional, luxurious, friendly) and your target audience. 
+          AI will create compelling headlines and choose perfect colors automatically. 
+          Mention specifics like video URLs, button timing, and lead capture requirements.
         </p>
       </CardContent>
     </Card>
