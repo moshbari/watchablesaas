@@ -195,7 +195,7 @@ export const AIHeadlineGenerator: React.FC<AIHeadlineGeneratorProps> = ({ onSele
         <DialogHeader>
           <DialogTitle>AI Headline Generator</DialogTitle>
           <DialogDescription>
-            Tell me about your video, product, or service, and I'll generate compelling headline options for you.
+            Tell me about your video, product, or service (including your target audience, key benefits, problems solved, and unique value) and I'll generate compelling headline options for you.
           </DialogDescription>
         </DialogHeader>
 
@@ -203,29 +203,28 @@ export const AIHeadlineGenerator: React.FC<AIHeadlineGeneratorProps> = ({ onSele
           {/* Context Input */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="ai-context">
-                What's your video about? (Product, audience, benefits, problems solved, etc.)
-              </Label>
+              <Label htmlFor="ai-context">Your Context</Label>
               <Button
                 type="button"
                 onClick={toggleRecording}
                 disabled={isTranscribing}
-                variant={isRecording ? "destructive" : "outline"}
+                variant={isRecording ? "destructive" : "default"}
                 size="sm"
+                className={isRecording ? "animate-pulse" : "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"}
               >
                 {isTranscribing ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Transcribing...
                   </>
                 ) : isRecording ? (
                   <>
-                    <MicOff className="w-4 h-4 mr-1" />
+                    <MicOff className="w-4 h-4 mr-2" />
                     Stop Recording
                   </>
                 ) : (
                   <>
-                    <Mic className="w-4 h-4 mr-1" />
+                    <Mic className="w-4 h-4 mr-2" />
                     Voice to Text
                   </>
                 )}
