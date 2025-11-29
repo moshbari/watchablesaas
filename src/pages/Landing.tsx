@@ -297,18 +297,16 @@ export default function Landing() {
         <div className="landing-container">
           <h2 className="landing-text-center landing-mb-xl" style={{ color: 'white' }}>The Feature That Changes Everything</h2>
 
-          <div className="landing-text-center landing-mb-l">
-            <img 
-              src={youtubeDistractionsImage} 
-              alt="YouTube player distractions - showing distracting links, suggestions, and progress bar" 
-              style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px', margin: '0 auto' }}
-            />
-          </div>
-
           <div className="landing-comparison">
             <div className="landing-comparison-card">
               <p className="landing-comparison-label landing-before">BEFORE:</p>
-              <div className="landing-comparison-image">YouTube player with suggestions</div>
+              <div className="landing-comparison-image">
+                <img 
+                  src={youtubeDistractionsImage} 
+                  alt="YouTube player with distracting links and suggestions" 
+                  style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                />
+              </div>
               <ul className="landing-comparison-points">
                 <li><span className="landing-table-x">✗</span> Visitors click away</li>
                 <li><span className="landing-table-x">✗</span> You lose the sale</li>
