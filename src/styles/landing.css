@@ -1,7 +1,19 @@
 /* Landing Page Styles */
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.landing-page {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
 .landing-page * {
   box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* Typography */
@@ -932,6 +944,59 @@
 
   .landing-price {
     font-size: 48px;
+  }
+
+  .landing-pricing-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .landing-testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-comparison-card {
+    padding: 24px;
+  }
+
+  .landing-comparison-image {
+    height: auto;
+  }
+
+  .landing-comparison-image img {
+    width: 100%;
+    height: auto;
+  }
+
+  iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .landing-steps-container {
+    margin: 32px auto 0;
+  }
+
+  .landing-step {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .landing-step::after {
+    display: none;
+  }
+
+  .landing-btn-large {
+    padding: 16px 24px;
+    font-size: 18px;
+  }
+
+  .landing-comparison-table {
+    max-width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
 
