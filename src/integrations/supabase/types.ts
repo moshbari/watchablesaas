@@ -88,6 +88,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          consent_given: boolean
           created_at: string
           email: string | null
           id: string
@@ -97,6 +98,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          consent_given?: boolean
           created_at?: string
           email?: string | null
           id?: string
@@ -106,6 +108,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          consent_given?: boolean
           created_at?: string
           email?: string | null
           id?: string

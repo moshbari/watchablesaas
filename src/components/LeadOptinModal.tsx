@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowRight } from 'lucide-react';
@@ -53,7 +54,8 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    consent: false
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -89,6 +91,16 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
       return;
     }
 
+    // Validate consent checkbox
+    if (!formData.consent) {
+      toast({
+        title: "Consent Required",
+        description: "Please accept that we may contact you",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Basic email validation if email is provided
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       toast({
@@ -105,6 +117,7 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
       const leadData: any = {
         page_id: pageId,
         user_id: userId,
+        consent_given: formData.consent,
       };
 
       if (nameEnabled && formData.name) leadData.name = formData.name.trim();
@@ -217,6 +230,23 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
               />
             </div>
           )}
+
+          <div className="flex items-start space-x-2 py-4">
+            <Checkbox
+              id="consent"
+              checked={formData.consent}
+              onCheckedChange={(checked) => 
+                setFormData(prev => ({ ...prev, consent: checked as boolean }))
+              }
+              disabled={loading}
+            />
+            <Label 
+              htmlFor="consent" 
+              className="text-sm leading-tight cursor-pointer"
+            >
+              I agree to be contacted regarding this video and related content <span className="text-destructive">*</span>
+            </Label>
+          </div>
 
           <Button 
             type="submit" 
