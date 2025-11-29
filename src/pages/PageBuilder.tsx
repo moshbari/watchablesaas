@@ -35,6 +35,16 @@ interface Page {
   sub_headline_font_size: number;
   button_bg_color: string;
   button_text_color: string;
+  lead_optin_enabled?: boolean;
+  lead_optin_name_enabled?: boolean;
+  lead_optin_name_required?: boolean;
+  lead_optin_email_enabled?: boolean;
+  lead_optin_email_required?: boolean;
+  lead_optin_phone_enabled?: boolean;
+  lead_optin_phone_required?: boolean;
+  lead_optin_button_text?: string;
+  lead_optin_headline?: string;
+  lead_optin_description?: string;
   footer_enabled?: boolean;
   copyright_text?: string;
   privacy_policy_url?: string;
@@ -107,6 +117,16 @@ const PageBuilder = () => {
     sub_headline_font_size: 16,
     button_bg_color: '#0084ff',
     button_text_color: '#ffffff',
+    lead_optin_enabled: false,
+    lead_optin_name_enabled: true,
+    lead_optin_name_required: false,
+    lead_optin_email_enabled: true,
+    lead_optin_email_required: true,
+    lead_optin_phone_enabled: false,
+    lead_optin_phone_required: false,
+    lead_optin_button_text: 'Join to Watch Video',
+    lead_optin_headline: 'Become a Member',
+    lead_optin_description: 'Enter your information to watch this exclusive video',
     footer_enabled: true,
     copyright_text: '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
     privacy_policy_url: 'https://winarzapps.com/privacy-policy/',
@@ -335,6 +355,16 @@ const PageBuilder = () => {
       sub_headline_font_size: 16,
       button_bg_color: '#0084ff',
       button_text_color: '#ffffff',
+      lead_optin_enabled: false,
+      lead_optin_name_enabled: true,
+      lead_optin_name_required: false,
+      lead_optin_email_enabled: true,
+      lead_optin_email_required: true,
+      lead_optin_phone_enabled: false,
+      lead_optin_phone_required: false,
+      lead_optin_button_text: 'Join to Watch Video',
+      lead_optin_headline: 'Become a Member',
+      lead_optin_description: 'Enter your information to watch this exclusive video',
       footer_enabled: true,
       copyright_text: '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
       privacy_policy_url: 'https://winarzapps.com/privacy-policy/',
@@ -383,6 +413,16 @@ const PageBuilder = () => {
       sub_headline_font_size: page.sub_headline_font_size || 16,
       button_bg_color: page.button_bg_color || '#0084ff',
       button_text_color: page.button_text_color || '#ffffff',
+      lead_optin_enabled: page.lead_optin_enabled ?? false,
+      lead_optin_name_enabled: page.lead_optin_name_enabled ?? true,
+      lead_optin_name_required: page.lead_optin_name_required ?? false,
+      lead_optin_email_enabled: page.lead_optin_email_enabled ?? true,
+      lead_optin_email_required: page.lead_optin_email_required ?? true,
+      lead_optin_phone_enabled: page.lead_optin_phone_enabled ?? false,
+      lead_optin_phone_required: page.lead_optin_phone_required ?? false,
+      lead_optin_button_text: page.lead_optin_button_text || 'Join to Watch Video',
+      lead_optin_headline: page.lead_optin_headline || 'Become a Member',
+      lead_optin_description: page.lead_optin_description || 'Enter your information to watch this exclusive video',
       footer_enabled: page.footer_enabled ?? true,
       copyright_text: page.copyright_text || '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
       privacy_policy_url: page.privacy_policy_url || 'https://winarzapps.com/privacy-policy/',
@@ -890,6 +930,135 @@ const PageBuilder = () => {
 
                   {/* Timed Button Section */}
                   <TimedButton />
+
+                  <Separator />
+
+                  {/* Lead Optin Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="lead_optin_enabled"
+                        checked={formData.lead_optin_enabled}
+                        onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_enabled: checked }))}
+                      />
+                      <Label htmlFor="lead_optin_enabled" className="text-lg font-semibold">
+                        Enable Lead Optin Popup
+                      </Label>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      When enabled, visitors must submit their information before watching the video
+                    </p>
+
+                    {formData.lead_optin_enabled && (
+                      <>
+                        <div className="pl-8 space-y-4">
+                          <div>
+                            <Label htmlFor="lead_optin_headline">Popup Headline</Label>
+                            <Input
+                              id="lead_optin_headline"
+                              value={formData.lead_optin_headline}
+                              onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_headline: e.target.value }))}
+                              placeholder="Become a Member"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="lead_optin_description">Popup Description</Label>
+                            <Textarea
+                              id="lead_optin_description"
+                              value={formData.lead_optin_description}
+                              onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_description: e.target.value }))}
+                              placeholder="Enter your information to watch this exclusive video"
+                              rows={2}
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="lead_optin_button_text">Button Text</Label>
+                            <Input
+                              id="lead_optin_button_text"
+                              value={formData.lead_optin_button_text}
+                              onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text: e.target.value }))}
+                              placeholder="Join to Watch Video"
+                            />
+                          </div>
+
+                          <div className="space-y-3">
+                            <Label className="text-base">Form Fields</Label>
+                            
+                            <div className="space-y-2 pl-4">
+                              <div className="flex items-center space-x-2">
+                                <Switch
+                                  id="lead_optin_name_enabled"
+                                  checked={formData.lead_optin_name_enabled}
+                                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_name_enabled: checked }))}
+                                />
+                                <Label htmlFor="lead_optin_name_enabled">Name Field</Label>
+                              </div>
+                              {formData.lead_optin_name_enabled && (
+                                <div className="flex items-center space-x-2 pl-8">
+                                  <Switch
+                                    id="lead_optin_name_required"
+                                    checked={formData.lead_optin_name_required}
+                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_name_required: checked }))}
+                                  />
+                                  <Label htmlFor="lead_optin_name_required" className="text-sm text-muted-foreground">
+                                    Make Required
+                                  </Label>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="space-y-2 pl-4">
+                              <div className="flex items-center space-x-2">
+                                <Switch
+                                  id="lead_optin_email_enabled"
+                                  checked={formData.lead_optin_email_enabled}
+                                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_email_enabled: checked }))}
+                                />
+                                <Label htmlFor="lead_optin_email_enabled">Email Field</Label>
+                              </div>
+                              {formData.lead_optin_email_enabled && (
+                                <div className="flex items-center space-x-2 pl-8">
+                                  <Switch
+                                    id="lead_optin_email_required"
+                                    checked={formData.lead_optin_email_required}
+                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_email_required: checked }))}
+                                  />
+                                  <Label htmlFor="lead_optin_email_required" className="text-sm text-muted-foreground">
+                                    Make Required
+                                  </Label>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="space-y-2 pl-4">
+                              <div className="flex items-center space-x-2">
+                                <Switch
+                                  id="lead_optin_phone_enabled"
+                                  checked={formData.lead_optin_phone_enabled}
+                                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_phone_enabled: checked }))}
+                                />
+                                <Label htmlFor="lead_optin_phone_enabled">Phone Field</Label>
+                              </div>
+                              {formData.lead_optin_phone_enabled && (
+                                <div className="flex items-center space-x-2 pl-8">
+                                  <Switch
+                                    id="lead_optin_phone_required"
+                                    checked={formData.lead_optin_phone_required}
+                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_phone_required: checked }))}
+                                  />
+                                  <Label htmlFor="lead_optin_phone_required" className="text-sm text-muted-foreground">
+                                    Make Required
+                                  </Label>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
 
                   <Separator />
 

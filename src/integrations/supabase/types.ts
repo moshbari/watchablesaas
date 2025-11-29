@@ -62,6 +62,44 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          page_id: string
+          phone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          page_id: string
+          phone?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          page_id?: string
+          phone?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pages: {
         Row: {
           button_bg_color: string | null
@@ -83,6 +121,16 @@ export type Database = {
           headline_font_size: number | null
           id: string
           is_published: boolean | null
+          lead_optin_button_text: string | null
+          lead_optin_description: string | null
+          lead_optin_email_enabled: boolean | null
+          lead_optin_email_required: boolean | null
+          lead_optin_enabled: boolean | null
+          lead_optin_headline: string | null
+          lead_optin_name_enabled: boolean | null
+          lead_optin_name_required: boolean | null
+          lead_optin_phone_enabled: boolean | null
+          lead_optin_phone_required: boolean | null
           legal_disclaimer_text: string | null
           mobile_fullscreen_enabled: boolean | null
           privacy_policy_url: string | null
@@ -117,6 +165,16 @@ export type Database = {
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
+          lead_optin_button_text?: string | null
+          lead_optin_description?: string | null
+          lead_optin_email_enabled?: boolean | null
+          lead_optin_email_required?: boolean | null
+          lead_optin_enabled?: boolean | null
+          lead_optin_headline?: string | null
+          lead_optin_name_enabled?: boolean | null
+          lead_optin_name_required?: boolean | null
+          lead_optin_phone_enabled?: boolean | null
+          lead_optin_phone_required?: boolean | null
           legal_disclaimer_text?: string | null
           mobile_fullscreen_enabled?: boolean | null
           privacy_policy_url?: string | null
@@ -151,6 +209,16 @@ export type Database = {
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
+          lead_optin_button_text?: string | null
+          lead_optin_description?: string | null
+          lead_optin_email_enabled?: boolean | null
+          lead_optin_email_required?: boolean | null
+          lead_optin_enabled?: boolean | null
+          lead_optin_headline?: string | null
+          lead_optin_name_enabled?: boolean | null
+          lead_optin_name_required?: boolean | null
+          lead_optin_phone_enabled?: boolean | null
+          lead_optin_phone_required?: boolean | null
           legal_disclaimer_text?: string | null
           mobile_fullscreen_enabled?: boolean | null
           privacy_policy_url?: string | null
