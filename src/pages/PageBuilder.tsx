@@ -659,75 +659,75 @@ const PageBuilder = () => {
                       <Label className="text-sm font-medium">Time Range (Optional)</Label>
                       
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">Start Time</Label>
-                          <div className="flex gap-1 items-center">
-                            <Input
-                              type="number"
-                              placeholder="HH"
-                              min="0"
-                              max="23"
-                              value={timeInputs.startHour}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startHour: e.target.value }))}
-                              className="w-14 text-center text-xs"
-                            />
-                            <span className="text-muted-foreground">:</span>
-                            <Input
-                              type="number"
-                              placeholder="MM"
-                              min="0"
-                              max="59"
-                              value={timeInputs.startMinute}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startMinute: e.target.value }))}
-                              className="w-14 text-center text-xs"
-                            />
-                            <span className="text-muted-foreground">:</span>
-                            <Input
-                              type="number"
-                              placeholder="SS"
-                              min="0"
-                              max="59"
-                              value={timeInputs.startSecond}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startSecond: e.target.value }))}
-                              className="w-14 text-center text-xs"
-                            />
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Start Time</Label>
+                            <div className="flex gap-1 items-center">
+                              <Input
+                                type="number"
+                                placeholder="HH"
+                                min="0"
+                                max="23"
+                                value={timeInputs.startHour}
+                                onChange={(e) => setTimeInputs(prev => ({ ...prev, startHour: e.target.value }))}
+                                className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg"
+                              />
+                              <span className="text-muted-foreground">:</span>
+                              <Input
+                                type="number"
+                                placeholder="MM"
+                                min="0"
+                                max="59"
+                                value={timeInputs.startMinute}
+                                onChange={(e) => setTimeInputs(prev => ({ ...prev, startMinute: e.target.value }))}
+                                className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg"
+                              />
+                              <span className="text-muted-foreground">:</span>
+                              <Input
+                                type="number"
+                                placeholder="SS"
+                                min="0"
+                                max="59"
+                                value={timeInputs.startSecond}
+                                onChange={(e) => setTimeInputs(prev => ({ ...prev, startSecond: e.target.value }))}
+                                className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">End Time</Label>
-                          <div className="flex gap-1 items-center">
-                            <Input
-                              type="number"
-                              placeholder="HH"
-                              min="0"
-                              max="23"
-                              value={timeInputs.endHour}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endHour: e.target.value }))}
-                              className="w-14 text-center text-xs"
-                            />
-                            <span className="text-muted-foreground">:</span>
-                            <Input
-                              type="number"
-                              placeholder="MM"
-                              min="0"
-                              max="59"
-                              value={timeInputs.endMinute}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endMinute: e.target.value }))}
-                              className="w-14 text-center text-xs"
-                            />
-                            <span className="text-muted-foreground">:</span>
-                            <Input
-                              type="number"
-                              placeholder="SS"
-                              min="0"
-                              max="59"
-                              value={timeInputs.endSecond}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endSecond: e.target.value }))}
-                              className="w-14 text-center text-xs"
-                            />
+                          
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">End Time</Label>
+                            <div className="flex gap-1 items-center">
+                              <Input
+                                type="number"
+                                placeholder="HH"
+                                min="0"
+                                max="23"
+                                value={timeInputs.endHour}
+                                onChange={(e) => setTimeInputs(prev => ({ ...prev, endHour: e.target.value }))}
+                                className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg"
+                              />
+                              <span className="text-muted-foreground">:</span>
+                              <Input
+                                type="number"
+                                placeholder="MM"
+                                min="0"
+                                max="59"
+                                value={timeInputs.endMinute}
+                                onChange={(e) => setTimeInputs(prev => ({ ...prev, endMinute: e.target.value }))}
+                                className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg"
+                              />
+                              <span className="text-muted-foreground">:</span>
+                              <Input
+                                type="number"
+                                placeholder="SS"
+                                min="0"
+                                max="59"
+                                value={timeInputs.endSecond}
+                                onChange={(e) => setTimeInputs(prev => ({ ...prev, endSecond: e.target.value }))}
+                                className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg"
+                              />
+                            </div>
                           </div>
-                        </div>
                       </div>
                       
                       <p className="text-xs text-muted-foreground">
@@ -850,41 +850,44 @@ const PageBuilder = () => {
                         <div>
                           <Label>Button Delay</Label>
                           <div className="grid grid-cols-3 gap-2 mt-2">
-                            <div>
-                              <Label htmlFor="button_delay_hours" className="text-xs text-muted-foreground">Hours</Label>
-                              <Input
-                                id="button_delay_hours"
-                                type="number"
-                                min="0"
-                                value={buttonDelayInputs.hours}
-                                onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, hours: e.target.value }))}
-                                placeholder="0"
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="button_delay_minutes" className="text-xs text-muted-foreground">Minutes</Label>
-                              <Input
-                                id="button_delay_minutes"
-                                type="number"
-                                min="0"
-                                max="59"
-                                value={buttonDelayInputs.minutes}
-                                onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, minutes: e.target.value }))}
-                                placeholder="0"
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="button_delay_seconds" className="text-xs text-muted-foreground">Seconds</Label>
-                              <Input
-                                id="button_delay_seconds"
-                                type="number"
-                                min="0"
-                                max="59"
-                                value={buttonDelayInputs.seconds}
-                                onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, seconds: e.target.value }))}
-                                placeholder="0"
-                              />
-                            </div>
+                          <div>
+                            <Label htmlFor="button_delay_hours" className="text-xs text-muted-foreground">Hours</Label>
+                            <Input
+                              id="button_delay_hours"
+                              type="number"
+                              min="0"
+                              value={buttonDelayInputs.hours}
+                              onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, hours: e.target.value }))}
+                              placeholder="0"
+                              className="border-2 border-foreground/80 rounded-lg"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="button_delay_minutes" className="text-xs text-muted-foreground">Minutes</Label>
+                            <Input
+                              id="button_delay_minutes"
+                              type="number"
+                              min="0"
+                              max="59"
+                              value={buttonDelayInputs.minutes}
+                              onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, minutes: e.target.value }))}
+                              placeholder="0"
+                              className="border-2 border-foreground/80 rounded-lg"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="button_delay_seconds" className="text-xs text-muted-foreground">Seconds</Label>
+                            <Input
+                              id="button_delay_seconds"
+                              type="number"
+                              min="0"
+                              max="59"
+                              value={buttonDelayInputs.seconds}
+                              onChange={(e) => setButtonDelayInputs(prev => ({ ...prev, seconds: e.target.value }))}
+                              placeholder="0"
+                              className="border-2 border-foreground/80 rounded-lg"
+                            />
+                          </div>
                           </div>
                           <p className="text-xs text-muted-foreground mt-2">
                             Total delay: {(parseInt(buttonDelayInputs.hours) || 0) * 3600 + (parseInt(buttonDelayInputs.minutes) || 0) * 60 + (parseInt(buttonDelayInputs.seconds) || 0)} seconds
