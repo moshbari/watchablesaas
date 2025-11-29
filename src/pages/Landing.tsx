@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import youtubeDistractionsImage from '@/assets/youtube_player_distractions.jpg';
+import cleanPlayerAfter from '@/assets/clean_player_after.png';
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255)
@@ -318,7 +319,13 @@ export default function Landing() {
 
             <div className="landing-comparison-card">
               <p className="landing-comparison-label landing-after">AFTER:</p>
-              <div className="landing-comparison-image">Clean locked player</div>
+              <div className="landing-comparison-image">
+                <img 
+                  src={cleanPlayerAfter} 
+                  alt="Clean distraction-free video player" 
+                  style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                />
+              </div>
               <ul className="landing-comparison-points">
                 <li><span className="landing-table-check">✓</span> Visitors watch full video</li>
                 <li><span className="landing-table-check">✓</span> You make the sale</li>
