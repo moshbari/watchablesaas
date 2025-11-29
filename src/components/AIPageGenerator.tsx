@@ -192,6 +192,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
                 variant="outline"
                 type="button"
                 disabled={isGenerating}
+                className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <Mic className="mr-2 h-4 w-4" />
                 Voice Input
@@ -224,7 +225,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
             <Button
               onClick={stopRecording}
               variant="destructive"
-              className="flex-1 animate-pulse"
+              className="flex-1 animate-pulse shadow-lg"
               size="lg"
             >
               <MicOff className="mr-2 h-4 w-4" />
