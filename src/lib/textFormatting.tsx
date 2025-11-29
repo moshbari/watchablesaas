@@ -5,6 +5,7 @@
 
 interface FormatConfig {
   highlight?: string; // comma-separated words to highlight (color + bold)
+  highlightColor?: string; // custom color for highlighted text
   bold?: string; // comma-separated words to make bold
   italic?: string; // comma-separated words to make italic
   underline?: string; // comma-separated words to underline
@@ -77,11 +78,17 @@ export const formatText = (text: string, config: FormatConfig): React.ReactNode 
       return <span key={index}>{part}</span>;
     }
 
-    // Build className based on formatting rules
+    // Build className and style based on formatting rules
     const classNames: string[] = [];
+    const inlineStyle: React.CSSProperties = {};
     
     if (isHighlight) {
-      classNames.push('text-primary', 'font-bold');
+      classNames.push('font-bold');
+      if (config.highlightColor) {
+        inlineStyle.color = config.highlightColor;
+      } else {
+        classNames.push('text-primary');
+      }
     }
     if (isBold) {
       classNames.push('font-bold');
@@ -94,7 +101,11 @@ export const formatText = (text: string, config: FormatConfig): React.ReactNode 
     }
 
     return (
-      <span key={index} className={classNames.join(' ')}>
+      <span 
+        key={index} 
+        className={classNames.join(' ')}
+        style={Object.keys(inlineStyle).length > 0 ? inlineStyle : undefined}
+      >
         {part}
       </span>
     );

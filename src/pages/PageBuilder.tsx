@@ -38,6 +38,7 @@ interface Page {
   button_bg_color: string;
   button_text_color: string;
   text_highlight?: string;
+  text_highlight_color?: string;
   text_bold?: string;
   text_italic?: string;
   text_underline?: string;
@@ -127,6 +128,7 @@ const PageBuilder = () => {
     button_bg_color: '#007bc7',
     button_text_color: '#ffffff',
     text_highlight: '',
+    text_highlight_color: '#ef4444',
     text_bold: '',
     text_italic: '',
     text_underline: '',
@@ -372,6 +374,7 @@ const PageBuilder = () => {
       button_bg_color: '#007bc7',
       button_text_color: '#ffffff',
       text_highlight: '',
+      text_highlight_color: '#ef4444',
       text_bold: '',
       text_italic: '',
       text_underline: '',
@@ -437,6 +440,7 @@ const PageBuilder = () => {
       button_bg_color: page.button_bg_color || '#007bc7',
       button_text_color: page.button_text_color || '#ffffff',
       text_highlight: page.text_highlight || '',
+      text_highlight_color: page.text_highlight_color || '#ef4444',
       text_bold: page.text_bold || '',
       text_italic: page.text_italic || '',
       text_underline: page.text_underline || '',
@@ -666,7 +670,7 @@ const PageBuilder = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="text_highlight">Highlight (Primary color + Bold)</Label>
+                      <Label htmlFor="text_highlight">Highlight (Color + Bold)</Label>
                       <Input
                         id="text_highlight"
                         value={formData.text_highlight}
@@ -675,8 +679,27 @@ const PageBuilder = () => {
                         className="border-2 border-foreground/80 rounded-lg"
                       />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Text will be colored with your primary theme color and made bold
+                        Text will be colored and made bold
                       </p>
+                      <div className="flex items-center gap-2 mt-3">
+                        <Label htmlFor="text_highlight_color" className="min-w-fit">Highlight Color:</Label>
+                        <div className="flex gap-2 flex-1">
+                          <input
+                            type="color"
+                            id="text_highlight_color"
+                            value={formData.text_highlight_color || '#ef4444'}
+                            onChange={(e) => setFormData(prev => ({ ...prev, text_highlight_color: e.target.value }))}
+                            className="h-10 w-16 rounded border cursor-pointer"
+                          />
+                          <Input
+                            type="text"
+                            value={formData.text_highlight_color || '#ef4444'}
+                            onChange={(e) => setFormData(prev => ({ ...prev, text_highlight_color: e.target.value }))}
+                            placeholder="#ef4444"
+                            className="flex-1"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div>
