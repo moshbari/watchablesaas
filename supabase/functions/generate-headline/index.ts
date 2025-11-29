@@ -35,9 +35,7 @@ serve(async (req) => {
     }
 
     const systemPrompt = promptConfig.prompt_text;
-    const userPrompt = context 
-      ? `Generate a headline and sub-headline based on this context: ${context}`
-      : 'Generate a compelling headline and sub-headline for a video sales letter.';
+    const userPrompt = `Generate 3 compelling headline and sub-headline variations based on this context: ${context}`;
 
     console.log('Calling OpenAI API...');
 
@@ -53,7 +51,7 @@ serve(async (req) => {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        max_completion_tokens: 500,
+        max_completion_tokens: 1500,
       }),
     });
 
@@ -77,11 +75,11 @@ serve(async (req) => {
         parsedResult = JSON.parse(codeBlockMatch[1]);
         console.log('Parsed from code block');
       } else {
-        // Try to extract any JSON object from the text
-        const jsonMatch = generatedText.match(/\{[^{}]*"headline"[^{}]*"subHeadline"[^{}]*\}/);
+        // Try to extract any JSON object containing "options"
+        const jsonMatch = generatedText.match(/\{[\s\S]*"options"[\s\S]*\[[\s\S]*\][\s\S]*\}/);
         if (jsonMatch) {
           parsedResult = JSON.parse(jsonMatch[0]);
-          console.log('Parsed from inline JSON');
+          console.log('Parsed from inline JSON with options array');
         } else {
           // Last resort: try parsing the whole string
           parsedResult = JSON.parse(generatedText.trim());
@@ -91,28 +89,24 @@ serve(async (req) => {
     } catch (parseError) {
       console.error('Failed to parse AI response:', generatedText);
       console.error('Parse error:', parseError.message);
-      
-      // Fallback: try to extract headline and subheadline manually
-      const headlineMatch = generatedText.match(/["']?headline["']?\s*:\s*["']([^"']+)["']/i);
-      const subHeadlineMatch = generatedText.match(/["']?(?:subHeadline|sub_headline|subheadline)["']?\s*:\s*["']([^"']+)["']/i);
-      
-      if (headlineMatch && subHeadlineMatch) {
-        parsedResult = {
-          headline: headlineMatch[1],
-          subHeadline: subHeadlineMatch[1]
-        };
-        console.log('Extracted via regex fallback');
-      } else {
-        throw new Error('AI returned invalid format. Response: ' + generatedText.substring(0, 200));
-      }
+      throw new Error('AI returned invalid format. Response: ' + generatedText.substring(0, 300));
     }
 
     console.log('Final parsed result:', parsedResult);
 
+    // Ensure we have an options array
+    if (!parsedResult.options || !Array.isArray(parsedResult.options)) {
+      throw new Error('AI did not return an options array');
+    }
+
     return new Response(
       JSON.stringify({ 
-        headline: parsedResult.headline || parsedResult.Headline,
-        subHeadline: parsedResult.subHeadline || parsedResult.SubHeadline || parsedResult.sub_headline
+        options: parsedResult.options.map((opt: any) => ({
+          headline: opt.headline || opt.Headline,
+          subHeadline: opt.subHeadline || opt.SubHeadline || opt.sub_headline,
+          rating: opt.rating || opt.Rating || 5,
+          reason: opt.reason || opt.Reason || 'Compelling copy'
+        }))
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
