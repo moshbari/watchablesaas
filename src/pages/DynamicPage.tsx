@@ -23,7 +23,9 @@ interface Page {
   button_enabled: boolean;
   is_published: boolean;
   headline_font_size?: number;
+  headline_color: string;
   sub_headline_font_size?: number;
+  sub_headline_color: string;
   button_bg_color?: string;
   button_text_color?: string;
   text_highlight?: string;
@@ -176,8 +178,11 @@ const DynamicPage = () => {
             {/* Hero Section */}
             <section className="space-y-6 mb-12">
               <h1 
-                className="font-bold text-gray-900 leading-tight"
-                style={{ fontSize: `${page.headline_font_size || 48}px` }}
+                className="font-bold leading-tight"
+                style={{ 
+                  fontSize: `${page.headline_font_size || 48}px`,
+                  color: page.headline_color || '#000000'
+                }}
               >
                 {formatText(page.headline, {
                   highlight: page.text_highlight,
@@ -190,8 +195,11 @@ const DynamicPage = () => {
               
               {page.sub_headline && (
                 <p 
-                  className="text-gray-600 max-w-3xl mx-auto leading-relaxed"
-                  style={{ fontSize: `${page.sub_headline_font_size || 20}px` }}
+                  className="max-w-3xl mx-auto leading-relaxed"
+                  style={{ 
+                    fontSize: `${page.sub_headline_font_size || 20}px`,
+                    color: page.sub_headline_color || '#000000'
+                  }}
                 >
                   {formatText(page.sub_headline, {
                     highlight: page.text_highlight,
