@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Sparkles, Star, Loader2 } from 'lucide-react';
+import { Sparkles, Star, Loader2, Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,6 +24,10 @@ export const AIHeadlineGenerator: React.FC<AIHeadlineGeneratorProps> = ({ onSele
   const [context, setContext] = useState('');
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<HeadlineOption[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
 
   const handleGenerate = async () => {
@@ -70,6 +74,100 @@ export const AIHeadlineGenerator: React.FC<AIHeadlineGeneratorProps> = ({ onSele
     // Don't close dialog so users can try other options
   };
 
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      toast({
+        title: "Recording Started",
+        description: "Speak now... Tap again to stop",
+      });
+    } catch (error: any) {
+      console.error('Error starting recording:', error);
+      toast({
+        title: "Recording Error",
+        description: error.message || "Failed to access microphone",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const transcribeAudio = async (audioBlob: Blob) => {
+    setIsTranscribing(true);
+    try {
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      
+      const base64Audio = await new Promise<string>((resolve, reject) => {
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          // Remove data URL prefix
+          const base64Data = base64.split(',')[1];
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+      });
+
+      const { data, error } = await supabase.functions.invoke('transcribe-audio', {
+        body: { audio: base64Audio }
+      });
+
+      if (error) throw error;
+
+      if (data?.text) {
+        setContext(prev => prev ? `${prev} ${data.text}` : data.text);
+        toast({
+          title: "Transcription Complete",
+          description: "Your voice has been converted to text",
+        });
+      } else {
+        throw new Error('No transcription returned');
+      }
+    } catch (error: any) {
+      console.error('Transcription error:', error);
+      toast({
+        title: "Transcription Error",
+        description: error.message || "Failed to transcribe audio",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   const renderStars = (rating: number) => {
     return (
       <div className="flex gap-1">
@@ -104,9 +202,35 @@ export const AIHeadlineGenerator: React.FC<AIHeadlineGeneratorProps> = ({ onSele
         <div className="space-y-6">
           {/* Context Input */}
           <div className="space-y-2">
-            <Label htmlFor="ai-context">
-              What's your video about? (Product, audience, benefits, problems solved, etc.)
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="ai-context">
+                What's your video about? (Product, audience, benefits, problems solved, etc.)
+              </Label>
+              <Button
+                type="button"
+                onClick={toggleRecording}
+                disabled={isTranscribing}
+                variant={isRecording ? "destructive" : "outline"}
+                size="sm"
+              >
+                {isTranscribing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    Transcribing...
+                  </>
+                ) : isRecording ? (
+                  <>
+                    <MicOff className="w-4 h-4 mr-1" />
+                    Stop Recording
+                  </>
+                ) : (
+                  <>
+                    <Mic className="w-4 h-4 mr-1" />
+                    Voice to Text
+                  </>
+                )}
+              </Button>
+            </div>
             <Textarea
               id="ai-context"
               value={context}
