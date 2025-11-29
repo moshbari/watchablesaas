@@ -28,6 +28,8 @@ interface LeadOptinModalProps {
   headline?: string;
   description?: string;
   buttonText?: string;
+  buttonBgColor?: string;
+  buttonTextColor?: string;
 }
 
 export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
@@ -44,7 +46,9 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
   isMandatory = false,
   headline = 'Become a Member',
   description = 'Enter your information to watch this exclusive video',
-  buttonText = 'Join to Watch Video'
+  buttonText = 'Join to Watch Video',
+  buttonBgColor = '#000000',
+  buttonTextColor = '#ffffff'
 }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -173,6 +177,7 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
                 placeholder="Enter your name"
                 required={nameRequired}
                 disabled={loading}
+                className="border-2 border-border"
               />
             </div>
           )}
@@ -190,6 +195,7 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
                 placeholder="Enter your email"
                 required={emailRequired}
                 disabled={loading}
+                className="border-2 border-border"
               />
             </div>
           )}
@@ -207,11 +213,20 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
                 placeholder="Enter your phone number"
                 required={phoneRequired}
                 disabled={loading}
+                className="border-2 border-border"
               />
             </div>
           )}
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={loading}
+            style={{
+              backgroundColor: buttonBgColor,
+              color: buttonTextColor
+            }}
+          >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {buttonText}
           </Button>

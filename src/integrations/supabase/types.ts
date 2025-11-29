@@ -121,7 +121,9 @@ export type Database = {
           headline_font_size: number | null
           id: string
           is_published: boolean | null
+          lead_optin_button_bg_color: string | null
           lead_optin_button_text: string | null
+          lead_optin_button_text_color: string | null
           lead_optin_description: string | null
           lead_optin_email_enabled: boolean | null
           lead_optin_email_required: boolean | null
@@ -166,7 +168,9 @@ export type Database = {
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
+          lead_optin_button_bg_color?: string | null
           lead_optin_button_text?: string | null
+          lead_optin_button_text_color?: string | null
           lead_optin_description?: string | null
           lead_optin_email_enabled?: boolean | null
           lead_optin_email_required?: boolean | null
@@ -211,7 +215,9 @@ export type Database = {
           headline_font_size?: number | null
           id?: string
           is_published?: boolean | null
+          lead_optin_button_bg_color?: string | null
           lead_optin_button_text?: string | null
+          lead_optin_button_text_color?: string | null
           lead_optin_description?: string | null
           lead_optin_email_enabled?: boolean | null
           lead_optin_email_required?: boolean | null

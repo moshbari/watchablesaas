@@ -44,6 +44,8 @@ interface Page {
   lead_optin_phone_enabled?: boolean;
   lead_optin_phone_required?: boolean;
   lead_optin_button_text?: string;
+  lead_optin_button_bg_color?: string;
+  lead_optin_button_text_color?: string;
   lead_optin_headline?: string;
   lead_optin_description?: string;
   footer_enabled?: boolean;
@@ -127,6 +129,8 @@ const PageBuilder = () => {
     lead_optin_phone_enabled: false,
     lead_optin_phone_required: false,
     lead_optin_button_text: 'Join to Watch Video',
+    lead_optin_button_bg_color: '#000000',
+    lead_optin_button_text_color: '#ffffff',
     lead_optin_headline: 'Become a Member',
     lead_optin_description: 'Enter your information to watch this exclusive video',
     footer_enabled: true,
@@ -366,6 +370,8 @@ const PageBuilder = () => {
       lead_optin_phone_enabled: false,
       lead_optin_phone_required: false,
       lead_optin_button_text: 'Join to Watch Video',
+      lead_optin_button_bg_color: '#000000',
+      lead_optin_button_text_color: '#ffffff',
       lead_optin_headline: 'Become a Member',
       lead_optin_description: 'Enter your information to watch this exclusive video',
       footer_enabled: true,
@@ -425,6 +431,8 @@ const PageBuilder = () => {
       lead_optin_phone_enabled: page.lead_optin_phone_enabled ?? false,
       lead_optin_phone_required: page.lead_optin_phone_required ?? false,
       lead_optin_button_text: page.lead_optin_button_text || 'Join to Watch Video',
+      lead_optin_button_bg_color: page.lead_optin_button_bg_color || '#000000',
+      lead_optin_button_text_color: page.lead_optin_button_text_color || '#ffffff',
       lead_optin_headline: page.lead_optin_headline || 'Become a Member',
       lead_optin_description: page.lead_optin_description || 'Enter your information to watch this exclusive video',
       footer_enabled: page.footer_enabled ?? true,
@@ -1015,6 +1023,30 @@ const PageBuilder = () => {
                               placeholder="Join to Watch Video"
                               className="border-2 border-foreground/80 rounded-lg"
                             />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="lead_optin_button_bg_color">Button Background Color</Label>
+                              <Input
+                                id="lead_optin_button_bg_color"
+                                type="color"
+                                value={formData.lead_optin_button_bg_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_bg_color: e.target.value }))}
+                                className="h-10 cursor-pointer"
+                              />
+                            </div>
+
+                            <div>
+                              <Label htmlFor="lead_optin_button_text_color">Button Text Color</Label>
+                              <Input
+                                id="lead_optin_button_text_color"
+                                type="color"
+                                value={formData.lead_optin_button_text_color}
+                                onChange={(e) => setFormData(prev => ({ ...prev, lead_optin_button_text_color: e.target.value }))}
+                                className="h-10 cursor-pointer"
+                              />
+                            </div>
                           </div>
 
                           <div className="space-y-3">
