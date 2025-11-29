@@ -35,6 +35,8 @@ interface Page {
   lead_optin_phone_enabled?: boolean;
   lead_optin_phone_required?: boolean;
   lead_optin_button_text?: string;
+  lead_optin_button_bg_color?: string;
+  lead_optin_button_text_color?: string;
   lead_optin_headline?: string;
   lead_optin_description?: string;
   footer_enabled?: boolean;
@@ -323,6 +325,8 @@ const DynamicPage = () => {
             headline={page.lead_optin_headline}
             description={page.lead_optin_description}
             buttonText={page.lead_optin_button_text}
+            buttonBgColor={page.lead_optin_button_bg_color}
+            buttonTextColor={page.lead_optin_button_text_color}
           />
         )}
       </div>
