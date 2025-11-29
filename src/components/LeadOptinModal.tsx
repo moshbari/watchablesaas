@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowRight } from 'lucide-react';
 
 interface LeadOptinModalProps {
   isOpen: boolean;
@@ -220,7 +220,7 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
 
           <Button 
             type="submit" 
-            className="w-full" 
+            className="w-full flex items-center justify-center gap-2" 
             disabled={loading}
             style={{
               backgroundColor: buttonBgColor,
@@ -229,6 +229,7 @@ export const LeadOptinModal: React.FC<LeadOptinModalProps> = ({
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {buttonText}
+            <ArrowRight className="h-4 w-4" style={{ color: buttonTextColor }} />
           </Button>
         </form>
       </DialogContent>
