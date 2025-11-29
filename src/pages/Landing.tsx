@@ -115,7 +115,7 @@ export default function Landing() {
           </h1>
 
           <div className="landing-hero-subheadline landing-fade-in">
-            <p>Last month, I paid a developer <span className="landing-highlight-orange">$1,275</span> to build a simple webinar funnel.</p>
+            <p>Last month, I paid a developer <span className="landing-highlight-orange">$1,267</span> to build a simple webinar funnel.</p>
             <p>It took him <strong>8 days</strong>.</p>
             <p className="landing-mt-s">Yesterday, I built the same funnel in <span className="landing-highlight-orange">59 seconds</span>. From my phone. Using only my voice.</p>
           </div>
