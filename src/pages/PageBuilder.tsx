@@ -1257,19 +1257,19 @@ const PageBuilder = () => {
                   <CardDescription>Live preview of your landing page</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-white p-6 rounded-lg border min-h-[400px]">
+                  <div className="bg-white p-4 sm:p-6 rounded-lg border min-h-[400px]">
                     <div className="text-center space-y-4">
                       <h1 
-                        className="font-bold text-gray-900"
-                        style={{ fontSize: `${formData.headline_font_size}px` }}
+                        className="font-bold text-gray-900 px-2"
+                        style={{ fontSize: `${Math.max(formData.headline_font_size * 0.7, 20)}px` }}
                       >
                         {formData.headline || 'Your Headline Here'}
                       </h1>
                       
                       {formData.sub_headline && (
                         <p 
-                          className="text-gray-600 max-w-2xl mx-auto"
-                          style={{ fontSize: `${formData.sub_headline_font_size}px` }}
+                          className="text-gray-600 max-w-2xl mx-auto px-2"
+                          style={{ fontSize: `${Math.max(formData.sub_headline_font_size * 0.8, 14)}px` }}
                         >
                           {formData.sub_headline}
                         </p>
@@ -1290,9 +1290,9 @@ const PageBuilder = () => {
                       )}
 
                       {formData.button_enabled && (
-                        <div className="pt-6">
+                        <div className="pt-6 px-4">
                           <Button 
-                            className="px-8 py-3 text-lg flex items-center gap-2"
+                            className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg flex items-center justify-center gap-2 break-words"
                             style={{
                               backgroundColor: formData.button_bg_color,
                               color: formData.button_text_color,
@@ -1300,10 +1300,10 @@ const PageBuilder = () => {
                             }}
                             disabled
                           >
-                            <span>{formData.button_text || 'Get Started Now'}</span>
-                            <ArrowRight className="w-5 h-5" />
+                            <span className="text-center">{formData.button_text || 'Get Started Now'}</span>
+                            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                           </Button>
-                          <p className="text-sm text-gray-500 mt-2">
+                          <p className="text-xs sm:text-sm text-gray-500 mt-2">
                             Button appears after {formData.button_delay} seconds
                           </p>
                         </div>
