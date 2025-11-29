@@ -77,9 +77,7 @@ const DynamicPage = () => {
       // Check if user has already opted in for this page
       const optedIn = sessionStorage.getItem(`lead_optin_${page.id}`) === 'true';
       setHasOptedIn(optedIn);
-      if (!optedIn) {
-        setShowLeadModal(true);
-      }
+      // Don't show automatically - will show on user tap/click
     }
   }, [page]);
 
@@ -118,6 +116,12 @@ const DynamicPage = () => {
       description: error,
       variant: "destructive",
     });
+  };
+
+  const handlePageClick = () => {
+    if (page?.lead_optin_enabled && !hasOptedIn) {
+      setShowLeadModal(true);
+    }
   };
 
   if (loading) {
@@ -160,7 +164,7 @@ const DynamicPage = () => {
         <link rel="canonical" href={`${window.location.origin}/${page.slug}`} />
       </Helmet>
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white" onClick={handlePageClick}>
         <main className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto text-center">
             {/* Hero Section */}
@@ -189,7 +193,6 @@ const DynamicPage = () => {
                   {page.lead_optin_enabled && !hasOptedIn ? (
                     <div 
                       className="relative cursor-pointer"
-                      onClick={() => setShowLeadModal(true)}
                     >
                       <VideoPlayer 
                         src={page.video_url} 
@@ -203,9 +206,9 @@ const DynamicPage = () => {
                         fakeProgressThickness={page.fake_progress_thickness || 4}
                         mobileFullscreenEnabled={page.mobile_fullscreen_enabled ?? true}
                       />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center pointer-events-none">
                         <div className="text-white text-center">
-                          <p className="text-xl font-semibold">Click to become a member and watch</p>
+                          <p className="text-xl font-semibold">Click anywhere to become a member and watch</p>
                         </div>
                       </div>
                     </div>
