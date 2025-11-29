@@ -24,20 +24,50 @@ export const TellaPlayer: React.FC<TellaPlayerProps> = ({
   }, [onError]);
 
   return (
-    <iframe
-      ref={iframeRef}
-      src={`https://www.tella.tv/video/${videoId}/embed`}
-      className="w-full h-full"
-      allow="autoplay; encrypted-media"
-      allowFullScreen
-      style={{
-        border: 'none',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%'
-      }}
-    />
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <iframe
+        ref={iframeRef}
+        src={`https://www.tella.tv/video/${videoId}/embed`}
+        className="w-full h-full"
+        allow="autoplay; encrypted-media"
+        allowFullScreen
+        style={{
+          border: 'none',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%'
+        }}
+      />
+      {/* Overlay to block Tella's header at the top */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '80px',
+          zIndex: 10,
+          pointerEvents: 'auto',
+          cursor: 'default'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      />
+      {/* Overlay to block Tella's controls at the bottom */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '60px',
+          zIndex: 10,
+          pointerEvents: 'auto',
+          cursor: 'default'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
   );
 };
