@@ -36,6 +36,7 @@ interface Page {
   button_bg_color: string;
   button_text_color: string;
   lead_optin_enabled?: boolean;
+  lead_optin_mandatory?: boolean;
   lead_optin_name_enabled?: boolean;
   lead_optin_name_required?: boolean;
   lead_optin_email_enabled?: boolean;
@@ -118,6 +119,7 @@ const PageBuilder = () => {
     button_bg_color: '#0084ff',
     button_text_color: '#ffffff',
     lead_optin_enabled: false,
+    lead_optin_mandatory: false,
     lead_optin_name_enabled: true,
     lead_optin_name_required: false,
     lead_optin_email_enabled: true,
@@ -356,6 +358,7 @@ const PageBuilder = () => {
       button_bg_color: '#0084ff',
       button_text_color: '#ffffff',
       lead_optin_enabled: false,
+      lead_optin_mandatory: false,
       lead_optin_name_enabled: true,
       lead_optin_name_required: false,
       lead_optin_email_enabled: true,
@@ -414,6 +417,7 @@ const PageBuilder = () => {
       button_bg_color: page.button_bg_color || '#0084ff',
       button_text_color: page.button_text_color || '#ffffff',
       lead_optin_enabled: page.lead_optin_enabled ?? false,
+      lead_optin_mandatory: page.lead_optin_mandatory ?? false,
       lead_optin_name_enabled: page.lead_optin_name_enabled ?? true,
       lead_optin_name_required: page.lead_optin_name_required ?? false,
       lead_optin_email_enabled: page.lead_optin_email_enabled ?? true,
@@ -962,6 +966,22 @@ const PageBuilder = () => {
 
                     {formData.lead_optin_enabled && (
                       <>
+                        <div className="pl-4 space-y-4">
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="lead_optin_mandatory"
+                              checked={formData.lead_optin_mandatory}
+                              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, lead_optin_mandatory: checked }))}
+                            />
+                            <Label htmlFor="lead_optin_mandatory" className="text-sm font-medium">
+                              Make it mandatory
+                            </Label>
+                          </div>
+                          <p className="text-xs text-muted-foreground pl-8">
+                            If enabled, visitors cannot close the popup without submitting their information
+                          </p>
+                        </div>
+
                         <div className="pl-8 space-y-4">
                           <div>
                             <Label htmlFor="lead_optin_headline">Popup Headline</Label>
