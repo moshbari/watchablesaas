@@ -185,7 +185,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
           className="resize-none"
           disabled={isGenerating || isRecording || isTranscribing}
         />
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           {!isRecording && !isTranscribing ? (
             <>
               <Button
@@ -193,7 +193,8 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
                 variant="outline"
                 type="button"
                 disabled={isGenerating}
-                className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="w-full sm:w-auto bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                size="lg"
               >
                 <Mic className="mr-2 h-4 w-4" />
                 Voice Input
@@ -201,7 +202,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating || !prompt.trim()}
-                className="flex-1"
+                className="flex-1 w-full"
                 size="lg"
               >
                 {isGenerating ? (
@@ -218,7 +219,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
               </Button>
             </>
           ) : isTranscribing ? (
-            <Button disabled className="flex-1" size="lg">
+            <Button disabled className="w-full" size="lg">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Transcribing...
             </Button>
@@ -226,7 +227,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
             <Button
               onClick={stopRecording}
               variant="destructive"
-              className="flex-1 animate-pulse shadow-lg"
+              className="w-full animate-pulse shadow-lg"
               size="lg"
             >
               <MicOff className="mr-2 h-4 w-4" />
