@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { format, startOfDay, endOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths } from 'date-fns';
-import { Loader2, Calendar as CalendarIcon } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -135,6 +135,51 @@ const Leads = () => {
     }
   };
 
+  const downloadCSV = () => {
+    if (leads.length === 0) {
+      toast({
+        title: "No data",
+        description: "No leads to download",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create CSV content
+    const headers = ['#', 'Date', 'Name', 'Email', 'Phone'];
+    const csvContent = [
+      headers.join(','),
+      ...leads.map((lead, index) => [
+        index + 1,
+        format(new Date(lead.created_at), 'MMM dd, yyyy HH:mm'),
+        lead.name || '-',
+        lead.email || '-',
+        lead.phone || '-'
+      ].map(field => `"${field}"`).join(','))
+    ].join('\n');
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    const periodLabel = quickPeriod === 'custom' 
+      ? `${startDate ? format(startDate, 'yyyy-MM-dd') : 'start'}_to_${endDate ? format(endDate, 'yyyy-MM-dd') : 'end'}`
+      : quickPeriod;
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `leads_${periodLabel}_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Success",
+      description: "Leads exported to CSV",
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-6 flex items-center justify-center">
@@ -148,10 +193,18 @@ const Leads = () => {
       <div className="max-w-7xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">Leads</CardTitle>
-            <CardDescription>
-              View all leads collected from your pages
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-3xl">Leads</CardTitle>
+                <CardDescription>
+                  View all leads collected from your pages
+                </CardDescription>
+              </div>
+              <Button onClick={downloadCSV} variant="default" className="gap-2">
+                <Download className="h-4 w-4" />
+                Download CSV
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Filter Section */}
