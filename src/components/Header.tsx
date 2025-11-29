@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthProvider";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 const Header: React.FC = () => {
   const { session, profile, signOut } = useAuth();
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="border-b bg-background">
       <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="font-semibold">Watchables</Link>
-        <div className="flex items-center gap-3">
+        <Link to="/" className="font-semibold text-lg">Watchables</Link>
+        
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-3">
           {!session && (
             <>
               <Link to="/login"><Button variant="ghost">Login</Button></Link>
@@ -29,6 +35,53 @@ const Header: React.FC = () => {
             </>
           )}
         </div>
+
+        {/* Mobile Navigation */}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" size="icon">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-64">
+            <div className="flex flex-col gap-4 mt-8">
+              {!session && (
+                <>
+                  <Link to="/login" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">Login</Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setOpen(false)}>
+                    <Button className="w-full">Create account</Button>
+                  </Link>
+                </>
+              )}
+              {session && (
+                <>
+                  <Link to="/campaigns" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">Video Hosting</Button>
+                  </Link>
+                  <Link to="/page-builder" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">Page Builder</Button>
+                  </Link>
+                  <Link to="/leads" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">Leads</Button>
+                  </Link>
+                  <Link to="/account" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">Account</Button>
+                  </Link>
+                  {profile?.role === "admin" && (
+                    <Link to="/admin" onClick={() => setOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">Admin</Button>
+                    </Link>
+                  )}
+                  <Button variant="outline" onClick={() => { signOut(); setOpen(false); }} className="w-full">
+                    Sign out
+                  </Button>
+                </>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
       </nav>
     </header>
   );
