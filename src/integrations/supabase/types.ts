@@ -86,6 +86,27 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_leads: {
+        Row: {
+          consent_given: boolean
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          consent_given?: boolean
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          consent_given?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           consent_given: boolean
