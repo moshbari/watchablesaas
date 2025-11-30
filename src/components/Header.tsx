@@ -28,10 +28,13 @@ const Header: React.FC = () => {
               <Link to="/page-builder"><Button variant="ghost">Page Builder</Button></Link>
               <Link to="/leads"><Button variant="ghost">Leads</Button></Link>
               <Link to="/account"><Button variant="ghost">Account</Button></Link>
-              {profile?.role === "admin" && (
-                <Link to="/admin"><Button variant="ghost">Admin</Button></Link>
-              )}
-              <Button variant="outline" onClick={signOut}>Sign out</Button>
+                  {profile?.role === "admin" && (
+                    <Link to="/admin"><Button variant="ghost">Admin</Button></Link>
+                  )}
+                  {profile?.role === "admin" && (
+                    <Link to="/landing-leads"><Button variant="ghost">Landing Leads</Button></Link>
+                  )}
+                  <Button variant="outline" onClick={signOut}>Sign out</Button>
             </>
           )}
         </div>
@@ -72,6 +75,11 @@ const Header: React.FC = () => {
                   {profile?.role === "admin" && (
                     <Link to="/admin" onClick={() => setOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start">Admin</Button>
+                    </Link>
+                  )}
+                  {profile?.role === "admin" && (
+                    <Link to="/landing-leads" onClick={() => setOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">Landing Leads</Button>
                     </Link>
                   )}
                   <Button variant="outline" onClick={() => { signOut(); setOpen(false); }} className="w-full">

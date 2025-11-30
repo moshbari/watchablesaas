@@ -26,6 +26,7 @@ import AuthCallback from "@/pages/AuthCallback";
 import Campaigns from "@/pages/Campaigns";
 import EditCampaign from "@/pages/EditCampaign";
 import Leads from "@/pages/Leads";
+import LandingLeads from "@/pages/LandingLeads";
 import TestEmail from "@/pages/TestEmail";
 import { RequireAuth, RequireRole } from "@/routes/guards";
 
@@ -51,6 +52,7 @@ const AppContent = () => {
                         !location.pathname.startsWith('/auth/callback') &&
                         !location.pathname.startsWith('/page-builder') &&
                         !location.pathname.startsWith('/leads') &&
+                        !location.pathname.startsWith('/landing-leads') &&
                         !location.pathname.startsWith('/test-email') &&
                         !location.pathname.startsWith('/404');
 
@@ -74,6 +76,7 @@ const AppContent = () => {
         <Route path="/admin" element={<RequireRole allow={["admin"]}><Admin /></RequireRole>} />
         <Route path="/page-builder" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/leads" element={<RequireAuth><Leads /></RequireAuth>} />
+        <Route path="/landing-leads" element={<RequireRole allow={["admin"]}><LandingLeads /></RequireRole>} />
         <Route path="/test-email" element={<TestEmail />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/404" element={<NotFound />} />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import youtubeDistractionsImage from '@/assets/youtube_player_distractions.jpg';
 import cleanPlayerAfter from '@/assets/clean_player_after.png';
@@ -32,7 +33,7 @@ export default function Landing() {
     return () => clearInterval(interval);
   }, [counter]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const result = emailSchema.safeParse({ email });
@@ -45,13 +46,36 @@ export default function Landing() {
       return;
     }
 
-    toast({
-      title: "Success!",
-      description: "Redirecting to your free trial...",
-    });
-    
-    // Redirect or handle signup
-    // window.location.href = `/signup?email=${encodeURIComponent(email)}`;
+    // Save lead to database
+    try {
+      const { error } = await supabase
+        .from('landing_leads')
+        .insert([{ 
+          email: email.trim(),
+          consent_given: true 
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "Check out our pricing below!",
+      });
+
+      // Scroll to pricing section
+      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+      
+      // Clear email input
+      setEmail('');
+    } catch (error) {
+      console.error('Error saving lead:', error);
+      toast({
+        title: "Success!",
+        description: "Check out our pricing below!",
+      });
+      // Still scroll to pricing even if there's an error saving
+      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const toggleFaq = (index: number) => {
