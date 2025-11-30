@@ -142,7 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
 
-      // When edge function returns non-2xx, check data first for the actual error message
+      // Prefer detailed error coming from the edge function body
       if (data?.error) {
         console.error("Custom signup function error:", data.error);
         return { error: data.error };
@@ -150,9 +150,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Custom signup error:", error);
-        // Try to extract the actual error message from the response
-        const errorMessage = data?.error || error.message || "Failed to sign up";
-        return { error: errorMessage };
+        let message = error.message || "Failed to sign up";
+
+        // Replace the generic edge-function text with a helpful explanation
+        if (message.includes("Edge Function returned a non-2xx status code")) {
+          message =
+            "Signup failed. This email address may already be registered. Try logging in or use a different email address.";
+        }
+
+        return { error: message };
       }
 
       console.log("Custom signup successful:", data);
