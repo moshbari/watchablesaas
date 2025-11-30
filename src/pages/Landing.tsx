@@ -209,7 +209,7 @@ export default function Landing() {
           </div>
 
           <div className="landing-text-center landing-mt-l">
-            <Button className="landing-btn-primary">See The Solution →</Button>
+            <h2>What If You Could Build Pages By Just... Talking?</h2>
           </div>
         </div>
       </section>
