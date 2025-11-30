@@ -223,8 +223,6 @@ export default function Landing() {
             </div>
 
             <div className="landing-solution-content">
-              <h2>What If You Could Build Pages By Just... Talking?</h2>
-
               <p>Here's what happened to me 6 months ago.</p>
 
               <p>I was exactly where you are now. Frustrated. Overpaying. Wasting time.</p>
