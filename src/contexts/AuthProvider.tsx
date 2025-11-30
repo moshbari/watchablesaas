@@ -142,14 +142,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
 
-      if (error) {
-        console.error("Custom signup error:", error);
-        return { error: error.message };
-      }
-
+      // When edge function returns non-2xx, check data first for the actual error message
       if (data?.error) {
         console.error("Custom signup function error:", data.error);
         return { error: data.error };
+      }
+
+      if (error) {
+        console.error("Custom signup error:", error);
+        // Try to extract the actual error message from the response
+        const errorMessage = data?.error || error.message || "Failed to sign up";
+        return { error: errorMessage };
       }
 
       console.log("Custom signup successful:", data);
