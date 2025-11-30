@@ -41,7 +41,7 @@ const AppContent = () => {
   const isSuspended = trialInfo?.role === 'SUSPENDED';
   const isDynamicPage = location.pathname !== '/' && 
                         location.pathname !== '/embed' && 
-                        location.pathname !== '/landing' &&
+                        location.pathname !== '/app' &&
                         !location.pathname.startsWith('/login') &&
                         !location.pathname.startsWith('/register') &&
                         !location.pathname.startsWith('/forgot-password') &&
@@ -62,8 +62,8 @@ const AppContent = () => {
       {!isEmbedRoute && !isDynamicPage && <Header />}
       <SuspendedAccountModal isOpen={isSuspended} />
       <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/landing" element={<Landing />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/app" element={<Index />} />
         <Route path="/embed" element={<Embed />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
