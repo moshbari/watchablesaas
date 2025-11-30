@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Copy, Edit, Trash2, Plus, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCampaignLimits } from '@/hooks/useCampaignLimits';
-import { TrialLimitTooltip } from '@/components/TrialLimitTooltip';
+import { UpgradeModal } from '@/components/UpgradeModal';
 import { format } from 'date-fns';
 import {
   AlertDialog,
@@ -40,6 +40,7 @@ interface Campaign {
 const Campaigns: React.FC = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const { session } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -143,16 +144,25 @@ const Campaigns: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">My Campaigns</h1>
-        <TrialLimitTooltip disabled={!canCreateVideo}>
-          <Button 
-            onClick={() => navigate('/campaigns/new')}
-            disabled={!canCreateVideo}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            New Campaign
-          </Button>
-        </TrialLimitTooltip>
+        <Button 
+          onClick={() => {
+            if (canCreateVideo) {
+              navigate('/campaigns/new');
+            } else {
+              setShowUpgradeModal(true);
+            }
+          }}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Campaign
+        </Button>
       </div>
+
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)}
+        campaignType="video"
+      />
 
       <Card>
         <CardHeader>
