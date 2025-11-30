@@ -240,8 +240,6 @@ export default function Landing() {
               <p><strong>And I just... talked.</strong></p>
 
               <p>59 seconds later, the page was done. Headline written. Layout perfect. Pop-up configured. Button delayed to 5 seconds.</p>
-
-              <Button className="landing-btn-primary landing-mt-m">Watch 59-Second Demo →</Button>
             </div>
           </div>
         </div>
