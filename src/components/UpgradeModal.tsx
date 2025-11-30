@@ -21,7 +21,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, cam
   const navigate = useNavigate();
 
   const handleUpgrade = () => {
-    navigate("/#pricing");
+    window.location.href = "https://59s.site/#pricing";
     onClose();
   };
 
