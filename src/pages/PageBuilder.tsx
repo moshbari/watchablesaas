@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useCampaignLimits } from '@/hooks/useCampaignLimits';
-import { TrialLimitTooltip } from '@/components/TrialLimitTooltip';
+import { UpgradeModal } from '@/components/UpgradeModal';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { validateVideoUrl } from '@/lib/videoUtils';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
@@ -78,6 +78,7 @@ const PageBuilder = () => {
   const [pages, setPages] = useState<Page[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   // Generate default slug with Dubai date and time
   const generateDefaultSlug = () => {
@@ -1568,17 +1569,26 @@ const PageBuilder = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Page Builder</h1>
-          <TrialLimitTooltip disabled={!canCreatePage}>
-            <Button 
-              onClick={() => setIsCreating(true)} 
-              className="flex items-center gap-2"
-              disabled={!canCreatePage}
-            >
-              <Plus className="h-4 w-4" />
-              Create New Page
-            </Button>
-          </TrialLimitTooltip>
+          <Button 
+            onClick={() => {
+              if (canCreatePage) {
+                setIsCreating(true);
+              } else {
+                setShowUpgradeModal(true);
+              }
+            }} 
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Create New Page
+          </Button>
         </div>
+
+        <UpgradeModal 
+          isOpen={showUpgradeModal} 
+          onClose={() => setShowUpgradeModal(false)}
+          campaignType="page"
+        />
 
         <div className="grid gap-6">
           {pages.length === 0 ? (
@@ -1586,7 +1596,16 @@ const PageBuilder = () => {
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <h3 className="text-lg font-semibold mb-2">No pages created yet</h3>
                 <p className="text-muted-foreground mb-4">Create your first landing page to get started.</p>
-                <Button onClick={() => setIsCreating(true)} className="flex items-center gap-2">
+                <Button 
+                  onClick={() => {
+                    if (canCreatePage) {
+                      setIsCreating(true);
+                    } else {
+                      setShowUpgradeModal(true);
+                    }
+                  }} 
+                  className="flex items-center gap-2"
+                >
                   <Plus className="h-4 w-4" />
                   Create Your First Page
                 </Button>
