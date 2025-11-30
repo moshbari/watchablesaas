@@ -6,6 +6,10 @@ import { z } from 'zod';
 import youtubeDistractionsImage from '@/assets/youtube_player_distractions.jpg';
 import cleanPlayerAfter from '@/assets/clean_player_after.png';
 import watchableInterface from '@/assets/watchable_interface.png';
+import testimonialSarah from '@/assets/testimonial-sarah.jpg';
+import testimonialMarcus from '@/assets/testimonial-marcus.jpg';
+import testimonialDavid from '@/assets/testimonial-david.jpg';
+import testimonialJennifer from '@/assets/testimonial-jennifer.jpg';
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255)
@@ -347,31 +351,31 @@ export default function Landing() {
               {
                 name: "Sarah Mitchell",
                 role: "Course Creator",
-                photo: "👩",
+                photo: testimonialSarah,
                 quote: "I built 4 product launch funnels in one weekend. All from my iPad. I used to pay my developer $800 per funnel. Now? I build them myself in under 10 minutes."
               },
               {
                 name: "Marcus Chen",
                 role: "Affiliate Marketer",
-                photo: "👨",
+                photo: testimonialMarcus,
                 quote: "This paid for itself in the first 3 hours. I've built 47 pages in 6 months. That's 94 hours saved. At my hourly rate, Watchable saved me $4,700."
               },
               {
                 name: "David Rodriguez",
                 role: "Real Estate Agent",
-                photo: "👨‍💼",
+                photo: testimonialDavid,
                 quote: "I build listing pages while driving between showings. My wife thought I hired someone. Nope. Just me and my voice. Saving $2,700/year."
               },
               {
                 name: "Jennifer Adams",
                 role: "Online Coach",
-                photo: "👩‍💻",
+                photo: testimonialJennifer,
                 quote: "I cancelled my $297/month Kartra subscription. Watchable does exactly what I need for $27. That's $3,240/year saved. That's a vacation with my kids."
               }
             ].map((testimonial, index) => (
               <div key={index} className="landing-testimonial-card">
                 <div className="landing-stars">⭐⭐⭐⭐⭐</div>
-                <div className="landing-testimonial-photo">{testimonial.photo}</div>
+                <img src={testimonial.photo} alt={testimonial.name} className="landing-testimonial-photo" />
                 <p className="landing-testimonial-quote">{testimonial.quote}</p>
                 <p className="landing-testimonial-author">{testimonial.name}</p>
                 <p className="landing-testimonial-role">{testimonial.role}</p>

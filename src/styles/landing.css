@@ -530,12 +530,9 @@ html, body {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: hsl(var(--landing-gray-light));
   margin: 0 auto 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
+  display: block;
+  object-fit: cover;
 }
 
 .landing-testimonial-quote {
