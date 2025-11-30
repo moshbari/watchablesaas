@@ -540,7 +540,7 @@ export default function Landing() {
                 ))}
               </ul>
 
-              <Button className="landing-btn-primary landing-btn-large landing-btn-block" onClick={() => document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' })}>
+              <Button className="landing-btn-primary landing-btn-large landing-btn-block" onClick={() => window.location.href = 'https://59s.site/register'}>
                 Start 17-Day Free Trial
               </Button>
 
@@ -587,7 +587,7 @@ export default function Landing() {
                 ))}
               </ul>
 
-              <Button className="landing-btn-primary landing-btn-large landing-btn-block" onClick={() => document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' })}>
+              <Button className="landing-btn-primary landing-btn-large landing-btn-block" onClick={() => window.location.href = 'https://59s.site/register'}>
                 Start 17-Day Free Trial
               </Button>
 
