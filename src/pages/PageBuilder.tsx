@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,8 +75,10 @@ interface Page {
 }
 
 const PageBuilder = () => {
+  const location = useLocation();
+  const isStudioRoute = location.pathname === '/studio';
   const [pages, setPages] = useState<Page[]>([]);
-  const [isCreating, setIsCreating] = useState(false);
+  const [isCreating, setIsCreating] = useState(isStudioRoute);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
@@ -329,6 +331,7 @@ const PageBuilder = () => {
       setIsCreating(false);
       setEditingPage(null);
       resetForm();
+      navigate('/page-builder');
       fetchPages();
     } catch (error: any) {
       toast({
@@ -637,7 +640,12 @@ const PageBuilder = () => {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold">{editingPage ? 'Edit Page' : 'Create New Page'}</h1>
-            <Button variant="outline" onClick={() => { setIsCreating(false); setEditingPage(null); resetForm(); }}>
+            <Button variant="outline" onClick={() => { 
+              setIsCreating(false); 
+              setEditingPage(null); 
+              resetForm(); 
+              navigate('/page-builder');
+            }}>
               Back to Pages
             </Button>
           </div>
