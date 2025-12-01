@@ -321,6 +321,11 @@ const PageBuilder = () => {
         description: `Page ${editingPage ? 'updated' : 'created'} successfully`,
       });
 
+      // If page is published, open it in a new tab
+      if (formData.is_published) {
+        window.open(`/${slug}`, '_blank');
+      }
+
       setIsCreating(false);
       setEditingPage(null);
       resetForm();
