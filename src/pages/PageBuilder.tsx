@@ -82,6 +82,15 @@ const PageBuilder = () => {
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
+  // Update isCreating when route changes
+  useEffect(() => {
+    if (location.pathname === '/studio') {
+      setIsCreating(true);
+    } else if (location.pathname === '/page-builder' || location.pathname === '/page-editor') {
+      setIsCreating(false);
+    }
+  }, [location.pathname]);
+  
   // Generate default slug with Dubai date and time
   const generateDefaultSlug = () => {
     const now = new Date();
