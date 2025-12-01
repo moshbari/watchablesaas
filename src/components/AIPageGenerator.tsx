@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Sparkles, Loader2, Mic, MicOff, AlertCircle, Wand2, Clock, CheckCircle } from 'lucide-react';
@@ -206,16 +205,17 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
           </div>
         </div>
 
-        <Alert className="bg-warning/10 border-warning/30 border-2">
-          <AlertCircle className="h-4 w-4 text-warning" />
-          <AlertDescription className="text-sm">
-            <span className="font-semibold text-warning">Pro Tip for Maximum Results:</span>
-            <br />
-            <span className="text-foreground/80">
-              Describe the emotion/tone (urgent, professional, luxurious, friendly) and your target audience. AI will create compelling headlines and choose perfect colors automatically. Mention specifics like video URLs, button timing, countdown timers, and lead capture requirements for a complete page.
-            </span>
-          </AlertDescription>
-        </Alert>
+        <div className="bg-warning/10 border border-warning/30 rounded-xl p-4">
+          <div className="flex gap-3">
+            <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold text-warning mb-1">Pro Tip for Maximum Results:</p>
+              <p className="text-foreground/80 leading-relaxed">
+                Describe the emotion/tone (urgent, professional, luxurious, friendly) and your target audience. AI will create compelling headlines and choose perfect colors automatically. Mention specifics like video URLs, button timing, countdown timers, and lead capture requirements for a complete page.
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
           {!isRecording && !isTranscribing ? (
