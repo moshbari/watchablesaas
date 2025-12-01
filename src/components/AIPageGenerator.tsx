@@ -224,7 +224,16 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
                 onClick={startRecording}
                 type="button"
                 disabled={isGenerating}
-                className="w-full sm:flex-1 h-14 bg-warning hover:bg-warning/90 text-white border-0 shadow-md rounded-xl font-semibold text-base"
+                style={{ 
+                  backgroundColor: '#fbbf24',
+                  color: '#78350f',
+                  boxShadow: '0 4px 14px 0 rgba(251, 191, 36, 0.39)',
+                  borderRadius: '14px',
+                  padding: '18px 24px',
+                  fontWeight: 700,
+                  border: 'none'
+                }}
+                className="w-full sm:flex-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 <Mic className="mr-2 h-5 w-5" />
                 Voice Input
@@ -232,7 +241,16 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating || !prompt.trim()}
-                className="w-full sm:flex-1 h-14 bg-primary hover:bg-primary/90 text-white shadow-md rounded-xl font-semibold text-base"
+                style={{ 
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: '#ffffff',
+                  boxShadow: '0 4px 14px 0 rgba(102, 126, 234, 0.39)',
+                  borderRadius: '14px',
+                  padding: '18px 24px',
+                  fontWeight: 700,
+                  border: 'none'
+                }}
+                className="w-full sm:flex-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 {isGenerating ? (
                   <>
@@ -248,7 +266,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
               </Button>
             </>
           ) : isTranscribing ? (
-            <Button disabled className="w-full h-14">
+            <Button disabled className="w-full" style={{ padding: '18px 24px', borderRadius: '14px', fontWeight: 700 }}>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Transcribing...
             </Button>
@@ -256,7 +274,8 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
             <Button
               onClick={stopRecording}
               variant="destructive"
-              className="w-full h-14 animate-pulse shadow-md rounded-xl"
+              style={{ padding: '18px 24px', borderRadius: '14px', fontWeight: 700 }}
+              className="w-full animate-pulse transition-all duration-200 hover:-translate-y-0.5"
             >
               <MicOff className="mr-2 h-5 w-5" />
               Stop Recording
