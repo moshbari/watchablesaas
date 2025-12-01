@@ -1640,7 +1640,7 @@ const PageBuilder = () => {
           <Button 
             onClick={() => {
               if (canCreatePage) {
-                setIsCreating(true);
+                navigate('/studio');
               } else {
                 setShowUpgradeModal(true);
               }

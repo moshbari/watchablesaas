@@ -51,6 +51,8 @@ const AppContent = () => {
                         !location.pathname.startsWith('/admin') &&
                         !location.pathname.startsWith('/auth/callback') &&
                         !location.pathname.startsWith('/page-builder') &&
+                        !location.pathname.startsWith('/page-editor') &&
+                        !location.pathname.startsWith('/studio') &&
                         !location.pathname.startsWith('/leads') &&
                         !location.pathname.startsWith('/landing-leads') &&
                         !location.pathname.startsWith('/test-email') &&
@@ -76,6 +78,7 @@ const AppContent = () => {
         <Route path="/admin" element={<RequireRole allow={["admin"]}><Admin /></RequireRole>} />
         <Route path="/page-builder" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/page-editor" element={<RequireAuth><PageBuilder /></RequireAuth>} />
+        <Route path="/studio" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/leads" element={<RequireAuth><Leads /></RequireAuth>} />
         <Route path="/landing-leads" element={<RequireRole allow={["admin"]}><LandingLeads /></RequireRole>} />
         <Route path="/test-email" element={<TestEmail />} />
