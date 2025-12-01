@@ -75,6 +75,7 @@ const AppContent = () => {
         <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="/admin" element={<RequireRole allow={["admin"]}><Admin /></RequireRole>} />
         <Route path="/page-builder" element={<RequireAuth><PageBuilder /></RequireAuth>} />
+        <Route path="/page-editor" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/leads" element={<RequireAuth><Leads /></RequireAuth>} />
         <Route path="/landing-leads" element={<RequireRole allow={["admin"]}><LandingLeads /></RequireRole>} />
         <Route path="/test-email" element={<TestEmail />} />
