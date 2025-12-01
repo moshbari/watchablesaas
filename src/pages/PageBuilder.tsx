@@ -639,11 +639,7 @@ const PageBuilder = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Page Configuration</CardTitle>
-                <CardDescription>Configure your landing page settings</CardDescription>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* AI Page Generator - at the top */}
                   <AIPageGenerator onConfigGenerated={handleAIConfigGenerated} />
