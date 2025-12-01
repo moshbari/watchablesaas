@@ -650,6 +650,73 @@ const PageBuilder = () => {
 
                   <Separator />
 
+                  {/* Preview section for mobile only - appears after AI Generator */}
+                  <div className="lg:hidden">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-xl">Preview</CardTitle>
+                        <CardDescription>Live preview of your landing page</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="bg-white p-4 rounded-lg border min-h-[300px]">
+                          <div className="text-center space-y-3">
+                            <h1 
+                              className="font-bold text-gray-900 px-2"
+                              style={{ fontSize: `${Math.max(formData.headline_font_size * 0.5, 18)}px` }}
+                            >
+                              {formData.headline || 'Your Headline Here'}
+                            </h1>
+                            
+                            {formData.sub_headline && (
+                              <p 
+                                className="text-gray-600 max-w-2xl mx-auto px-2"
+                                style={{ fontSize: `${Math.max(formData.sub_headline_font_size * 0.6, 12)}px` }}
+                              >
+                                {formData.sub_headline}
+                              </p>
+                            )}
+
+                            {previewVideo && (
+                              <div className="max-w-2xl mx-auto my-4">
+                                <VideoPlayer 
+                                  src={previewVideo}
+                                  onError={() => {}}
+                                  playButtonColor="#ff0000"
+                                  playButtonSize={64}
+                                  fakeProgressEnabled={formData.fake_progress_enabled}
+                                  fakeProgressColor={formData.fake_progress_color}
+                                  fakeProgressThickness={formData.fake_progress_thickness}
+                                />
+                              </div>
+                            )}
+
+                            {formData.button_enabled && (
+                              <div className="pt-4 px-2">
+                                <Button 
+                                  className="w-full px-4 py-2 text-sm flex items-center justify-center gap-2"
+                                  style={{
+                                    backgroundColor: formData.button_bg_color,
+                                    color: formData.button_text_color,
+                                    borderColor: formData.button_bg_color
+                                  }}
+                                  disabled
+                                >
+                                  <span className="text-center">{formData.button_text || 'Get Started Now'}</span>
+                                  <ArrowRight className="w-4 h-4 flex-shrink-0" />
+                                </Button>
+                                <p className="text-xs text-gray-500 mt-2">
+                                  Button appears after {formData.button_delay} seconds
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Separator className="lg:hidden" />
+
                   <div>
                     <Label htmlFor="title">Page Title</Label>
                     <InputWithClipboard
@@ -1469,7 +1536,7 @@ const PageBuilder = () => {
               </CardContent>
             </Card>
 
-            <div className="space-y-4">
+            <div className="space-y-4 hidden lg:block">
               <Card>
                 <CardHeader>
                   <CardTitle>Preview</CardTitle>
