@@ -321,6 +321,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           <TellaPlayer
             videoId={tellaId}
             onError={onError}
+            playButtonColor={playButtonColor}
+            playButtonSize={playButtonSize}
           />
         ) : (
           <>
