@@ -59,11 +59,28 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onTranscription, d
         const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         setAudioBlob(blob);
         
-        // Get duration
+        // Get duration - use different approach for Safari/iOS
         const audio = new Audio();
-        audio.src = URL.createObjectURL(blob);
-        audio.onloadedmetadata = () => {
-          setAudioDuration(Math.round(audio.duration));
+        const blobUrl = URL.createObjectURL(blob);
+        audio.src = blobUrl;
+        
+        // Handle duration calculation
+        const handleDuration = () => {
+          if (audio.duration && isFinite(audio.duration)) {
+            setAudioDuration(Math.round(audio.duration));
+          } else {
+            // Estimate based on blob size (~16kbps for webm audio)
+            const estimatedDuration = Math.round(blob.size / 2000);
+            setAudioDuration(estimatedDuration > 0 ? estimatedDuration : 1);
+          }
+          URL.revokeObjectURL(blobUrl);
+        };
+        
+        audio.onloadedmetadata = handleDuration;
+        audio.onerror = () => {
+          // Fallback for browsers that can't read duration
+          setAudioDuration(Math.round(blob.size / 2000) || 1);
+          URL.revokeObjectURL(blobUrl);
         };
         
         // Clean up stream
