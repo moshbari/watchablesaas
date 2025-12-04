@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Sparkles, Loader2, Mic, MicOff, AlertCircle, Wand2, Clock, CheckCircle } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle, Wand2, Clock, CheckCircle } from 'lucide-react';
+import { VoiceRecorder } from './VoiceRecorder';
 
 interface AIPageGeneratorProps {
   onConfigGenerated: (config: any) => void;
@@ -13,12 +14,7 @@ interface AIPageGeneratorProps {
 export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenerated }) => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [isAiGenerated, setIsAiGenerated] = useState(false);
   const { toast } = useToast();
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -59,7 +55,6 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
 
       onConfigGenerated(data.config);
       setPrompt('');
-      setIsAiGenerated(false);
 
     } catch (error: any) {
       console.error('Generation error:', error);
@@ -73,97 +68,8 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
     }
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm',
-      });
-
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await transcribeAudio(audioBlob);
-        
-        // Clean up
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-
-      toast({
-        title: "Recording Started",
-        description: "Speak your page description now...",
-      });
-    } catch (error: any) {
-      console.error('Error starting recording:', error);
-      toast({
-        title: "Microphone Error",
-        description: error.message || "Failed to access microphone",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      setIsTranscribing(true);
-    }
-  };
-
-  const transcribeAudio = async (audioBlob: Blob) => {
-    try {
-      // Convert blob to base64
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
-      
-      await new Promise((resolve) => {
-        reader.onloadend = resolve;
-      });
-
-      const base64Audio = (reader.result as string).split(',')[1];
-
-      const { data, error } = await supabase.functions.invoke('transcribe-page-prompt', {
-        body: { audio: base64Audio }
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Failed to transcribe audio');
-      }
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (data.text) {
-        setPrompt(prev => prev ? `${prev} ${data.text}` : data.text);
-        setIsAiGenerated(true);
-        toast({
-          title: "Transcription Complete",
-          description: "Your speech has been converted to text",
-        });
-      }
-    } catch (error: any) {
-      console.error('Transcription error:', error);
-      toast({
-        title: "Transcription Failed",
-        description: error.message || "Failed to transcribe audio",
-        variant: "destructive",
-      });
-    } finally {
-      setIsTranscribing(false);
-    }
+  const handleTranscription = (text: string) => {
+    setPrompt(prev => prev ? `${prev} ${text}` : text);
   };
 
   const maxChars = 1000;
@@ -192,13 +98,12 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
             onChange={(e) => {
               if (e.target.value.length <= maxChars) {
                 setPrompt(e.target.value);
-                setIsAiGenerated(false);
               }
             }}
             rows={4}
             maxLength={maxChars}
             className="resize-none border-2 rounded-xl transition-all focus:border-primary text-sm sm:text-base"
-            disabled={isGenerating || isRecording || isTranscribing}
+            disabled={isGenerating}
           />
           <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
             {charCount}/{maxChars}
@@ -218,69 +123,36 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          {!isRecording && !isTranscribing ? (
-            <>
-              <Button
-                onClick={startRecording}
-                type="button"
-                disabled={isGenerating}
-                style={{ 
-                  backgroundColor: '#fbbf24',
-                  color: '#78350f',
-                  boxShadow: '0 4px 14px 0 rgba(251, 191, 36, 0.39)',
-                  borderRadius: '14px',
-                  padding: '14px 20px',
-                  fontWeight: 700,
-                  border: 'none'
-                }}
-                className="w-full sm:flex-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 text-sm sm:text-base"
-              >
-                <Mic className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                Voice Input
-              </Button>
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating || !prompt.trim()}
-                style={{ 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: '#ffffff',
-                  boxShadow: '0 4px 14px 0 rgba(102, 126, 234, 0.39)',
-                  borderRadius: '14px',
-                  padding: '14px 20px',
-                  fontWeight: 700,
-                  border: 'none'
-                }}
-                className="w-full sm:flex-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 text-sm sm:text-base"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                    Generate with AI
-                  </>
-                )}
-              </Button>
-            </>
-          ) : isTranscribing ? (
-            <Button disabled className="w-full" style={{ padding: '14px 20px', borderRadius: '14px', fontWeight: 700 }}>
-              <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-              Transcribing...
-            </Button>
-          ) : (
-            <Button
-              onClick={stopRecording}
-              variant="destructive"
-              style={{ padding: '14px 20px', borderRadius: '14px', fontWeight: 700 }}
-              className="w-full animate-pulse transition-all duration-200 hover:-translate-y-0.5"
-            >
-              <MicOff className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              Stop Recording
-            </Button>
-          )}
+          <VoiceRecorder 
+            onTranscription={handleTranscription} 
+            disabled={isGenerating}
+          />
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating || !prompt.trim()}
+            style={{ 
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: '#ffffff',
+              boxShadow: '0 4px 14px 0 rgba(102, 126, 234, 0.39)',
+              borderRadius: '14px',
+              padding: '14px 20px',
+              fontWeight: 700,
+              border: 'none'
+            }}
+            className="w-full sm:flex-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 text-sm sm:text-base"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                Generate with AI
+              </>
+            )}
+          </Button>
         </div>
 
         <div className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t">
