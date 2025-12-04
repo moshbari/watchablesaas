@@ -236,46 +236,47 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onTranscription, d
   // Has recording - show play, delete, transcribe buttons
   if (audioBlob) {
     return (
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:flex-1">
-        <div className="flex gap-2 flex-1">
-          <Button
-            onClick={playAudio}
-            type="button"
-            variant="outline"
-            className="flex-1"
-            style={{ padding: '14px 16px', borderRadius: '14px', fontWeight: 600 }}
-          >
-            {isPlaying ? (
-              <Pause className="mr-2 h-4 w-4" />
-            ) : (
-              <Play className="mr-2 h-4 w-4" />
-            )}
-            {isPlaying ? 'Pause' : 'Play'} ({formatDuration(audioDuration)})
-          </Button>
-          <Button
-            onClick={deleteRecording}
-            type="button"
-            variant="outline"
-            className="px-3"
-            style={{ borderRadius: '14px' }}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
+      <div className="flex items-center gap-2 w-full sm:flex-1">
+        <Button
+          onClick={playAudio}
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-10 px-3 sm:px-4"
+          style={{ borderRadius: '10px', fontWeight: 600 }}
+        >
+          {isPlaying ? (
+            <Pause className="h-4 w-4 sm:mr-1.5" />
+          ) : (
+            <Play className="h-4 w-4 sm:mr-1.5" />
+          )}
+          <span className="hidden sm:inline">{isPlaying ? 'Pause' : 'Play'}</span>
+          <span className="text-xs ml-1">({formatDuration(audioDuration)})</span>
+        </Button>
+        <Button
+          onClick={deleteRecording}
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-10 w-10 p-0"
+          style={{ borderRadius: '10px' }}
+        >
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
         <Button
           onClick={transcribeAudio}
           type="button"
           disabled={disabled}
+          size="sm"
           style={{ 
             backgroundColor: '#22c55e',
             color: '#ffffff',
             boxShadow: '0 4px 14px 0 rgba(34, 197, 94, 0.39)',
-            borderRadius: '14px',
-            padding: '14px 20px',
+            borderRadius: '10px',
             fontWeight: 700,
             border: 'none'
           }}
-          className="flex-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
+          className="h-10 px-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
         >
           Transcribe
         </Button>
