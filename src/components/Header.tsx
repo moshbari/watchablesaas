@@ -10,7 +10,7 @@ const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="border-b bg-background">
+    <header className="border-b bg-background relative z-40">
       <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="font-semibold text-lg">Watchables</Link>
         
