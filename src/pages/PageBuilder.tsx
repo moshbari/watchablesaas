@@ -163,7 +163,7 @@ const PageBuilder = () => {
     lead_optin_headline: 'Become a Member',
     lead_optin_description: 'Enter your information to watch this exclusive video',
     footer_enabled: true,
-    copyright_text: '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
+    copyright_text: '2026 Mosh Bari - Copyright© 2026. All Rights Reserved.',
     privacy_policy_url: 'https://winarzapps.com/privacy-policy/',
     terms_conditions_url: 'https://winarzapps.com/terms-of-service/',
     earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
