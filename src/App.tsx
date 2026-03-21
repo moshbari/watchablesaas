@@ -28,6 +28,7 @@ import EditCampaign from "@/pages/EditCampaign";
 import Leads from "@/pages/Leads";
 import LandingLeads from "@/pages/LandingLeads";
 import TestEmail from "@/pages/TestEmail";
+import Privacy from "@/pages/Privacy";
 import { RequireAuth, RequireRole } from "@/routes/guards";
 
 const queryClient = new QueryClient();
