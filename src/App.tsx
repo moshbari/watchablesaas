@@ -83,6 +83,7 @@ const AppContent = () => {
         <Route path="/leads" element={<RequireAuth><Leads /></RequireAuth>} />
         <Route path="/landing-leads" element={<RequireRole allow={["admin"]}><LandingLeads /></RequireRole>} />
         <Route path="/test-email" element={<TestEmail />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/404" element={<NotFound />} />
         {/* Dynamic pages route - this must be second to last */}
