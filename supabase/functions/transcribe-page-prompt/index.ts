@@ -35,9 +35,11 @@ serve(async (req) => {
     console.log('Decoded audio bytes:', bytes.length);
     
     // Create blob and form data
-    const blob = new Blob([bytes], { type: 'audio/webm' });
+    const audioType = mimeType || 'audio/webm';
+    const ext = audioType.includes('m4a') || audioType.includes('mp4') ? 'm4a' : audioType.includes('wav') ? 'wav' : 'webm';
+    const blob = new Blob([bytes], { type: audioType });
     const formData = new FormData();
-    formData.append('file', blob, 'audio.webm');
+    formData.append('file', blob, `audio.${ext}`);
     formData.append('model', 'whisper-1');
 
     console.log('Sending to OpenAI Whisper API...');
