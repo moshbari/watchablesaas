@@ -86,6 +86,274 @@ export type Database = {
         }
         Relationships: []
       }
+      caption_results: {
+        Row: {
+          caption_v1: string
+          caption_v2: string
+          content_type: string | null
+          created_at: string
+          cta_goal: string | null
+          edited_caption: string | null
+          folder: string
+          hashtags_v1: string[]
+          hashtags_v2: string[]
+          id: string
+          improvement_log: Json
+          overall_score_v1: number
+          overall_score_v2: number
+          patterns_applied: string[]
+          rating_v1: Json
+          rating_v2: Json
+          tone: string | null
+          video_name: string
+        }
+        Insert: {
+          caption_v1: string
+          caption_v2: string
+          content_type?: string | null
+          created_at?: string
+          cta_goal?: string | null
+          edited_caption?: string | null
+          folder: string
+          hashtags_v1?: string[]
+          hashtags_v2?: string[]
+          id?: string
+          improvement_log?: Json
+          overall_score_v1?: number
+          overall_score_v2?: number
+          patterns_applied?: string[]
+          rating_v1?: Json
+          rating_v2?: Json
+          tone?: string | null
+          video_name: string
+        }
+        Update: {
+          caption_v1?: string
+          caption_v2?: string
+          content_type?: string | null
+          created_at?: string
+          cta_goal?: string | null
+          edited_caption?: string | null
+          folder?: string
+          hashtags_v1?: string[]
+          hashtags_v2?: string[]
+          id?: string
+          improvement_log?: Json
+          overall_score_v1?: number
+          overall_score_v2?: number
+          patterns_applied?: string[]
+          rating_v1?: Json
+          rating_v2?: Json
+          tone?: string | null
+          video_name?: string
+        }
+        Relationships: []
+      }
+      ds_files: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          folder_id: string | null
+          id: string
+          mime_type: string | null
+          name: string
+          owner_id: string
+          r2_key: string | null
+          retention_days: number | null
+          size: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          folder_id?: string | null
+          id?: string
+          mime_type?: string | null
+          name: string
+          owner_id: string
+          r2_key?: string | null
+          retention_days?: number | null
+          size?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          folder_id?: string | null
+          id?: string
+          mime_type?: string | null
+          name?: string
+          owner_id?: string
+          r2_key?: string | null
+          retention_days?: number | null
+          size?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ds_files_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "ds_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ds_folder_shares: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          folder_id: string
+          id: string
+          is_active: boolean
+          label: string | null
+          password_hash: string | null
+          share_token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          folder_id: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          password_hash?: string | null
+          share_token?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          folder_id?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          password_hash?: string | null
+          share_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ds_folder_shares_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "ds_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ds_folders: {
+        Row: {
+          created_at: string
+          id: string
+          is_evergreen: boolean
+          name: string
+          owner_id: string
+          parent_id: string | null
+          retention_days: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_evergreen?: boolean
+          name: string
+          owner_id: string
+          parent_id?: string | null
+          retention_days?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_evergreen?: boolean
+          name?: string
+          owner_id?: string
+          parent_id?: string | null
+          retention_days?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ds_folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "ds_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ds_permissions: {
+        Row: {
+          created_at: string
+          folder_id: string
+          granted_by: string
+          id: string
+          role: Database["public"]["Enums"]["ds_permission_role"]
+          user_email: string
+        }
+        Insert: {
+          created_at?: string
+          folder_id: string
+          granted_by: string
+          id?: string
+          role?: Database["public"]["Enums"]["ds_permission_role"]
+          user_email: string
+        }
+        Update: {
+          created_at?: string
+          folder_id?: string
+          granted_by?: string
+          id?: string
+          role?: Database["public"]["Enums"]["ds_permission_role"]
+          user_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ds_permissions_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "ds_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ds_transfers: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          file_id: string
+          id: string
+          share_token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          file_id: string
+          id?: string
+          share_token?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          file_id?: string
+          id?: string
+          share_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ds_transfers_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "ds_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       landing_leads: {
         Row: {
           consent_given: boolean
@@ -315,6 +583,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          can_evergreen_files: boolean
           created_at: string
           email: string | null
           id: string
@@ -323,6 +592,7 @@ export type Database = {
           trial_started_at: string | null
         }
         Insert: {
+          can_evergreen_files?: boolean
           created_at?: string
           email?: string | null
           id: string
@@ -331,6 +601,7 @@ export type Database = {
           trial_started_at?: string | null
         }
         Update: {
+          can_evergreen_files?: boolean
           created_at?: string
           email?: string | null
           id?: string
@@ -504,6 +775,7 @@ export type Database = {
       admin_set_role: {
         Args: { _new_role: string; _user_id: string }
         Returns: {
+          can_evergreen_files: boolean
           created_at: string
           email: string | null
           id: string
@@ -523,6 +795,10 @@ export type Database = {
         Returns: boolean
       }
       cleanup_deleted_campaigns: { Args: never; Returns: undefined }
+      ds_can_access_folder: { Args: { _folder_id: string }; Returns: boolean }
+      ds_can_edit_folder: { Args: { _folder_id: string }; Returns: boolean }
+      ds_is_file_owner: { Args: { _file_id: string }; Returns: boolean }
+      ds_is_folder_owner: { Args: { _folder_id: string }; Returns: boolean }
       get_trial_info: {
         Args: { user_id: string }
         Returns: {
@@ -538,6 +814,7 @@ export type Database = {
       suspend_expired_trials: { Args: never; Returns: number }
     }
     Enums: {
+      ds_permission_role: "viewer" | "editor"
       user_role: "TRIAL" | "UNLIMITED" | "SUSPENDED" | "admin"
     }
     CompositeTypes: {
@@ -666,6 +943,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ds_permission_role: ["viewer", "editor"],
       user_role: ["TRIAL", "UNLIMITED", "SUSPENDED", "admin"],
     },
   },
