@@ -244,7 +244,7 @@ const DynamicPage = () => {
               <footer className="mt-16 pt-8 border-t border-gray-200">
                 <div className="text-center space-y-6">
                   <p className="text-sm text-gray-600">
-                    {page.copyright_text || '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.'}
+                    {page.copyright_text || '2026 Mosh Bari - Copyright© 2026. All Rights Reserved.'}
                   </p>
                   
                   <div className="flex justify-center flex-wrap gap-x-4 gap-y-2 text-sm">

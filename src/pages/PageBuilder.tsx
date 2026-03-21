@@ -1466,7 +1466,7 @@ const PageBuilder = () => {
                             id="copyright_text"
                             value={formData.copyright_text}
                             onChange={(e) => setFormData(prev => ({ ...prev, copyright_text: e.target.value }))}
-                            placeholder="2025 Mosh Bari - Copyright© 2025. All Rights Reserved."
+                            placeholder="2026 Mosh Bari - Copyright© 2026. All Rights Reserved."
                             className="border-2 border-foreground/80 rounded-lg"
                           />
                         </div>
