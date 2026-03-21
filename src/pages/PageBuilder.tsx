@@ -485,7 +485,7 @@ const PageBuilder = () => {
       lead_optin_headline: page.lead_optin_headline || 'Become a Member',
       lead_optin_description: page.lead_optin_description || 'Enter your information to watch this exclusive video',
       footer_enabled: page.footer_enabled ?? true,
-      copyright_text: page.copyright_text || '2025 Mosh Bari - Copyright© 2025. All Rights Reserved.',
+      copyright_text: page.copyright_text || '2026 Mosh Bari - Copyright© 2026. All Rights Reserved.',
       privacy_policy_url: page.privacy_policy_url || 'https://winarzapps.com/privacy-policy/',
       terms_conditions_url: page.terms_conditions_url || 'https://winarzapps.com/terms-of-service/',
       earnings_disclaimer_url: page.earnings_disclaimer_url || 'https://winarzapps.com/earning-disclaimer',
