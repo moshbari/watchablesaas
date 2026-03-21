@@ -28,6 +28,7 @@ import EditCampaign from "@/pages/EditCampaign";
 import Leads from "@/pages/Leads";
 import LandingLeads from "@/pages/LandingLeads";
 import TestEmail from "@/pages/TestEmail";
+import Privacy from "@/pages/Privacy";
 import { RequireAuth, RequireRole } from "@/routes/guards";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const AppContent = () => {
                         !location.pathname.startsWith('/leads') &&
                         !location.pathname.startsWith('/landing-leads') &&
                         !location.pathname.startsWith('/test-email') &&
+                        !location.pathname.startsWith('/privacy') &&
                         !location.pathname.startsWith('/404');
 
   return (
@@ -82,6 +84,7 @@ const AppContent = () => {
         <Route path="/leads" element={<RequireAuth><Leads /></RequireAuth>} />
         <Route path="/landing-leads" element={<RequireRole allow={["admin"]}><LandingLeads /></RequireRole>} />
         <Route path="/test-email" element={<TestEmail />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/404" element={<NotFound />} />
         {/* Dynamic pages route - this must be second to last */}
