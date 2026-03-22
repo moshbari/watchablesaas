@@ -149,7 +149,7 @@ export const AIPageGenerator: React.FC<AIPageGeneratorProps> = ({ onConfigGenera
             ) : (
               <>
                 <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                Generate with AI
+                AI
               </>
             )}
           </Button>
