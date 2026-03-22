@@ -53,6 +53,19 @@ const Embed = () => {
     if (endParam) {
       setEndTime(parseInt(endParam));
     }
+
+    // Parse skip sections from URL param (JSON array)
+    const skipParam = urlParams.get('skipSections');
+    if (skipParam) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(skipParam));
+        if (Array.isArray(parsed)) {
+          setSkipSections(parsed);
+        }
+      } catch (e) {
+        console.log('Failed to parse skip sections:', e);
+      }
+    }
     
     // Configure overlay button from URL params
     if (buttonEnabled === 'true' && buttonText && buttonUrl) {
