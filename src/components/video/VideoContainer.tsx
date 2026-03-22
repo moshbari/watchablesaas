@@ -277,7 +277,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       video.removeEventListener('error', handleError);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [saveProgress, onError, isYoutube, isGoogleDrive, isTella, startTime, endTime, hasInitialized, setLoading, setPlaying, setError]);
+  }, [saveProgress, onError, isYoutube, isGoogleDrive, isTella, startTime, endTime, skipSections, hasInitialized, setLoading, setPlaying, setError]);
 
   // Initialize volume for HTML5 videos
   useEffect(() => {
