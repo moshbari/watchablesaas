@@ -40,6 +40,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   overlayButtonConfig,
   startTime,
   endTime,
+  skipSections = [],
   fakeProgressEnabled = false,
   fakeProgressColor = '#ef4444',
   fakeProgressThickness = 4,
