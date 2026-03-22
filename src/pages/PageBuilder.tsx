@@ -319,12 +319,22 @@ const PageBuilder = () => {
         (parseInt(buttonDelayInputs.minutes) || 0) * 60 +
         (parseInt(buttonDelayInputs.seconds) || 0);
 
+      // Convert skip sections to seconds
+      const skipSectionsData = skipSections
+        .filter(s => (s.fromHour || s.fromMinute || s.fromSecond) && (s.toHour || s.toMinute || s.toSecond))
+        .map(s => ({
+          from: timeToSeconds(s.fromHour, s.fromMinute, s.fromSecond),
+          to: timeToSeconds(s.toHour, s.toMinute, s.toSecond)
+        }))
+        .filter(s => s.to > s.from);
+
       const pageData = {
         ...formData,
         slug,
         button_delay: buttonDelaySeconds,
         start_time: startTime,
         end_time: endTime,
+        skip_sections: skipSectionsData,
         user_id: (await supabase.auth.getUser()).data.user?.id
       };
 
