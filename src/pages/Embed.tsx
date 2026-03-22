@@ -9,6 +9,7 @@ const Embed = () => {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const [endTime, setEndTime] = useState<number | undefined>(undefined);
+  const [skipSections, setSkipSections] = useState<SkipSection[]>([]);
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [overlayButtonConfig, setOverlayButtonConfig] = useState<OverlayButtonConfig>({
