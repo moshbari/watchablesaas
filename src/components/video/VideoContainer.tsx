@@ -217,7 +217,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       onError?.(error);
     };
 
-    // Progress saving and end time checking
+    // Progress saving, end time checking, and skip sections
     const handleTimeUpdate = () => {
       if (video.currentTime > 0) {
         // Check if we've reached the end time
@@ -226,6 +226,14 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           video.pause();
           setPlaying(false);
           return;
+        }
+        // Check skip sections - jump past if inside one
+        for (const section of skipSections) {
+          if (video.currentTime >= section.from && video.currentTime < section.to) {
+            console.log(`Skipping section ${section.from}-${section.to}, jumping to ${section.to}`);
+            video.currentTime = section.to;
+            return;
+          }
         }
         saveProgress(video.currentTime);
       }
