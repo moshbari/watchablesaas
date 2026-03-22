@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { type SkipSection } from './VideoContainer';
 
 interface IsolatedYouTubePlayerProps {
   videoId: string;
@@ -10,6 +11,7 @@ interface IsolatedYouTubePlayerProps {
   playButtonSize?: number;
   startTime?: number;
   endTime?: number;
+  skipSections?: SkipSection[];
   onProgressUpdate?: (currentTime: number) => void;
   shouldSeekTo?: number;
   onSeekComplete?: () => void;
