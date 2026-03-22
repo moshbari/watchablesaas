@@ -467,6 +467,7 @@ const PageBuilder = () => {
       endMinute: '',
       endSecond: ''
     });
+    setSkipSections([]);
     setButtonDelayInputs({
       hours: '0',
       minutes: '0',
