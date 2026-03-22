@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { VideoActionButton } from '@/components/VideoActionButton';
 import { type OverlayButtonConfig } from '@/components/VideoOverlayButton';
+import { type SkipSection } from '@/components/video/useVideoState';
 import { useToast } from '@/hooks/use-toast';
 
 const Embed = () => {
