@@ -12,8 +12,8 @@ import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { extractVideoUrl, isYouTubeUrl, getYouTubeId, isGoogleDriveUrl, getGoogleDriveId, isTellaUrl, getTellaId } from '@/lib/videoUtils';
 import { FakeProgressBar } from './FakeProgressBar';
 
-// SkipSection type is defined in useVideoState.ts to avoid circular imports
 import { type SkipSection } from './useVideoState';
+export type { SkipSection } from './useVideoState';
 
 interface VideoContainerProps {
   src: string;
