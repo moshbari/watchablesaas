@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { VideoActionButton } from '@/components/VideoActionButton';
 import { type OverlayButtonConfig } from '@/components/VideoOverlayButton';
+import { type SkipSection } from '@/components/video/useVideoState';
 import { useToast } from '@/hooks/use-toast';
 
 const Embed = () => {
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const [endTime, setEndTime] = useState<number | undefined>(undefined);
+  const [skipSections, setSkipSections] = useState<SkipSection[]>([]);
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [overlayButtonConfig, setOverlayButtonConfig] = useState<OverlayButtonConfig>({
@@ -51,6 +53,19 @@ const Embed = () => {
     if (endParam) {
       setEndTime(parseInt(endParam));
     }
+
+    // Parse skip sections from URL param (JSON array)
+    const skipParam = urlParams.get('skipSections');
+    if (skipParam) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(skipParam));
+        if (Array.isArray(parsed)) {
+          setSkipSections(parsed);
+        }
+      } catch (e) {
+        console.log('Failed to parse skip sections:', e);
+      }
+    }
     
     // Configure overlay button from URL params
     if (buttonEnabled === 'true' && buttonText && buttonUrl) {
@@ -88,6 +103,7 @@ const Embed = () => {
         playButtonSize={playButtonSize}
         startTime={startTime}
         endTime={endTime}
+        skipSections={skipSections}
       />
       
       {/* Action Button Below Video */}

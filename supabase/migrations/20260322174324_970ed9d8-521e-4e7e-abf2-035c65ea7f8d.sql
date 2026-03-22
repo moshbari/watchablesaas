@@ -1,0 +1,1 @@
+ALTER TABLE public.pages ADD COLUMN skip_sections jsonb DEFAULT '[]'::jsonb;

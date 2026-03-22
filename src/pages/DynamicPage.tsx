@@ -223,6 +223,7 @@ const DynamicPage = () => {
                     playButtonSize={120}
                     startTime={page.start_time}
                     endTime={page.end_time}
+                    skipSections={(page as any).skip_sections || []}
                     fakeProgressEnabled={page.fake_progress_enabled ?? true}
                     fakeProgressColor={page.fake_progress_color || '#ef4444'}
                     fakeProgressThickness={page.fake_progress_thickness || 4}

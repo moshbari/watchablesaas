@@ -12,6 +12,9 @@ import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { extractVideoUrl, isYouTubeUrl, getYouTubeId, isGoogleDriveUrl, getGoogleDriveId, isTellaUrl, getTellaId } from '@/lib/videoUtils';
 import { FakeProgressBar } from './FakeProgressBar';
 
+import { type SkipSection } from './useVideoState';
+export type { SkipSection } from './useVideoState';
+
 interface VideoContainerProps {
   src: string;
   onError?: (error: string) => void;
@@ -20,6 +23,7 @@ interface VideoContainerProps {
   overlayButtonConfig?: OverlayButtonConfig;
   startTime?: number;
   endTime?: number;
+  skipSections?: SkipSection[];
   fakeProgressEnabled?: boolean;
   fakeProgressColor?: string;
   fakeProgressThickness?: number;
@@ -34,6 +38,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   overlayButtonConfig,
   startTime,
   endTime,
+  skipSections = [],
   fakeProgressEnabled = false,
   fakeProgressColor = '#ef4444',
   fakeProgressThickness = 4,
@@ -210,7 +215,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       onError?.(error);
     };
 
-    // Progress saving and end time checking
+    // Progress saving, end time checking, and skip sections
     const handleTimeUpdate = () => {
       if (video.currentTime > 0) {
         // Check if we've reached the end time
@@ -219,6 +224,14 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           video.pause();
           setPlaying(false);
           return;
+        }
+        // Check skip sections - jump past if inside one
+        for (const section of skipSections) {
+          if (video.currentTime >= section.from && video.currentTime < section.to) {
+            console.log(`Skipping section ${section.from}-${section.to}, jumping to ${section.to}`);
+            video.currentTime = section.to;
+            return;
+          }
         }
         saveProgress(video.currentTime);
       }
@@ -262,7 +275,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       video.removeEventListener('error', handleError);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [saveProgress, onError, isYoutube, isGoogleDrive, isTella, startTime, endTime, hasInitialized, setLoading, setPlaying, setError]);
+  }, [saveProgress, onError, isYoutube, isGoogleDrive, isTella, startTime, endTime, skipSections, hasInitialized, setLoading, setPlaying, setError]);
 
   // Initialize volume for HTML5 videos
   useEffect(() => {
@@ -306,6 +319,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             playButtonSize={playButtonSize}
             startTime={startTime}
             endTime={endTime}
+            skipSections={skipSections}
             onProgressUpdate={saveProgress}
             shouldSeekTo={state.shouldSeekTo}
             onSeekComplete={() => setShouldSeekTo(undefined)}

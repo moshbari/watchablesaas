@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { type SkipSection } from './useVideoState';
 
 interface IsolatedYouTubePlayerProps {
   videoId: string;
@@ -10,6 +11,7 @@ interface IsolatedYouTubePlayerProps {
   playButtonSize?: number;
   startTime?: number;
   endTime?: number;
+  skipSections?: SkipSection[];
   onProgressUpdate?: (currentTime: number) => void;
   shouldSeekTo?: number;
   onSeekComplete?: () => void;
@@ -31,6 +33,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   playButtonSize = 96,
   startTime,
   endTime,
+  skipSections = [],
   onProgressUpdate,
   shouldSeekTo,
   onSeekComplete,
@@ -194,6 +197,16 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
             console.log('YouTube end time reached, pausing video');
             ytPlayerRef.current.pauseVideo();
             stopProgressTracking();
+            return;
+          }
+          
+          // Check skip sections - jump past if inside one
+          for (const section of skipSections) {
+            if (currentTime >= section.from && currentTime < section.to) {
+              console.log(`YouTube: Skipping section ${section.from}-${section.to}, jumping to ${section.to}`);
+              ytPlayerRef.current.seekTo(section.to, true);
+              return;
+            }
           }
         } catch (error) {
           console.log('Error getting current time:', error);
