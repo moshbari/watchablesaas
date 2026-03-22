@@ -184,6 +184,25 @@ const PageBuilder = () => {
     endMinute: '',
     endSecond: ''
   });
+  const [skipSections, setSkipSections] = useState<Array<{
+    fromHour: string; fromMinute: string; fromSecond: string;
+    toHour: string; toMinute: string; toSecond: string;
+  }>>([]);
+
+  const addSkipSection = () => {
+    setSkipSections(prev => [...prev, {
+      fromHour: '', fromMinute: '', fromSecond: '',
+      toHour: '', toMinute: '', toSecond: ''
+    }]);
+  };
+
+  const removeSkipSection = (index: number) => {
+    setSkipSections(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateSkipSection = (index: number, field: string, value: string) => {
+    setSkipSections(prev => prev.map((s, i) => i === index ? { ...s, [field]: value } : s));
+  };
   const [buttonDelayInputs, setButtonDelayInputs] = useState({
     hours: '0',
     minutes: '0',
