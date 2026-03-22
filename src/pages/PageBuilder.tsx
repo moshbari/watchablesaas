@@ -545,8 +545,22 @@ const PageBuilder = () => {
         ...prev,
         endHour: endTime.hours,
         endMinute: endTime.minutes,
-        endSecond: endTime.seconds
+      endSecond: endTime.seconds
       }));
+    }
+
+    // Load skip sections
+    if ((page as any).skip_sections && Array.isArray((page as any).skip_sections)) {
+      setSkipSections((page as any).skip_sections.map((s: any) => {
+        const from = secondsToTime(s.from);
+        const to = secondsToTime(s.to);
+        return {
+          fromHour: from.hours, fromMinute: from.minutes, fromSecond: from.seconds,
+          toHour: to.hours, toMinute: to.minutes, toSecond: to.seconds
+        };
+      }));
+    } else {
+      setSkipSections([]);
     }
 
     // Set button delay inputs based on existing button delay
