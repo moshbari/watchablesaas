@@ -321,6 +321,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             playButtonSize={playButtonSize}
             startTime={startTime}
             endTime={endTime}
+            skipSections={skipSections}
             onProgressUpdate={saveProgress}
             shouldSeekTo={state.shouldSeekTo}
             onSeekComplete={() => setShouldSeekTo(undefined)}
