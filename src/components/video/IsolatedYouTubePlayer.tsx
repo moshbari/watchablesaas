@@ -33,6 +33,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   playButtonSize = 96,
   startTime,
   endTime,
+  skipSections = [],
   onProgressUpdate,
   shouldSeekTo,
   onSeekComplete,
