@@ -12,6 +12,11 @@ import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { extractVideoUrl, isYouTubeUrl, getYouTubeId, isGoogleDriveUrl, getGoogleDriveId, isTellaUrl, getTellaId } from '@/lib/videoUtils';
 import { FakeProgressBar } from './FakeProgressBar';
 
+export interface SkipSection {
+  from: number;
+  to: number;
+}
+
 interface VideoContainerProps {
   src: string;
   onError?: (error: string) => void;
@@ -20,6 +25,7 @@ interface VideoContainerProps {
   overlayButtonConfig?: OverlayButtonConfig;
   startTime?: number;
   endTime?: number;
+  skipSections?: SkipSection[];
   fakeProgressEnabled?: boolean;
   fakeProgressColor?: string;
   fakeProgressThickness?: number;
