@@ -1375,12 +1375,8 @@ const PageBuilder = () => {
                     )}
                   </div>
 
-                  <Separator />
 
-                  {/* Timed Button Section */}
-                  <TimedButton />
 
-                  <Separator />
 
                   {/* Lead Optin Section */}
                   <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
