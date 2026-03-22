@@ -103,6 +103,7 @@ const Embed = () => {
         playButtonSize={playButtonSize}
         startTime={startTime}
         endTime={endTime}
+        skipSections={skipSections}
       />
       
       {/* Action Button Below Video */}
