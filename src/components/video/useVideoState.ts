@@ -1,5 +1,10 @@
 import { useState, useCallback } from 'react';
 
+export interface SkipSection {
+  from: number;
+  to: number;
+}
+
 export interface VideoState {
   isPlaying: boolean;
   isMuted: boolean;

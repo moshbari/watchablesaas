@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { type SkipSection } from './VideoContainer';
+import { type SkipSection } from './useVideoState';
 
 interface IsolatedYouTubePlayerProps {
   videoId: string;
