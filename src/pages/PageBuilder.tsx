@@ -1093,6 +1093,84 @@ const PageBuilder = () => {
                       <p className="text-xs text-muted-foreground">
                         Leave empty to play the full video. End time must be after start time.
                       </p>
+
+                      <Separator />
+
+                      {/* Skip Sections */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm font-medium">Skip Sections</Label>
+                          <Button type="button" variant="outline" size="sm" onClick={addSkipSection} className="gap-1">
+                            <Plus className="w-3 h-3" /> Add Skip
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Define sections to skip during playback. The player will seamlessly jump over these parts.
+                        </p>
+
+                        {skipSections.map((section, index) => (
+                          <div key={index} className="space-y-2 p-3 bg-background rounded-lg border">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-muted-foreground">Skip #{index + 1}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeSkipSection(index)}
+                                className="h-6 px-2 text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">From</Label>
+                                <div className="flex gap-1 items-center">
+                                  <Input type="number" placeholder="HH" min="0" max="23"
+                                    value={section.fromHour}
+                                    onChange={(e) => updateSkipSection(index, 'fromHour', e.target.value)}
+                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
+                                  />
+                                  <span className="text-muted-foreground text-xs">:</span>
+                                  <Input type="number" placeholder="MM" min="0" max="59"
+                                    value={section.fromMinute}
+                                    onChange={(e) => updateSkipSection(index, 'fromMinute', e.target.value)}
+                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
+                                  />
+                                  <span className="text-muted-foreground text-xs">:</span>
+                                  <Input type="number" placeholder="SS" min="0" max="59"
+                                    value={section.fromSecond}
+                                    onChange={(e) => updateSkipSection(index, 'fromSecond', e.target.value)}
+                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">To</Label>
+                                <div className="flex gap-1 items-center">
+                                  <Input type="number" placeholder="HH" min="0" max="23"
+                                    value={section.toHour}
+                                    onChange={(e) => updateSkipSection(index, 'toHour', e.target.value)}
+                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
+                                  />
+                                  <span className="text-muted-foreground text-xs">:</span>
+                                  <Input type="number" placeholder="MM" min="0" max="59"
+                                    value={section.toMinute}
+                                    onChange={(e) => updateSkipSection(index, 'toMinute', e.target.value)}
+                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
+                                  />
+                                  <span className="text-muted-foreground text-xs">:</span>
+                                  <Input type="number" placeholder="SS" min="0" max="59"
+                                    value={section.toSecond}
+                                    onChange={(e) => updateSkipSection(index, 'toSecond', e.target.value)}
+                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
 
