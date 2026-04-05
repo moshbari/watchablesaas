@@ -60,6 +60,9 @@ const AppContent = () => {
                         !location.pathname.startsWith('/landing-leads') &&
                         !location.pathname.startsWith('/test-email') &&
                         !location.pathname.startsWith('/privacy') &&
+                        !location.pathname.startsWith('/privacy-policy') &&
+                        !location.pathname.startsWith('/terms-of-use') &&
+                        !location.pathname.startsWith('/404');
                         !location.pathname.startsWith('/404');
 
   return (
