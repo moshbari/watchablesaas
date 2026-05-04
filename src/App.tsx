@@ -95,6 +95,8 @@ const AppContent = () => {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-use" element={<TermsOfUse />} />
+        <Route path="/multivideo-pagebuilder" element={<RequireAuth><MultiVideoPageBuilder /></RequireAuth>} />
+        <Route path="/mv/:slug" element={<DynamicMultiVideoPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/404" element={<NotFound />} />
         {/* Dynamic pages route - this must be second to last */}
