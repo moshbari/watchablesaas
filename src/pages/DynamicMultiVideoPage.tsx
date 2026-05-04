@@ -137,6 +137,7 @@ const DynamicMultiVideoPage = () => {
                       skipSections={v.skip_sections || []}
                       fakeProgressEnabled={false}
                       mobileFullscreenEnabled={true}
+                      disableResume={true}
                     />
                   </div>
                 ))}
