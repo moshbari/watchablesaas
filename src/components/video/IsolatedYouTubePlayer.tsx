@@ -140,11 +140,33 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
         document.head.appendChild(script);
       }
 
+      // Chain the global callback so multiple instances mounting in parallel
+      // all get notified (each one calling this would otherwise overwrite the previous).
+      const previousCallback = window.onYouTubeIframeAPIReady;
       window.onYouTubeIframeAPIReady = () => {
+        if (typeof previousCallback === 'function') {
+          try { previousCallback(); } catch (e) { console.log('prev YT cb error', e); }
+        }
         if (isComponentMounted) {
           initializeTimeoutRef.current = setTimeout(initializePlayer, 100);
         }
       };
+
+      // Safety net: poll for the API in case the global callback was overwritten
+      // by another instance mounting in parallel.
+      const pollStart = Date.now();
+      const poll = setInterval(() => {
+        if (!isComponentMounted || ytPlayerRef.current) {
+          clearInterval(poll);
+          return;
+        }
+        if (window.YT && window.YT.Player) {
+          clearInterval(poll);
+          initializeTimeoutRef.current = setTimeout(initializePlayer, 100);
+        } else if (Date.now() - pollStart > 15000) {
+          clearInterval(poll);
+        }
+      }, 200);
     };
 
     loadAPI();
