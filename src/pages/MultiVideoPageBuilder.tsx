@@ -78,7 +78,7 @@ const defaultForm = () => ({
   button_text_color: '#ffffff',
   button_delay: 0,
   columns: 1,
-  is_published: false,
+  is_published: true,
 });
 
 const MultiVideoPageBuilder = () => {
