@@ -388,7 +388,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     </div>
 
       {/* Resume Modal - Works for both YouTube and HTML5 videos */}
-      {showResumeModal && savedProgress && (
+      {!disableResume && showResumeModal && savedProgress && (
         <ResumeModal
           isOpen={showResumeModal}
           onChoice={handleResumeChoice}
