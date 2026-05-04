@@ -28,6 +28,7 @@ interface VideoContainerProps {
   fakeProgressColor?: string;
   fakeProgressThickness?: number;
   mobileFullscreenEnabled?: boolean;
+  disableResume?: boolean;
 }
 
 export const VideoContainer: React.FC<VideoContainerProps> = ({ 
