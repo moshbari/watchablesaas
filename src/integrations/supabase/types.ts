@@ -416,6 +416,93 @@ export type Database = {
           },
         ]
       }
+      multivideo_pages: {
+        Row: {
+          button_bg_color: string | null
+          button_delay: number | null
+          button_enabled: boolean | null
+          button_text: string | null
+          button_text_color: string | null
+          button_url: string | null
+          columns: number
+          created_at: string
+          headline: string
+          headline_color: string | null
+          headline_font_size: number | null
+          id: string
+          is_published: boolean | null
+          slug: string
+          sub_headline: string | null
+          sub_headline_color: string | null
+          sub_headline_font_size: number | null
+          text_bold: string | null
+          text_highlight: string | null
+          text_highlight_color: string | null
+          text_italic: string | null
+          text_underline: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          videos: Json
+        }
+        Insert: {
+          button_bg_color?: string | null
+          button_delay?: number | null
+          button_enabled?: boolean | null
+          button_text?: string | null
+          button_text_color?: string | null
+          button_url?: string | null
+          columns?: number
+          created_at?: string
+          headline: string
+          headline_color?: string | null
+          headline_font_size?: number | null
+          id?: string
+          is_published?: boolean | null
+          slug: string
+          sub_headline?: string | null
+          sub_headline_color?: string | null
+          sub_headline_font_size?: number | null
+          text_bold?: string | null
+          text_highlight?: string | null
+          text_highlight_color?: string | null
+          text_italic?: string | null
+          text_underline?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          videos?: Json
+        }
+        Update: {
+          button_bg_color?: string | null
+          button_delay?: number | null
+          button_enabled?: boolean | null
+          button_text?: string | null
+          button_text_color?: string | null
+          button_url?: string | null
+          columns?: number
+          created_at?: string
+          headline?: string
+          headline_color?: string | null
+          headline_font_size?: number | null
+          id?: string
+          is_published?: boolean | null
+          slug?: string
+          sub_headline?: string | null
+          sub_headline_color?: string | null
+          sub_headline_font_size?: number | null
+          text_bold?: string | null
+          text_highlight?: string | null
+          text_highlight_color?: string | null
+          text_italic?: string | null
+          text_underline?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          videos?: Json
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           button_bg_color: string | null
