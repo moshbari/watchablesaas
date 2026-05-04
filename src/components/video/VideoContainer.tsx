@@ -28,6 +28,7 @@ interface VideoContainerProps {
   fakeProgressColor?: string;
   fakeProgressThickness?: number;
   mobileFullscreenEnabled?: boolean;
+  disableResume?: boolean;
 }
 
 export const VideoContainer: React.FC<VideoContainerProps> = ({ 
@@ -42,7 +43,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   fakeProgressEnabled = false,
   fakeProgressColor = '#ef4444',
   fakeProgressThickness = 4,
-  mobileFullscreenEnabled = true
+  mobileFullscreenEnabled = true,
+  disableResume = false
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -386,7 +388,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     </div>
 
       {/* Resume Modal - Works for both YouTube and HTML5 videos */}
-      {showResumeModal && savedProgress && (
+      {!disableResume && showResumeModal && savedProgress && (
         <ResumeModal
           isOpen={showResumeModal}
           onChoice={handleResumeChoice}
