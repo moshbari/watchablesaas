@@ -31,6 +31,8 @@ import TestEmail from "@/pages/TestEmail";
 import Privacy from "@/pages/Privacy";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfUse from "@/pages/TermsOfUse";
+import MultiVideoPageBuilder from "@/pages/MultiVideoPageBuilder";
+import DynamicMultiVideoPage from "@/pages/DynamicMultiVideoPage";
 import { RequireAuth, RequireRole } from "@/routes/guards";
 
 const queryClient = new QueryClient();
