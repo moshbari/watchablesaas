@@ -35,6 +35,7 @@ import MultiVideoPageBuilder from "@/pages/MultiVideoPageBuilder";
 import DynamicMultiVideoPage from "@/pages/DynamicMultiVideoPage";
 import StaticPageBuilder from "@/pages/StaticPageBuilder";
 import DynamicStaticPage from "@/pages/DynamicStaticPage";
+import Api from "@/pages/Api";
 import { RequireAuth, RequireRole } from "@/routes/guards";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,7 @@ const AppContent = () => {
                         !location.pathname.startsWith('/mv/') &&
                         !location.pathname.startsWith('/static-pagebuilder') &&
                         !location.pathname.startsWith('/s/') &&
+                        !location.pathname.startsWith('/api') &&
                         !location.pathname.startsWith('/404');
 
   return (
@@ -103,6 +105,7 @@ const AppContent = () => {
         <Route path="/mv/:slug" element={<DynamicMultiVideoPage />} />
         <Route path="/static-pagebuilder" element={<RequireAuth><StaticPageBuilder /></RequireAuth>} />
         <Route path="/s/:slug" element={<DynamicStaticPage />} />
+        <Route path="/api" element={<RequireAuth><Api /></RequireAuth>} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/404" element={<NotFound />} />
         {/* Dynamic pages route - this must be second to last */}

@@ -1,5 +1,6 @@
-// Public endpoint for Claude (or any tool) to create/update static pages.
-// Auth: caller must include header `x-api-token: <STATIC_PAGE_API_TOKEN>`.
+// Public endpoint for users to create/update their static pages from external tools
+// (Claude, ChatGPT, Cursor, curl, n8n, Zapier, etc.).
+// Auth: header `x-api-token: <user's personal API token>` from the api_tokens table.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -17,12 +18,9 @@ const json = (body: unknown, status = 200) =>
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const expected = Deno.env.get("STATIC_PAGE_API_TOKEN");
-  if (!expected) return json({ error: "Server not configured" }, 500);
-
   const provided = req.headers.get("x-api-token");
-  if (!provided || provided !== expected) {
-    return json({ error: "Unauthorized. Send header x-api-token with your API token." }, 401);
+  if (!provided) {
+    return json({ error: "Missing x-api-token header." }, 401);
   }
 
   const supabase = createClient(
@@ -30,11 +28,27 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  // GET = list all pages (slug + title + is_published)
+  // Resolve token -> user_id
+  const { data: tokenRow, error: tokenErr } = await supabase
+    .from("api_tokens")
+    .select("user_id")
+    .eq("token", provided)
+    .maybeSingle();
+
+  if (tokenErr || !tokenRow) {
+    return json({ error: "Invalid API token." }, 401);
+  }
+  const ownerId = tokenRow.user_id as string;
+
+  // Best-effort touch last_used_at
+  supabase.from("api_tokens").update({ last_used_at: new Date().toISOString() }).eq("token", provided).then(() => {});
+
+  // GET = list this user's pages
   if (req.method === "GET") {
     const { data, error } = await supabase
       .from("static_pages")
       .select("slug,title,is_published,updated_at")
+      .eq("user_id", ownerId)
       .order("updated_at", { ascending: false });
     if (error) return json({ error: error.message }, 500);
     return json({ pages: data });
@@ -49,17 +63,18 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
-  const { slug, html_content, title, cta_url, cta_text, cta_enabled, is_published, user_id } = body ?? {};
+  const { slug, html_content, title, cta_url, cta_text, cta_enabled, is_published } = body ?? {};
 
   if (!slug || typeof slug !== "string") {
     return json({ error: "Missing required field: slug" }, 400);
   }
 
-  // Does this slug already exist?
+  // Only look at pages owned by this user
   const { data: existing } = await supabase
     .from("static_pages")
-    .select("id,user_id")
+    .select("id")
     .eq("slug", slug)
+    .eq("user_id", ownerId)
     .maybeSingle();
 
   const updateFields: Record<string, unknown> = {};
@@ -71,7 +86,6 @@ Deno.serve(async (req) => {
   if (is_published !== undefined) updateFields.is_published = is_published;
 
   if (existing) {
-    // UPDATE existing page
     const { data, error } = await supabase
       .from("static_pages")
       .update(updateFields)
@@ -82,18 +96,14 @@ Deno.serve(async (req) => {
     return json({ action: "updated", page: data });
   }
 
-  // CREATE new page — need a user_id. Use provided, else borrow from any existing static_page (single-owner app).
-  let ownerId = user_id as string | undefined;
-  if (!ownerId) {
-    const { data: anyPage } = await supabase
-      .from("static_pages")
-      .select("user_id")
-      .limit(1)
-      .maybeSingle();
-    ownerId = anyPage?.user_id;
-  }
-  if (!ownerId) {
-    return json({ error: "No user_id provided and no existing pages to infer owner from. Include user_id in the request body." }, 400);
+  // Check slug isn't already owned by someone else
+  const { data: conflict } = await supabase
+    .from("static_pages")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (conflict) {
+    return json({ error: `Slug "${slug}" is already taken by another user.` }, 409);
   }
 
   const insertRow: Record<string, unknown> = {

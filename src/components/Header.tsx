@@ -29,6 +29,7 @@ const Header: React.FC = () => {
               <Link to="/multivideo-pagebuilder"><Button variant="ghost">Multi-Video</Button></Link>
               <Link to="/static-pagebuilder"><Button variant="ghost">Static Pages</Button></Link>
               <Link to="/leads"><Button variant="ghost">Leads</Button></Link>
+              <Link to="/api"><Button variant="ghost">API</Button></Link>
               <Link to="/account"><Button variant="ghost">Account</Button></Link>
                   {profile?.role === "admin" && (
                     <Link to="/admin"><Button variant="ghost">Admin</Button></Link>
@@ -76,6 +77,9 @@ const Header: React.FC = () => {
                   </Link>
                   <Link to="/leads" onClick={() => setOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">Leads</Button>
+                  </Link>
+                  <Link to="/api" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">API</Button>
                   </Link>
                   <Link to="/account" onClick={() => setOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">Account</Button>
