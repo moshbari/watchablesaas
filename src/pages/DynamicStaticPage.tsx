@@ -21,6 +21,7 @@ interface SPage {
   scarcity_end_at: string | null;
   scarcity_bg_color: string;
   scarcity_text_color: string;
+  scarcity_show_labels: boolean;
 }
 
 const pad = (n: number) => String(Math.max(0, Math.floor(n))).padStart(2, '0');
