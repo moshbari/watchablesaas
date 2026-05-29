@@ -108,7 +108,11 @@ const StaticPageBuilder = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const payload: any = { ...formData, user_id: user.id };
+      const payload: any = {
+        ...formData,
+        user_id: user.id,
+        scarcity_end_at: formData.scarcity_end_at ? new Date(formData.scarcity_end_at).toISOString() : null,
+      };
 
       if (editingId) {
         const { error } = await supabase.from('static_pages' as any).update(payload).eq('id', editingId);
