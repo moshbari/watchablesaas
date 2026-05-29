@@ -22,6 +22,12 @@ interface SPage {
   cta_text_color: string;
   is_published: boolean;
   created_at: string;
+  scarcity_enabled: boolean;
+  scarcity_type: string;
+  scarcity_text: string;
+  scarcity_end_at: string | null;
+  scarcity_bg_color: string;
+  scarcity_text_color: string;
 }
 
 const defaultForm = () => ({
@@ -34,6 +40,12 @@ const defaultForm = () => ({
   cta_bg_color: '#007bc7',
   cta_text_color: '#ffffff',
   is_published: true,
+  scarcity_enabled: false,
+  scarcity_type: 'text' as 'text' | 'timer',
+  scarcity_text: 'Limited time offer — act now',
+  scarcity_end_at: '',
+  scarcity_bg_color: '#000000',
+  scarcity_text_color: '#ffeb3b',
 });
 
 const StaticPageBuilder = () => {
