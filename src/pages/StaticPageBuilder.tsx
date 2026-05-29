@@ -99,6 +99,7 @@ const StaticPageBuilder = () => {
       cta_bar_bg_color: (p as any).cta_bar_bg_color ?? '#f59e0b',
       cta_bar_padding: (p as any).cta_bar_padding ?? 9,
       auto_complementary: (p as any).auto_complementary ?? true,
+      complementary_mode: ((p as any).complementary_mode ?? 'balanced') as ComplementaryMode,
       is_published: p.is_published,
       scarcity_enabled: p.scarcity_enabled ?? false,
       scarcity_type: (p.scarcity_type as 'text' | 'timer') ?? 'text',
