@@ -860,6 +860,7 @@ export type Database = {
       static_pages: {
         Row: {
           auto_complementary: boolean | null
+          complementary_mode: string
           created_at: string
           cta_bar_bg_color: string | null
           cta_bar_padding: number
@@ -884,6 +885,7 @@ export type Database = {
         }
         Insert: {
           auto_complementary?: boolean | null
+          complementary_mode?: string
           created_at?: string
           cta_bar_bg_color?: string | null
           cta_bar_padding?: number
@@ -908,6 +910,7 @@ export type Database = {
         }
         Update: {
           auto_complementary?: boolean | null
+          complementary_mode?: string
           created_at?: string
           cta_bar_bg_color?: string | null
           cta_bar_padding?: number

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, ExternalLink, Edit } from 'lucide-react';
-import { complementaryColor } from '@/lib/colorUtils';
+import { complementaryColor, type ComplementaryMode } from '@/lib/colorUtils';
 
 interface SPage {
   id: string;
@@ -24,6 +24,7 @@ interface SPage {
   cta_bar_bg_color: string;
   cta_bar_padding: number;
   auto_complementary: boolean;
+  complementary_mode: ComplementaryMode;
   is_published: boolean;
   created_at: string;
   scarcity_enabled: boolean;
@@ -46,6 +47,7 @@ const defaultForm = () => ({
   cta_bar_bg_color: '#f59e0b',
   cta_bar_padding: 9,
   auto_complementary: true,
+  complementary_mode: 'balanced' as ComplementaryMode,
   is_published: true,
   scarcity_enabled: false,
   scarcity_type: 'text' as 'text' | 'timer',
@@ -97,6 +99,7 @@ const StaticPageBuilder = () => {
       cta_bar_bg_color: (p as any).cta_bar_bg_color ?? '#f59e0b',
       cta_bar_padding: (p as any).cta_bar_padding ?? 9,
       auto_complementary: (p as any).auto_complementary ?? true,
+      complementary_mode: ((p as any).complementary_mode ?? 'balanced') as ComplementaryMode,
       is_published: p.is_published,
       scarcity_enabled: p.scarcity_enabled ?? false,
       scarcity_type: (p.scarcity_type as 'text' | 'timer') ?? 'text',
@@ -250,14 +253,14 @@ const StaticPageBuilder = () => {
 
               <div className="flex items-center justify-between rounded-md border p-3">
                 <div>
-                  <Label>Auto-pick complementary colors</Label>
-                  <p className="text-xs text-muted-foreground">Picks the opposite color on the wheel so the button pops off the bar.</p>
+                  <Label>Auto-pair complementary colors</Label>
+                  <p className="text-xs text-muted-foreground">When you change one color, the other auto-snaps to its 180° hue partner on the color wheel.</p>
                 </div>
                 <Switch
                   checked={formData.auto_complementary}
                   onCheckedChange={v => {
                     if (v) {
-                      setFormData({ ...formData, auto_complementary: true, cta_bar_bg_color: complementaryColor(formData.cta_bg_color) });
+                      setFormData({ ...formData, auto_complementary: true, cta_bar_bg_color: complementaryColor(formData.cta_bg_color, formData.complementary_mode) });
                     } else {
                       setFormData({ ...formData, auto_complementary: false });
                     }
@@ -265,13 +268,41 @@ const StaticPageBuilder = () => {
                 />
               </div>
 
+              {formData.auto_complementary && (
+                <div className="rounded-md border p-3 space-y-2">
+                  <Label>Complementary algorithm</Label>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={formData.complementary_mode === 'balanced' ? 'default' : 'outline'}
+                      onClick={() => setFormData({ ...formData, complementary_mode: 'balanced', cta_bar_bg_color: complementaryColor(formData.cta_bg_color, 'balanced') })}
+                    >
+                      Tonally balanced (perceptual)
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={formData.complementary_mode === 'pure' ? 'default' : 'outline'}
+                      onClick={() => setFormData({ ...formData, complementary_mode: 'pure', cta_bar_bg_color: complementaryColor(formData.cta_bg_color, 'pure') })}
+                    >
+                      True complement (180° HSL)
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    <strong>Tonally balanced</strong>: rotates hue 180° and clamps saturation/lightness into a legible mid-range so both colors stay readable on screen.<br />
+                    <strong>True complement</strong>: strict 180° hue rotation, preserves the source saturation &amp; lightness exactly (textbook color-theory complement).
+                  </p>
+                </div>
+              )}
+
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <Label>Button background</Label>
                   <Input type="color" value={formData.cta_bg_color} onChange={e => {
                     const c = e.target.value;
                     if (formData.auto_complementary) {
-                      setFormData({ ...formData, cta_bg_color: c, cta_bar_bg_color: complementaryColor(c) });
+                      setFormData({ ...formData, cta_bg_color: c, cta_bar_bg_color: complementaryColor(c, formData.complementary_mode) });
                     } else {
                       setFormData({ ...formData, cta_bg_color: c });
                     }
@@ -282,7 +313,7 @@ const StaticPageBuilder = () => {
                   <Input type="color" value={formData.cta_bar_bg_color} onChange={e => {
                     const c = e.target.value;
                     if (formData.auto_complementary) {
-                      setFormData({ ...formData, cta_bar_bg_color: c, cta_bg_color: complementaryColor(c) });
+                      setFormData({ ...formData, cta_bar_bg_color: c, cta_bg_color: complementaryColor(c, formData.complementary_mode) });
                     } else {
                       setFormData({ ...formData, cta_bar_bg_color: c });
                     }
