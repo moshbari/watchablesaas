@@ -279,7 +279,7 @@ const StaticPageBuilder = () => {
                 </div>
                 <div>
                   <Label>Bar background</Label>
-                  <Input type="color" value={formData.cta_bar_bg_color} disabled={formData.auto_complementary} onChange={e => {
+                  <Input type="color" value={formData.cta_bar_bg_color} onChange={e => {
                     const c = e.target.value;
                     if (formData.auto_complementary) {
                       setFormData({ ...formData, cta_bar_bg_color: c, cta_bg_color: complementaryColor(c) });
