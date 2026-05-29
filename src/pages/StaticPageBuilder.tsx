@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, ExternalLink, Edit } from 'lucide-react';
+import { complementaryColor } from '@/lib/colorUtils';
 
 interface SPage {
   id: string;
