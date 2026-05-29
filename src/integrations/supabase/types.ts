@@ -868,6 +868,12 @@ export type Database = {
           html_content: string
           id: string
           is_published: boolean
+          scarcity_bg_color: string
+          scarcity_enabled: boolean
+          scarcity_end_at: string | null
+          scarcity_text: string
+          scarcity_text_color: string
+          scarcity_type: string
           slug: string
           title: string
           updated_at: string
@@ -883,6 +889,12 @@ export type Database = {
           html_content?: string
           id?: string
           is_published?: boolean
+          scarcity_bg_color?: string
+          scarcity_enabled?: boolean
+          scarcity_end_at?: string | null
+          scarcity_text?: string
+          scarcity_text_color?: string
+          scarcity_type?: string
           slug: string
           title?: string
           updated_at?: string
@@ -898,6 +910,12 @@ export type Database = {
           html_content?: string
           id?: string
           is_published?: boolean
+          scarcity_bg_color?: string
+          scarcity_enabled?: boolean
+          scarcity_end_at?: string | null
+          scarcity_text?: string
+          scarcity_text_color?: string
+          scarcity_type?: string
           slug?: string
           title?: string
           updated_at?: string
