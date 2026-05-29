@@ -33,6 +33,8 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfUse from "@/pages/TermsOfUse";
 import MultiVideoPageBuilder from "@/pages/MultiVideoPageBuilder";
 import DynamicMultiVideoPage from "@/pages/DynamicMultiVideoPage";
+import StaticPageBuilder from "@/pages/StaticPageBuilder";
+import DynamicStaticPage from "@/pages/DynamicStaticPage";
 import { RequireAuth, RequireRole } from "@/routes/guards";
 
 const queryClient = new QueryClient();
@@ -66,6 +68,8 @@ const AppContent = () => {
                         !location.pathname.startsWith('/terms-of-use') &&
                         !location.pathname.startsWith('/multivideo-pagebuilder') &&
                         !location.pathname.startsWith('/mv/') &&
+                        !location.pathname.startsWith('/static-pagebuilder') &&
+                        !location.pathname.startsWith('/s/') &&
                         !location.pathname.startsWith('/404');
 
   return (
@@ -97,6 +101,8 @@ const AppContent = () => {
         <Route path="/terms-of-use" element={<TermsOfUse />} />
         <Route path="/multivideo-pagebuilder" element={<RequireAuth><MultiVideoPageBuilder /></RequireAuth>} />
         <Route path="/mv/:slug" element={<DynamicMultiVideoPage />} />
+        <Route path="/static-pagebuilder" element={<RequireAuth><StaticPageBuilder /></RequireAuth>} />
+        <Route path="/s/:slug" element={<DynamicStaticPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/404" element={<NotFound />} />
         {/* Dynamic pages route - this must be second to last */}
