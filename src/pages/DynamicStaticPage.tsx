@@ -130,7 +130,7 @@ const DynamicStaticPage: React.FC = () => {
             </div>
           )}
           {page.cta_enabled && (
-            <div className="container mx-auto px-5 sm:px-8 py-4 sm:py-5 flex justify-center">
+            <div className="container mx-auto px-5 sm:px-8 py-6 sm:py-8 flex justify-center">
               <a
                 href={page.cta_url}
                 target="_blank"
