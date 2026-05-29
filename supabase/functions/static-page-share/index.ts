@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
 
   const title = page?.title || "Static Page";
   const description = title;
-  const imageUrl = `${url.origin}/functions/v1/static-page-og?slug=${encodeURIComponent(slug)}`;
+  const imageUrl = `https://${url.host}/functions/v1/static-page-og?slug=${encodeURIComponent(slug)}`;
   const ua = req.headers.get("user-agent") || "";
   const isBot = BOT_UA.test(ua);
 
