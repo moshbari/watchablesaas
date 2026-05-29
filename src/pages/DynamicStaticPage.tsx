@@ -146,7 +146,7 @@ const DynamicStaticPage: React.FC = () => {
             >
               {page.scarcity_text && <span>{page.scarcity_text}</span>}
               {page.scarcity_type === 'timer' && page.scarcity_end_at && (
-                <Countdown endAt={page.scarcity_end_at} />
+                <Countdown endAt={page.scarcity_end_at} showLabels={page.scarcity_show_labels ?? true} />
               )}
             </div>
           )}
