@@ -8,7 +8,10 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, ExternalLink, Edit } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Edit, Share2 } from 'lucide-react';
+
+const SHARE_BASE = 'https://kjabpmcsiluvtxmbbfbg.supabase.co/functions/v1/static-page-share';
+const shareLink = (slug: string) => `${SHARE_BASE}/${encodeURIComponent(slug)}`;
 import { complementaryColor, type ComplementaryMode } from '@/lib/colorUtils';
 
 interface SPage {
@@ -184,6 +187,12 @@ const StaticPageBuilder = () => {
                 <div className="flex gap-2 flex-wrap">
                   <Button variant="outline" size="sm" onClick={() => window.open(`/s/${p.slug}`, '_blank')}>
                     <ExternalLink className="w-4 h-4 mr-1" />View
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={async () => {
+                    await navigator.clipboard.writeText(shareLink(p.slug));
+                    toast({ title: 'Share link copied', description: 'Paste in LinkedIn, Facebook, WhatsApp, etc. for a proper preview.' });
+                  }}>
+                    <Share2 className="w-4 h-4 mr-1" />Share link
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => startEdit(p)}>
                     <Edit className="w-4 h-4 mr-1" />Edit
