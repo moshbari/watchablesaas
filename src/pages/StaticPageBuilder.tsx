@@ -33,6 +33,7 @@ interface SPage {
   scarcity_end_at: string | null;
   scarcity_bg_color: string;
   scarcity_text_color: string;
+  scarcity_show_labels: boolean;
 }
 
 const defaultForm = () => ({
