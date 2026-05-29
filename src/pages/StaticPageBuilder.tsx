@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, ExternalLink, Edit } from 'lucide-react';
-import { complementaryColor } from '@/lib/colorUtils';
+import { complementaryColor, type ComplementaryMode } from '@/lib/colorUtils';
 
 interface SPage {
   id: string;
@@ -24,6 +24,7 @@ interface SPage {
   cta_bar_bg_color: string;
   cta_bar_padding: number;
   auto_complementary: boolean;
+  complementary_mode: ComplementaryMode;
   is_published: boolean;
   created_at: string;
   scarcity_enabled: boolean;
@@ -46,6 +47,7 @@ const defaultForm = () => ({
   cta_bar_bg_color: '#f59e0b',
   cta_bar_padding: 9,
   auto_complementary: true,
+  complementary_mode: 'balanced' as ComplementaryMode,
   is_published: true,
   scarcity_enabled: false,
   scarcity_type: 'text' as 'text' | 'timer',
