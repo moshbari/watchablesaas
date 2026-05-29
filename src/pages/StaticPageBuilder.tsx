@@ -8,7 +8,10 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, ExternalLink, Edit } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Edit, Share2 } from 'lucide-react';
+
+const SHARE_BASE = 'https://kjabpmcsiluvtxmbbfbg.supabase.co/functions/v1/static-page-share';
+const shareLink = (slug: string) => `${SHARE_BASE}/${encodeURIComponent(slug)}`;
 import { complementaryColor, type ComplementaryMode } from '@/lib/colorUtils';
 
 interface SPage {
