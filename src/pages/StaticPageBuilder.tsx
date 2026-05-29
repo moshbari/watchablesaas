@@ -42,6 +42,8 @@ const defaultForm = () => ({
   cta_url: 'https://example.com',
   cta_bg_color: '#007bc7',
   cta_text_color: '#ffffff',
+  cta_bar_bg_color: '#f59e0b',
+  auto_complementary: true,
   is_published: true,
   scarcity_enabled: false,
   scarcity_type: 'text' as 'text' | 'timer',
