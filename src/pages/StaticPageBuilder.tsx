@@ -92,6 +92,8 @@ const StaticPageBuilder = () => {
       cta_url: p.cta_url,
       cta_bg_color: p.cta_bg_color,
       cta_text_color: p.cta_text_color,
+      cta_bar_bg_color: (p as any).cta_bar_bg_color ?? '#f59e0b',
+      auto_complementary: (p as any).auto_complementary ?? true,
       is_published: p.is_published,
       scarcity_enabled: p.scarcity_enabled ?? false,
       scarcity_type: (p.scarcity_type as 'text' | 'timer') ?? 'text',
