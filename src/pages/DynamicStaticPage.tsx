@@ -134,7 +134,7 @@ const DynamicStaticPage: React.FC = () => {
             <div
               className="container mx-auto flex justify-center"
               style={{
-                padding: `${page.cta_bar_padding ?? 18}px clamp(20px, 5vw, 56px)`,
+                padding: `${page.cta_bar_padding ?? 9}px clamp(20px, 5vw, 56px)`,
                 boxSizing: 'border-box',
               }}
             >
