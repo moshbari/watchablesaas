@@ -56,6 +56,7 @@ const defaultForm = () => ({
   scarcity_end_at: '',
   scarcity_bg_color: '#000000',
   scarcity_text_color: '#ffeb3b',
+  scarcity_show_labels: true,
 });
 
 const StaticPageBuilder = () => {
