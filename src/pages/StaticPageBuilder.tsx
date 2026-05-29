@@ -44,7 +44,7 @@ const defaultForm = () => ({
   cta_bg_color: '#007bc7',
   cta_text_color: '#ffffff',
   cta_bar_bg_color: '#f59e0b',
-  cta_bar_padding: 18,
+  cta_bar_padding: 9,
   auto_complementary: true,
   is_published: true,
   scarcity_enabled: false,
@@ -95,7 +95,7 @@ const StaticPageBuilder = () => {
       cta_bg_color: p.cta_bg_color,
       cta_text_color: p.cta_text_color,
       cta_bar_bg_color: (p as any).cta_bar_bg_color ?? '#f59e0b',
-      cta_bar_padding: (p as any).cta_bar_padding ?? 18,
+      cta_bar_padding: (p as any).cta_bar_padding ?? 9,
       auto_complementary: (p as any).auto_complementary ?? true,
       is_published: p.is_published,
       scarcity_enabled: p.scarcity_enabled ?? false,
@@ -303,7 +303,7 @@ const StaticPageBuilder = () => {
                   value={formData.cta_bar_padding}
                   onChange={e => setFormData({ ...formData, cta_bar_padding: Math.max(0, parseInt(e.target.value || '0', 10)) })}
                 />
-                <p className="text-xs text-muted-foreground mt-1">Default: 18px. Lower = tighter bar, higher = more breathing room.</p>
+                <p className="text-xs text-muted-foreground mt-1">Default: 9px. Lower = tighter bar, higher = more breathing room.</p>
               </div>
 
             </div>

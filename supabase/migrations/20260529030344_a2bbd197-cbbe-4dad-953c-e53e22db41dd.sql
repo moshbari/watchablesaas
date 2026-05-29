@@ -1,0 +1,1 @@
+ALTER TABLE public.static_pages ALTER COLUMN cta_bar_padding SET DEFAULT 9;
