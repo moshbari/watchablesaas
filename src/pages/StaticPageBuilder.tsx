@@ -188,6 +188,12 @@ const StaticPageBuilder = () => {
                   <Button variant="outline" size="sm" onClick={() => window.open(`/s/${p.slug}`, '_blank')}>
                     <ExternalLink className="w-4 h-4 mr-1" />View
                   </Button>
+                  <Button variant="outline" size="sm" onClick={async () => {
+                    await navigator.clipboard.writeText(shareLink(p.slug));
+                    toast({ title: 'Share link copied', description: 'Paste in LinkedIn, Facebook, WhatsApp, etc. for a proper preview.' });
+                  }}>
+                    <Share2 className="w-4 h-4 mr-1" />Share link
+                  </Button>
                   <Button variant="outline" size="sm" onClick={() => startEdit(p)}>
                     <Edit className="w-4 h-4 mr-1" />Edit
                   </Button>
