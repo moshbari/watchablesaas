@@ -35,9 +35,18 @@ export function hslToHex(h: number, s: number, l: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-export function complementaryColor(hex: string): string {
+export type ComplementaryMode = 'balanced' | 'pure';
+
+/**
+ * Returns the complementary color on the HSL wheel.
+ * - 'pure': strict 180° hue rotation, preserves original saturation & lightness (true color-theory complement).
+ * - 'balanced': 180° hue rotation but clamps S/L into a legible mid-range so the pair stays visible on UI.
+ */
+export function complementaryColor(hex: string, mode: ComplementaryMode = 'balanced'): string {
   const { h, s, l } = hexToHsl(hex);
-  // rotate 180° on the wheel; nudge saturation/lightness for legibility
+  if (mode === 'pure') {
+    return hslToHex(h + 180, s, l);
+  }
   const newS = Math.max(0.55, Math.min(0.85, s || 0.7));
   const newL = Math.max(0.4, Math.min(0.6, l || 0.5));
   return hslToHex(h + 180, newS, newL);
