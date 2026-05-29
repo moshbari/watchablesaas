@@ -249,6 +249,42 @@ const StaticPageBuilder = () => {
           <Separator />
 
           <div className="flex items-center justify-between">
+            <Label>Scarcity bar (above CTA)</Label>
+            <Switch checked={formData.scarcity_enabled} onCheckedChange={v => setFormData({ ...formData, scarcity_enabled: v })} />
+          </div>
+          {formData.scarcity_enabled && (
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Button type="button" size="sm" variant={formData.scarcity_type === 'text' ? 'default' : 'outline'} onClick={() => setFormData({ ...formData, scarcity_type: 'text' })}>Text</Button>
+                <Button type="button" size="sm" variant={formData.scarcity_type === 'timer' ? 'default' : 'outline'} onClick={() => setFormData({ ...formData, scarcity_type: 'timer' })}>Real countdown (dd:hh:mm:ss)</Button>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <Label>{formData.scarcity_type === 'timer' ? 'Label shown before timer' : 'Scarcity text'}</Label>
+                  <Input value={formData.scarcity_text} onChange={e => setFormData({ ...formData, scarcity_text: e.target.value })} placeholder={formData.scarcity_type === 'timer' ? 'Offer ends in' : 'Limited time offer'} />
+                </div>
+                {formData.scarcity_type === 'timer' && (
+                  <div className="md:col-span-2">
+                    <Label>Countdown end date/time (your local time)</Label>
+                    <Input type="datetime-local" value={formData.scarcity_end_at} onChange={e => setFormData({ ...formData, scarcity_end_at: e.target.value })} />
+                    <p className="text-xs text-muted-foreground mt-1">Real timer — when it hits 00:00:00:00 it stays at zero. No fake countdown.</p>
+                  </div>
+                )}
+                <div>
+                  <Label>Background color</Label>
+                  <Input type="color" value={formData.scarcity_bg_color} onChange={e => setFormData({ ...formData, scarcity_bg_color: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Text color</Label>
+                  <Input type="color" value={formData.scarcity_text_color} onChange={e => setFormData({ ...formData, scarcity_text_color: e.target.value })} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <Separator />
+
+          <div className="flex items-center justify-between">
             <div>
               <Label>Published</Label>
               <p className="text-xs text-muted-foreground">Publicly accessible at /s/{formData.slug}</p>
