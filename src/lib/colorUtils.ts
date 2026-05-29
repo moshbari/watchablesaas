@@ -45,9 +45,13 @@ export type ComplementaryMode = 'balanced' | 'pure';
 export function complementaryColor(hex: string, mode: ComplementaryMode = 'balanced'): string {
   const { h, s, l } = hexToHsl(hex);
   if (mode === 'pure') {
+    // Strict color-theory complement: hue +180°, original S & L preserved.
     return hslToHex(h + 180, s, l);
   }
-  const newS = Math.max(0.55, Math.min(0.85, s || 0.7));
-  const newL = Math.max(0.4, Math.min(0.6, l || 0.5));
-  return hslToHex(h + 180, newS, newL);
+  // 'balanced' — perceptual pairing tuned for UI legibility.
+  // Desaturate noticeably and bias lightness away from the source so the
+  // pair reads as a softer, harmonious partner rather than a vivid clash.
+  const newS = Math.max(0.25, Math.min(0.55, (s || 0.7) * 0.55));
+  const targetL = l < 0.5 ? Math.min(0.92, l + 0.45) : Math.max(0.12, l - 0.45);
+  return hslToHex(h + 180, newS, targetL);
 }
