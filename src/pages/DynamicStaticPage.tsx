@@ -26,7 +26,7 @@ interface SPage {
 
 const pad = (n: number) => String(Math.max(0, Math.floor(n))).padStart(2, '0');
 
-const Countdown: React.FC<{ endAt: string }> = ({ endAt }) => {
+const Countdown: React.FC<{ endAt: string; showLabels?: boolean }> = ({ endAt, showLabels }) => {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -38,6 +38,25 @@ const Countdown: React.FC<{ endAt: string }> = ({ endAt }) => {
   const hh = Math.floor((diff % 86400) / 3600);
   const mm = Math.floor((diff % 3600) / 60);
   const ss = Math.floor(diff % 60);
+  if (showLabels) {
+    const Unit: React.FC<{ value: string; label: string }> = ({ value, label }) => (
+      <span className="inline-flex flex-col items-center leading-none">
+        <span className="font-mono tabular-nums font-bold text-base sm:text-lg">{value}</span>
+        <span className="text-[9px] sm:text-[10px] uppercase tracking-wider opacity-80 mt-0.5">{label}</span>
+      </span>
+    );
+    return (
+      <span className="inline-flex items-start gap-1.5 sm:gap-2">
+        <Unit value={pad(dd)} label="Day" />
+        <span className="font-mono font-bold">:</span>
+        <Unit value={pad(hh)} label="Hr" />
+        <span className="font-mono font-bold">:</span>
+        <Unit value={pad(mm)} label="Min" />
+        <span className="font-mono font-bold">:</span>
+        <Unit value={pad(ss)} label="Sec" />
+      </span>
+    );
+  }
   return (
     <span className="font-mono tabular-nums tracking-wider font-bold">
       {pad(dd)}:{pad(hh)}:{pad(mm)}:{pad(ss)}
