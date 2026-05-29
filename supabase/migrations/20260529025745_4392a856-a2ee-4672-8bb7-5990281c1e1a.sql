@@ -1,0 +1,1 @@
+ALTER TABLE public.static_pages ADD COLUMN IF NOT EXISTS cta_bar_padding integer NOT NULL DEFAULT 18;
