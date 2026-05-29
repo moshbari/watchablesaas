@@ -1,0 +1,1 @@
+ALTER TABLE public.static_pages ADD COLUMN IF NOT EXISTS scarcity_show_labels boolean NOT NULL DEFAULT true;

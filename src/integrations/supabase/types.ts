@@ -875,6 +875,7 @@ export type Database = {
           scarcity_bg_color: string
           scarcity_enabled: boolean
           scarcity_end_at: string | null
+          scarcity_show_labels: boolean
           scarcity_text: string
           scarcity_text_color: string
           scarcity_type: string
@@ -900,6 +901,7 @@ export type Database = {
           scarcity_bg_color?: string
           scarcity_enabled?: boolean
           scarcity_end_at?: string | null
+          scarcity_show_labels?: boolean
           scarcity_text?: string
           scarcity_text_color?: string
           scarcity_type?: string
@@ -925,6 +927,7 @@ export type Database = {
           scarcity_bg_color?: string
           scarcity_enabled?: boolean
           scarcity_end_at?: string | null
+          scarcity_show_labels?: boolean
           scarcity_text?: string
           scarcity_text_color?: string
           scarcity_type?: string

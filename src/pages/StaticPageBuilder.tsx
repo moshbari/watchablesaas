@@ -33,6 +33,7 @@ interface SPage {
   scarcity_end_at: string | null;
   scarcity_bg_color: string;
   scarcity_text_color: string;
+  scarcity_show_labels: boolean;
 }
 
 const defaultForm = () => ({
@@ -55,6 +56,7 @@ const defaultForm = () => ({
   scarcity_end_at: '',
   scarcity_bg_color: '#000000',
   scarcity_text_color: '#ffeb3b',
+  scarcity_show_labels: true,
 });
 
 const StaticPageBuilder = () => {
@@ -107,6 +109,7 @@ const StaticPageBuilder = () => {
       scarcity_end_at: p.scarcity_end_at ? p.scarcity_end_at.slice(0, 16) : '',
       scarcity_bg_color: p.scarcity_bg_color ?? '#000000',
       scarcity_text_color: p.scarcity_text_color ?? '#ffeb3b',
+      scarcity_show_labels: (p as any).scarcity_show_labels ?? true,
     });
     setIsCreating(true);
   };
@@ -362,6 +365,18 @@ const StaticPageBuilder = () => {
                     <Label>Countdown end date/time (your local time)</Label>
                     <Input type="datetime-local" value={formData.scarcity_end_at} onChange={e => setFormData({ ...formData, scarcity_end_at: e.target.value })} />
                     <p className="text-xs text-muted-foreground mt-1">Real timer — when it hits 00:00:00:00 it stays at zero. No fake countdown.</p>
+                  </div>
+                )}
+                {formData.scarcity_type === 'timer' && (
+                  <div className="md:col-span-2 flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <Label>Show Day / Hour / Min / Sec labels</Label>
+                      <p className="text-xs text-muted-foreground">Display captions under each digit pair.</p>
+                    </div>
+                    <Switch
+                      checked={formData.scarcity_show_labels}
+                      onCheckedChange={v => setFormData({ ...formData, scarcity_show_labels: v })}
+                    />
                   </div>
                 )}
                 <div>
