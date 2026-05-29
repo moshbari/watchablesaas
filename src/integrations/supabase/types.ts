@@ -857,6 +857,54 @@ export type Database = {
         }
         Relationships: []
       }
+      static_pages: {
+        Row: {
+          created_at: string
+          cta_bg_color: string
+          cta_enabled: boolean
+          cta_text: string
+          cta_text_color: string
+          cta_url: string
+          html_content: string
+          id: string
+          is_published: boolean
+          slug: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cta_bg_color?: string
+          cta_enabled?: boolean
+          cta_text?: string
+          cta_text_color?: string
+          cta_url?: string
+          html_content?: string
+          id?: string
+          is_published?: boolean
+          slug: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cta_bg_color?: string
+          cta_enabled?: boolean
+          cta_text?: string
+          cta_text_color?: string
+          cta_url?: string
+          html_content?: string
+          id?: string
+          is_published?: boolean
+          slug?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
