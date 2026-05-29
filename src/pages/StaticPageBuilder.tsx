@@ -109,6 +109,7 @@ const StaticPageBuilder = () => {
       scarcity_end_at: p.scarcity_end_at ? p.scarcity_end_at.slice(0, 16) : '',
       scarcity_bg_color: p.scarcity_bg_color ?? '#000000',
       scarcity_text_color: p.scarcity_text_color ?? '#ffeb3b',
+      scarcity_show_labels: (p as any).scarcity_show_labels ?? true,
     });
     setIsCreating(true);
   };
