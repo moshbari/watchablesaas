@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, ExternalLink, Edit } from 'lucide-react';
+import { complementaryColor } from '@/lib/colorUtils';
 
 interface SPage {
   id: string;
@@ -20,6 +21,8 @@ interface SPage {
   cta_url: string;
   cta_bg_color: string;
   cta_text_color: string;
+  cta_bar_bg_color: string;
+  auto_complementary: boolean;
   is_published: boolean;
   created_at: string;
   scarcity_enabled: boolean;
@@ -39,6 +42,8 @@ const defaultForm = () => ({
   cta_url: 'https://example.com',
   cta_bg_color: '#007bc7',
   cta_text_color: '#ffffff',
+  cta_bar_bg_color: '#f59e0b',
+  auto_complementary: true,
   is_published: true,
   scarcity_enabled: false,
   scarcity_type: 'text' as 'text' | 'timer',
@@ -87,6 +92,8 @@ const StaticPageBuilder = () => {
       cta_url: p.cta_url,
       cta_bg_color: p.cta_bg_color,
       cta_text_color: p.cta_text_color,
+      cta_bar_bg_color: (p as any).cta_bar_bg_color ?? '#f59e0b',
+      auto_complementary: (p as any).auto_complementary ?? true,
       is_published: p.is_published,
       scarcity_enabled: p.scarcity_enabled ?? false,
       scarcity_type: (p.scarcity_type as 'text' | 'timer') ?? 'text',
@@ -226,22 +233,62 @@ const StaticPageBuilder = () => {
             <Switch checked={formData.cta_enabled} onCheckedChange={v => setFormData({ ...formData, cta_enabled: v })} />
           </div>
           {formData.cta_enabled && (
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label>Button text</Label>
-                <Input value={formData.cta_text} onChange={e => setFormData({ ...formData, cta_text: e.target.value })} />
+            <div className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label>Button text</Label>
+                  <Input value={formData.cta_text} onChange={e => setFormData({ ...formData, cta_text: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Button URL</Label>
+                  <Input value={formData.cta_url} onChange={e => setFormData({ ...formData, cta_url: e.target.value })} />
+                </div>
               </div>
-              <div>
-                <Label>Button URL</Label>
-                <Input value={formData.cta_url} onChange={e => setFormData({ ...formData, cta_url: e.target.value })} />
+
+              <div className="flex items-center justify-between rounded-md border p-3">
+                <div>
+                  <Label>Auto-pick complementary colors</Label>
+                  <p className="text-xs text-muted-foreground">Picks the opposite color on the wheel so the button pops off the bar.</p>
+                </div>
+                <Switch
+                  checked={formData.auto_complementary}
+                  onCheckedChange={v => {
+                    if (v) {
+                      setFormData({ ...formData, auto_complementary: true, cta_bar_bg_color: complementaryColor(formData.cta_bg_color) });
+                    } else {
+                      setFormData({ ...formData, auto_complementary: false });
+                    }
+                  }}
+                />
               </div>
-              <div>
-                <Label>Background color</Label>
-                <Input type="color" value={formData.cta_bg_color} onChange={e => setFormData({ ...formData, cta_bg_color: e.target.value })} />
-              </div>
-              <div>
-                <Label>Text color</Label>
-                <Input type="color" value={formData.cta_text_color} onChange={e => setFormData({ ...formData, cta_text_color: e.target.value })} />
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label>Button background</Label>
+                  <Input type="color" value={formData.cta_bg_color} onChange={e => {
+                    const c = e.target.value;
+                    if (formData.auto_complementary) {
+                      setFormData({ ...formData, cta_bg_color: c, cta_bar_bg_color: complementaryColor(c) });
+                    } else {
+                      setFormData({ ...formData, cta_bg_color: c });
+                    }
+                  }} />
+                </div>
+                <div>
+                  <Label>Bar background</Label>
+                  <Input type="color" value={formData.cta_bar_bg_color} disabled={formData.auto_complementary} onChange={e => {
+                    const c = e.target.value;
+                    if (formData.auto_complementary) {
+                      setFormData({ ...formData, cta_bar_bg_color: c, cta_bg_color: complementaryColor(c) });
+                    } else {
+                      setFormData({ ...formData, cta_bar_bg_color: c });
+                    }
+                  }} />
+                </div>
+                <div>
+                  <Label>Button text color</Label>
+                  <Input type="color" value={formData.cta_text_color} onChange={e => setFormData({ ...formData, cta_text_color: e.target.value })} />
+                </div>
               </div>
             </div>
           )}

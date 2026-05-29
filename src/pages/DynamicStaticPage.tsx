@@ -11,6 +11,8 @@ interface SPage {
   cta_url: string;
   cta_bg_color: string;
   cta_text_color: string;
+  cta_bar_bg_color: string;
+  auto_complementary: boolean;
   is_published: boolean;
   scarcity_enabled: boolean;
   scarcity_type: string;
@@ -114,7 +116,7 @@ const DynamicStaticPage: React.FC = () => {
         <div
           ref={barRef}
           className="fixed bottom-0 left-0 right-0 z-50 shadow-2xl"
-          style={{ backgroundColor: page.cta_enabled ? page.cta_bg_color : 'transparent' }}
+          style={{ backgroundColor: page.cta_enabled ? (page.cta_bar_bg_color || '#0a0a0a') : 'transparent' }}
         >
           {page.scarcity_enabled && (
             <div
@@ -128,12 +130,12 @@ const DynamicStaticPage: React.FC = () => {
             </div>
           )}
           {page.cta_enabled && (
-            <div className="container mx-auto px-4 py-3 flex justify-center">
+            <div className="container mx-auto px-5 sm:px-8 py-4 sm:py-5 flex justify-center">
               <a
                 href={page.cta_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full max-w-xl rounded-xl font-bold uppercase tracking-wide shadow-lg ring-1 ring-black/10 border-b-4 border-black/20 transition-all hover:scale-[1.02] active:scale-[0.99] active:border-b-2 active:translate-y-[2px]"
+                className="inline-flex items-center justify-center gap-2 w-full max-w-xl rounded-xl font-bold uppercase tracking-wide shadow-lg ring-1 ring-black/20 border-b-4 border-black/30 transition-all hover:scale-[1.02] active:scale-[0.99] active:border-b-2 active:translate-y-[2px]"
                 style={{
                   backgroundColor: page.cta_bg_color,
                   color: page.cta_text_color,

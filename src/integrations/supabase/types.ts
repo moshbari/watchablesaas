@@ -859,7 +859,9 @@ export type Database = {
       }
       static_pages: {
         Row: {
+          auto_complementary: boolean | null
           created_at: string
+          cta_bar_bg_color: string | null
           cta_bg_color: string
           cta_enabled: boolean
           cta_text: string
@@ -880,7 +882,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auto_complementary?: boolean | null
           created_at?: string
+          cta_bar_bg_color?: string | null
           cta_bg_color?: string
           cta_enabled?: boolean
           cta_text?: string
@@ -901,7 +905,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          auto_complementary?: boolean | null
           created_at?: string
+          cta_bar_bg_color?: string | null
           cta_bg_color?: string
           cta_enabled?: boolean
           cta_text?: string
