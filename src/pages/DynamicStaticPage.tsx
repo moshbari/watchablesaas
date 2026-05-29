@@ -12,6 +12,7 @@ interface SPage {
   cta_bg_color: string;
   cta_text_color: string;
   cta_bar_bg_color: string;
+  cta_bar_padding: number;
   auto_complementary: boolean;
   is_published: boolean;
   scarcity_enabled: boolean;
@@ -133,7 +134,7 @@ const DynamicStaticPage: React.FC = () => {
             <div
               className="container mx-auto flex justify-center"
               style={{
-                padding: '36px clamp(20px, 5vw, 56px)',
+                padding: `${page.cta_bar_padding ?? 18}px clamp(20px, 5vw, 56px)`,
                 boxSizing: 'border-box',
               }}
             >

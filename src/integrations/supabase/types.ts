@@ -862,6 +862,7 @@ export type Database = {
           auto_complementary: boolean | null
           created_at: string
           cta_bar_bg_color: string | null
+          cta_bar_padding: number
           cta_bg_color: string
           cta_enabled: boolean
           cta_text: string
@@ -885,6 +886,7 @@ export type Database = {
           auto_complementary?: boolean | null
           created_at?: string
           cta_bar_bg_color?: string | null
+          cta_bar_padding?: number
           cta_bg_color?: string
           cta_enabled?: boolean
           cta_text?: string
@@ -908,6 +910,7 @@ export type Database = {
           auto_complementary?: boolean | null
           created_at?: string
           cta_bar_bg_color?: string | null
+          cta_bar_padding?: number
           cta_bg_color?: string
           cta_enabled?: boolean
           cta_text?: string
