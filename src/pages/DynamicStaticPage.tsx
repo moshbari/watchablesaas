@@ -11,6 +11,8 @@ interface SPage {
   cta_url: string;
   cta_bg_color: string;
   cta_text_color: string;
+  cta_bar_bg_color: string;
+  auto_complementary: boolean;
   is_published: boolean;
   scarcity_enabled: boolean;
   scarcity_type: string;
