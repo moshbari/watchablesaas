@@ -1,0 +1,1 @@
+ALTER TABLE public.static_pages ADD COLUMN IF NOT EXISTS complementary_mode text NOT NULL DEFAULT 'balanced';
