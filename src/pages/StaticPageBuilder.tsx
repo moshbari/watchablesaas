@@ -88,6 +88,12 @@ const StaticPageBuilder = () => {
       cta_bg_color: p.cta_bg_color,
       cta_text_color: p.cta_text_color,
       is_published: p.is_published,
+      scarcity_enabled: p.scarcity_enabled ?? false,
+      scarcity_type: (p.scarcity_type as 'text' | 'timer') ?? 'text',
+      scarcity_text: p.scarcity_text ?? '',
+      scarcity_end_at: p.scarcity_end_at ? p.scarcity_end_at.slice(0, 16) : '',
+      scarcity_bg_color: p.scarcity_bg_color ?? '#000000',
+      scarcity_text_color: p.scarcity_text_color ?? '#ffeb3b',
     });
     setIsCreating(true);
   };
