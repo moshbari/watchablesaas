@@ -38,3 +38,9 @@ verify_jwt = false
 
 [functions.push-static-page]
 verify_jwt = false
+
+[functions.static-page-share]
+verify_jwt = false
+
+[functions.static-page-og]
+verify_jwt = false
