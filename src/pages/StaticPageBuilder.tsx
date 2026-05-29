@@ -367,6 +367,18 @@ const StaticPageBuilder = () => {
                     <p className="text-xs text-muted-foreground mt-1">Real timer — when it hits 00:00:00:00 it stays at zero. No fake countdown.</p>
                   </div>
                 )}
+                {formData.scarcity_type === 'timer' && (
+                  <div className="md:col-span-2 flex items-center justify-between rounded-md border p-3">
+                    <div>
+                      <Label>Show Day / Hour / Min / Sec labels</Label>
+                      <p className="text-xs text-muted-foreground">Display captions under each digit pair.</p>
+                    </div>
+                    <Switch
+                      checked={formData.scarcity_show_labels}
+                      onCheckedChange={v => setFormData({ ...formData, scarcity_show_labels: v })}
+                    />
+                  </div>
+                )}
                 <div>
                   <Label>Background color</Label>
                   <Input type="color" value={formData.scarcity_bg_color} onChange={e => setFormData({ ...formData, scarcity_bg_color: e.target.value })} />
