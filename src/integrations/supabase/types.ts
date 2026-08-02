@@ -582,6 +582,8 @@ export type Database = {
           user_id: string
           video_type: string
           video_url: string | null
+          between_videos_mode: string
+          continue_button_text: string
           videos: Json
         }
         Insert: {
@@ -638,6 +640,8 @@ export type Database = {
           user_id: string
           video_type?: string
           video_url?: string | null
+          between_videos_mode?: string
+          continue_button_text?: string
           videos?: Json
         }
         Update: {
@@ -694,6 +698,8 @@ export type Database = {
           user_id?: string
           video_type?: string
           video_url?: string | null
+          between_videos_mode?: string
+          continue_button_text?: string
           videos?: Json
         }
         Relationships: []

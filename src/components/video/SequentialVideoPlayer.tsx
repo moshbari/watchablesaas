@@ -12,19 +12,25 @@ import { FakeProgressBar } from './FakeProgressBar';
 /**
  * Plays a list of trimmed video segments back-to-back in a single player frame.
  *
- * How it stays seamless: two stacked player slots. While slot A plays segment N,
- * slot B silently loads and buffers segment N+1, parked at its start time. At the
- * boundary we swap which slot is visible and unmute it — no iframe creation, no
- * network fetch, no seek at the moment it matters.
+ * Two stacked slots, each owning a YouTube player that is created once and then
+ * REUSED for every segment it shows. Rebuilding the iframe per segment costs one
+ * to three seconds of player boot on its own, which is the difference between a
+ * clean cut and a spinner. Swapping content with loadVideoById keeps the player warm.
  *
- * iOS refuses to let a second video buffer while one is playing, so there we skip
- * pre-buffering and reuse the live player (loadVideoById), covering the load with a
- * short fade. Direct video files are seamless everywhere.
+ * While slot A plays segment N, slot B loads segment N+1 muted, lets it buffer, then
+ * parks it on its start frame. The handoff is a visibility swap plus an unmute.
+ *
+ * iOS will not buffer a second video while one plays, so there we reuse the live
+ * player and cover the load. `mode="button"` sidesteps the problem entirely: the
+ * viewer clicks Continue, and that gesture lets the next video start immediately.
  */
 
-const TICK_MS = 100;              // boundary resolution — the old 1s poll overshot cuts audibly
-const PREBUFFER_LEAD_SECONDS = 8; // start loading the next segment this early
+const TICK_MS = 100;               // boundary resolution — a 1s poll overshoots cuts audibly
+const PREBUFFER_AFTER_MS = 1200;   // let the playing segment claim bandwidth first
+const BUFFER_ASSUME_MS = 6000;     // treat a silent pre-buffer as ready even if it never reports
 const FADE_MS = 180;
+
+export type BetweenVideosMode = 'auto' | 'button';
 
 interface SequentialVideoPlayerProps {
   segments: VideoSegment[];
@@ -36,7 +42,11 @@ interface SequentialVideoPlayerProps {
   fakeProgressColor?: string;
   fakeProgressThickness?: number;
   mobileFullscreenEnabled?: boolean;
-  /** Fires when the last segment finishes. */
+  /** 'auto' chains straight through; 'button' waits for a Continue click at each cut. */
+  mode?: BetweenVideosMode;
+  continueButtonText?: string;
+  continueButtonBgColor?: string;
+  continueButtonTextColor?: string;
   onSequenceEnd?: () => void;
 }
 
@@ -45,18 +55,15 @@ type SlotKey = 0 | 1;
 interface Slot {
   segmentIndex: number | null;
   engine: 'youtube' | 'html5' | null;
-  yt: any | null;
-  ytHost: HTMLDivElement | null;
+  activate: boolean;
   buffered: boolean;
-  /** Guards against a slow mount landing after we moved on. */
   token: number;
 }
 
 const emptySlot = (): Slot => ({
   segmentIndex: null,
   engine: null,
-  yt: null,
-  ytHost: null,
+  activate: false,
   buffered: false,
   token: 0,
 });
@@ -73,239 +80,85 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   fakeProgressColor = '#ef4444',
   fakeProgressThickness = 4,
   mobileFullscreenEnabled = true,
+  mode = 'auto',
+  continueButtonText = 'Continue Watching',
+  continueButtonBgColor = '#3b82f6',
+  continueButtonTextColor = '#ffffff',
   onSequenceEnd,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRefs = useRef<Array<HTMLDivElement | null>>([null, null]);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([null, null]);
+  /** Persistent across segments — this is what keeps transitions fast. */
+  const ytPlayers = useRef<Array<any | null>>([null, null]);
+  const ytHosts = useRef<Array<HTMLDivElement | null>>([null, null]);
+  const ytReady = useRef<Array<boolean>>([false, false]);
   const slots = useRef<[Slot, Slot]>([emptySlot(), emptySlot()]);
+  const pendingMount = useRef<Array<(() => void) | null>>([null, null]);
+
   const tokenCounter = useRef(0);
   const tickRef = useRef<ReturnType<typeof setInterval>>();
   const advancingRef = useRef(false);
   const volumeRef = useRef(0.8);
   const mutedRef = useRef(false);
   const startedRef = useRef(false);
+  const activeStartedAt = useRef(0);
 
   const [activeSlot, setActiveSlot] = useState<SlotKey>(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isBridging, setIsBridging] = useState(false); // covering a non-prebuffered handoff
+  const [isBridging, setIsBridging] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [hasEnded, setHasEnded] = useState(false);
+  const [awaitingContinue, setAwaitingContinue] = useState(false);
   const [volume, setVolumeState] = useState(80);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalDuration, setTotalDuration] = useState(0);
-  // Mirrors slots.current[].engine for rendering — a ref alone would not repaint,
-  // leaving an empty <video> covering the YouTube iframe.
   const [slotEngines, setSlotEngines] = useState<Array<'youtube' | 'html5' | null>>([null, null]);
 
   const segmentsRef = useRef(segments);
   segmentsRef.current = segments;
-
   const currentIndexRef = useRef(0);
   currentIndexRef.current = currentIndex;
   const activeSlotRef = useRef<SlotKey>(0);
   activeSlotRef.current = activeSlot;
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
 
   const allowPrebuffer = !isIOS;
 
-  /* ------------------------------------------------------------------ slots */
-
-  const teardownSlot = useCallback((key: SlotKey) => {
-    const slot = slots.current[key];
-    if (slot.yt) {
-      try { slot.yt.destroy(); } catch { /* already gone */ }
-    }
-    if (slot.ytHost && slot.ytHost.parentNode) {
-      slot.ytHost.parentNode.removeChild(slot.ytHost);
-    }
-    const video = videoRefs.current[key];
-    if (video) {
-      try {
-        video.pause();
-        video.removeAttribute('src');
-        video.load();
-      } catch { /* detached */ }
-    }
-    slots.current[key] = emptySlot();
-    setSlotEngines((prev) => {
-      const next = [...prev];
-      next[key] = null;
-      return next;
-    });
-  }, []);
-
-  const segmentStart = (segment: VideoSegment) => segment.start_time ?? 0;
-
-  /**
-   * Load a segment into a slot. `activate` means it plays immediately (audible);
-   * otherwise it buffers silently, parked at its start time.
-   */
-  const mountSegment = useCallback(
-    async (key: SlotKey, segmentIndex: number, activate: boolean) => {
-      const segment = segmentsRef.current[segmentIndex];
-      if (!segment) return;
-
-      teardownSlot(key);
-      const token = ++tokenCounter.current;
-      const engine = getSegmentEngine(segment.video_url) === 'youtube' ? 'youtube' : 'html5';
-      const start = segmentStart(segment);
-
-      slots.current[key] = { ...emptySlot(), segmentIndex, engine, token };
-      setSlotEngines((prev) => {
-        const next = [...prev];
-        next[key] = engine;
-        return next;
-      });
-
-      if (engine === 'youtube') {
-        const videoId = getYouTubeId(extractVideoUrl(segment.video_url));
-        if (!videoId) {
-          handleFatal('That YouTube link could not be read.');
-          return;
-        }
-
-        try {
-          await loadYouTubeIframeAPI();
-        } catch {
-          handleFatal('YouTube player failed to load.');
-          return;
-        }
-        if (slots.current[key].token !== token) return; // superseded while loading
-
-        const wrapper = wrapperRefs.current[key];
-        if (!wrapper) return;
-        const host = document.createElement('div');
-        host.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
-        wrapper.appendChild(host);
-        slots.current[key].ytHost = host;
-
-        const player = new window.YT.Player(host, {
-          videoId,
-          width: '100%',
-          height: '100%',
-          playerVars: {
-            controls: 0,
-            disablekb: 1,
-            fs: 0,
-            modestbranding: 1,
-            rel: 0,
-            showinfo: 0,
-            iv_load_policy: 3,
-            cc_load_policy: 0,
-            playsinline: 1,
-            enablejsapi: 1,
-            origin: window.location.origin,
-            start: Math.floor(start),
-            // No `end` playerVar on purpose: we detect the boundary ourselves so the
-            // handoff is ours to time, and YouTube's ENDED does not fight it.
-          },
-          events: {
-            onReady: () => {
-              if (slots.current[key].token !== token) return;
-              slots.current[key].yt = player;
-              try {
-                if (activate) {
-                  applyVolumeTo(key);
-                  player.seekTo(start, true);
-                  player.playVideo();
-                } else {
-                  // Force a real buffer: play muted, then park at the start frame.
-                  player.mute();
-                  player.seekTo(start, true);
-                  player.playVideo();
-                }
-              } catch { /* player torn down mid-call */ }
-            },
-            onStateChange: (event: any) => {
-              if (slots.current[key].token !== token) return;
-              const playing = event.data === window.YT.PlayerState.PLAYING;
-
-              if (!activate && playing && !slots.current[key].buffered) {
-                // Buffered enough to have started — park it and wait for the handoff.
-                slots.current[key].buffered = true;
-                try {
-                  player.pauseVideo();
-                  player.seekTo(start, true);
-                } catch { /* ignore */ }
-                return;
-              }
-
-              if (activeSlotRef.current === key) {
-                setIsPlaying(playing);
-                if (playing) {
-                  setIsLoading(false);
-                  setIsBridging(false);
-                }
-              }
-            },
-            onError: () => {
-              if (slots.current[key].token !== token) return;
-              if (activeSlotRef.current === key) handleFatal('This video could not be played.');
-            },
-          },
-        });
-
-        slots.current[key].yt = player;
-        return;
-      }
-
-      // Direct video file
-      const video = videoRefs.current[key];
-      if (!video) return;
-      video.src = extractVideoUrl(segment.video_url);
-      video.preload = 'auto';
-      video.muted = activate ? mutedRef.current : true;
-      video.load();
-
-      // Seek before playing, or the first moments of the untrimmed head leak through.
-      const onMetadata = () => {
-        video.removeEventListener('loadedmetadata', onMetadata);
-        if (slots.current[key].token !== token) return;
-        try { video.currentTime = start; } catch { /* seek unsupported on this source */ }
-        if (activate) {
-          applyVolumeTo(key);
-          video.play().catch(() => { /* awaiting gesture */ });
-        }
-      };
-      video.addEventListener('loadedmetadata', onMetadata);
-
-      if (activate) {
-        applyVolumeTo(key);
-      } else {
-        // Nudge the decoder so the first frame is ready, then park.
-        video
-          .play()
-          .then(() => {
-            if (slots.current[key].token !== token) return;
-            video.pause();
-            try { video.currentTime = start; } catch { /* ignore */ }
-            slots.current[key].buffered = true;
-          })
-          .catch(() => { /* blocked — preload="auto" still buffers */ });
-      }
-    },
-    [teardownSlot]
-  );
-
-  const handleFatal = (message: string) => {
+  const handleFatal = useCallback((message: string) => {
     setError(message);
     setIsLoading(false);
+    setIsBridging(false);
     onError?.(message);
+  }, [onError]);
+
+  const setEngine = (key: SlotKey, engine: 'youtube' | 'html5' | null) => {
+    setSlotEngines((prev) => {
+      if (prev[key] === engine) return prev;
+      const next = [...prev];
+      next[key] = engine;
+      return next;
+    });
   };
+
+  const segmentStart = (segment: VideoSegment) => segment.start_time ?? 0;
 
   /* ------------------------------------------------------- engine accessors */
 
   const applyVolumeTo = useCallback((key: SlotKey) => {
     const slot = slots.current[key];
-    if (slot.engine === 'youtube' && slot.yt) {
+    if (slot.engine === 'youtube') {
+      const player = ytPlayers.current[key];
+      if (!player) return;
       try {
-        if (mutedRef.current) slot.yt.mute();
-        else { slot.yt.unMute(); slot.yt.setVolume(Math.round(volumeRef.current * 100)); }
-      } catch { /* ignore */ }
+        if (mutedRef.current) player.mute();
+        else { player.unMute(); player.setVolume(Math.round(volumeRef.current * 100)); }
+      } catch { /* player busy */ }
     } else {
       const video = videoRefs.current[key];
       if (video) {
@@ -318,8 +171,9 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   const slotTime = (key: SlotKey): number | null => {
     const slot = slots.current[key];
     if (slot.engine === 'youtube') {
-      if (!slot.yt?.getCurrentTime) return null;
-      try { return slot.yt.getCurrentTime(); } catch { return null; }
+      const player = ytPlayers.current[key];
+      if (!player?.getCurrentTime) return null;
+      try { return player.getCurrentTime(); } catch { return null; }
     }
     const video = videoRefs.current[key];
     return video ? video.currentTime : null;
@@ -328,17 +182,17 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   const slotDuration = (key: SlotKey): number | null => {
     const slot = slots.current[key];
     if (slot.engine === 'youtube') {
-      if (!slot.yt?.getDuration) return null;
-      try { return slot.yt.getDuration() || null; } catch { return null; }
+      const player = ytPlayers.current[key];
+      if (!player?.getDuration) return null;
+      try { return player.getDuration() || null; } catch { return null; }
     }
     const video = videoRefs.current[key];
     return video && Number.isFinite(video.duration) ? video.duration : null;
   };
 
   const slotSeek = (key: SlotKey, time: number) => {
-    const slot = slots.current[key];
-    if (slot.engine === 'youtube') {
-      try { slot.yt?.seekTo(time, true); } catch { /* ignore */ }
+    if (slots.current[key].engine === 'youtube') {
+      try { ytPlayers.current[key]?.seekTo(time, true); } catch { /* ignore */ }
     } else {
       const video = videoRefs.current[key];
       if (video) { try { video.currentTime = time; } catch { /* ignore */ } }
@@ -346,35 +200,244 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   };
 
   const slotPlay = (key: SlotKey) => {
-    const slot = slots.current[key];
-    if (slot.engine === 'youtube') {
-      try { slot.yt?.playVideo(); } catch { /* ignore */ }
+    if (slots.current[key].engine === 'youtube') {
+      try { ytPlayers.current[key]?.playVideo(); } catch { /* ignore */ }
     } else {
       videoRefs.current[key]?.play().catch(() => { /* ignore */ });
     }
   };
 
   const slotPause = (key: SlotKey) => {
-    const slot = slots.current[key];
-    if (slot.engine === 'youtube') {
-      try { slot.yt?.pauseVideo(); } catch { /* ignore */ }
+    if (slots.current[key].engine === 'youtube') {
+      try { ytPlayers.current[key]?.pauseVideo(); } catch { /* ignore */ }
     } else {
       videoRefs.current[key]?.pause();
     }
   };
 
-  /* --------------------------------------------------------- the tick loop */
+  /* ------------------------------------------------------- player creation */
 
-  const advance = useCallback(async () => {
+  /** Creates a slot's YouTube player once; later segments reuse it. */
+  const ensureYouTubePlayer = useCallback(async (key: SlotKey, firstVideoId: string, firstStart: number) => {
+    if (ytPlayers.current[key]) return ytPlayers.current[key];
+
+    try {
+      await loadYouTubeIframeAPI();
+    } catch {
+      handleFatal('YouTube player failed to load.');
+      return null;
+    }
+
+    if (ytPlayers.current[key]) return ytPlayers.current[key];
+
+    const wrapper = wrapperRefs.current[key];
+    if (!wrapper) return null;
+
+    const host = document.createElement('div');
+    host.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+    wrapper.appendChild(host);
+    ytHosts.current[key] = host;
+
+    return await new Promise<any>((resolve) => {
+      const player = new window.YT.Player(host, {
+        videoId: firstVideoId,
+        width: '100%',
+        height: '100%',
+        playerVars: {
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          iv_load_policy: 3,
+          cc_load_policy: 0,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin,
+          start: Math.floor(firstStart),
+          // No `end` playerVar on purpose: we time the handoff ourselves.
+        },
+        events: {
+          onReady: () => {
+            ytReady.current[key] = true;
+            resolve(player);
+            const queued = pendingMount.current[key];
+            pendingMount.current[key] = null;
+            queued?.();
+          },
+          onStateChange: (event: any) => {
+            const slot = slots.current[key];
+            const playing = event.data === window.YT.PlayerState.PLAYING;
+
+            // A silent pre-buffer has started fetching: park it on its start frame.
+            if (!slot.activate && playing && !slot.buffered) {
+              slot.buffered = true;
+              const segment = segmentsRef.current[slot.segmentIndex ?? -1];
+              try {
+                player.pauseVideo();
+                if (segment) player.seekTo(segmentStart(segment), true);
+              } catch { /* ignore */ }
+              return;
+            }
+
+            if (activeSlotRef.current === key && slot.activate) {
+              setIsPlaying(playing);
+              if (playing) {
+                setIsLoading(false);
+                setIsBridging(false);
+              }
+            }
+          },
+          onError: () => {
+            if (activeSlotRef.current === key) handleFatal('This video could not be played.');
+          },
+        },
+      });
+      ytPlayers.current[key] = player;
+    });
+  }, [handleFatal]);
+
+  /**
+   * Point a slot at a segment. `activate` plays it audibly now; otherwise it loads
+   * muted in the background and parks on its start frame, ready for the handoff.
+   */
+  const mountSegment = useCallback(
+    async (key: SlotKey, segmentIndex: number, activate: boolean) => {
+      const segment = segmentsRef.current[segmentIndex];
+      if (!segment) return;
+
+      const token = ++tokenCounter.current;
+      const engine = getSegmentEngine(segment.video_url) === 'youtube' ? 'youtube' : 'html5';
+      const start = segmentStart(segment);
+
+      slots.current[key] = { segmentIndex, engine, activate, buffered: false, token };
+      setEngine(key, engine);
+
+      if (engine === 'youtube') {
+        const videoId = getYouTubeId(extractVideoUrl(segment.video_url));
+        if (!videoId) {
+          if (activate) handleFatal('That YouTube link could not be read.');
+          return;
+        }
+
+        const existing = ytPlayers.current[key];
+        if (!existing) {
+          // First use of this slot — the player boots straight onto this segment.
+          const player = await ensureYouTubePlayer(key, videoId, start);
+          if (!player || slots.current[key].token !== token) return;
+          try {
+            if (activate) {
+              applyVolumeTo(key);
+              player.playVideo();
+            } else {
+              player.mute();
+              player.playVideo();
+            }
+          } catch { /* ignore */ }
+        } else {
+          const load = () => {
+            if (slots.current[key].token !== token) return;
+            try {
+              if (activate) applyVolumeTo(key);
+              else existing.mute();
+              // Reusing the warm player — no iframe rebuild, no player boot.
+              existing.loadVideoById({ videoId, startSeconds: start });
+            } catch { /* ignore */ }
+          };
+          if (ytReady.current[key]) load();
+          else pendingMount.current[key] = load;
+        }
+
+        if (!activate) {
+          // If the buffering player never reports back, do not let that force the
+          // slow path at the cut — assume it is warm enough and swap anyway.
+          window.setTimeout(() => {
+            if (slots.current[key].token === token) slots.current[key].buffered = true;
+          }, BUFFER_ASSUME_MS);
+        }
+        return;
+      }
+
+      // Direct video file
+      const video = videoRefs.current[key];
+      if (!video) return;
+      video.src = extractVideoUrl(segment.video_url);
+      video.preload = 'auto';
+      video.muted = activate ? mutedRef.current : true;
+      video.load();
+
+      // Seek before playing, or the untrimmed head leaks through.
+      const onMetadata = () => {
+        video.removeEventListener('loadedmetadata', onMetadata);
+        if (slots.current[key].token !== token) return;
+        try { video.currentTime = start; } catch { /* seek unsupported */ }
+        if (activate) {
+          applyVolumeTo(key);
+          video.play().catch(() => { /* awaiting gesture */ });
+        } else {
+          video.play()
+            .then(() => {
+              if (slots.current[key].token !== token) return;
+              video.pause();
+              try { video.currentTime = start; } catch { /* ignore */ }
+              slots.current[key].buffered = true;
+            })
+            .catch(() => { slots.current[key].buffered = true; });
+        }
+      };
+      video.addEventListener('loadedmetadata', onMetadata);
+    },
+    [applyVolumeTo, ensureYouTubePlayer, handleFatal]
+  );
+
+  /* ------------------------------------------------------------- advancing */
+
+  const goToSegment = useCallback(async (next: number) => {
+    const active = activeSlotRef.current;
+    const other = (active === 0 ? 1 : 0) as SlotKey;
+    const standby = slots.current[other];
+    const ready = standby.segmentIndex === next && standby.buffered;
+
+    if (ready) {
+      // The point of the whole design: already loaded and parked.
+      standby.activate = true;
+      applyVolumeTo(other);
+      slotPlay(other);
+      setActiveSlot(other);
+      activeSlotRef.current = other;
+      setCurrentIndex(next);
+      currentIndexRef.current = next;
+      activeStartedAt.current = Date.now();
+      slots.current[active].activate = false;
+      slotPause(active);
+      advancingRef.current = false;
+      return;
+    }
+
+    // Not pre-buffered (iOS, a very short clip, or a slow network).
+    setIsBridging(true);
+    window.setTimeout(() => setIsBridging(false), 12000);
+    slots.current[active].activate = false;
+    slotPause(active);
+
+    await mountSegment(other, next, true);
+    setActiveSlot(other);
+    activeSlotRef.current = other;
+    setCurrentIndex(next);
+    currentIndexRef.current = next;
+    activeStartedAt.current = Date.now();
+    advancingRef.current = false;
+  }, [applyVolumeTo, mountSegment]);
+
+  const reachedEndOfSegment = useCallback(() => {
     if (advancingRef.current) return;
     advancingRef.current = true;
 
-    const from = currentIndexRef.current;
-    const next = from + 1;
-    const active = activeSlotRef.current;
+    const next = currentIndexRef.current + 1;
 
     if (next >= segmentsRef.current.length) {
-      slotPause(active);
+      slotPause(activeSlotRef.current);
       setIsPlaying(false);
       setHasEnded(true);
       advancingRef.current = false;
@@ -382,71 +445,28 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       return;
     }
 
-    const other = (active === 0 ? 1 : 0) as SlotKey;
-    const standby = slots.current[other];
-    const prebuffered = standby.segmentIndex === next && standby.buffered;
-
-    if (prebuffered) {
-      // The whole point: the next segment is already decoded and parked.
-      applyVolumeTo(other);
-      slotSeek(other, segmentStart(segmentsRef.current[next]));
-      slotPlay(other);
-      setActiveSlot(other);
-      activeSlotRef.current = other;
-      setCurrentIndex(next);
-      currentIndexRef.current = next;
-      slotPause(active);
-      // Free the old slot for the segment after this one.
-      window.setTimeout(() => {
-        if (currentIndexRef.current === next) {
-          teardownSlot(active);
-          if (next + 1 < segmentsRef.current.length && allowPrebuffer) {
-            mountSegment(active, next + 1, false);
-          }
-        }
-        advancingRef.current = false;
-      }, FADE_MS * 2);
+    if (modeRef.current === 'button') {
+      // Hold on the last frame and let the viewer choose to go on.
+      slotPause(activeSlotRef.current);
+      setIsPlaying(false);
+      setAwaitingContinue(true);
+      advancingRef.current = false;
       return;
     }
 
-    // Nothing pre-buffered (iOS, a very short segment, or a slow network):
-    // load in place and cover the gap.
-    setIsBridging(true);
-    window.setTimeout(() => setIsBridging(false), 10000);
-    slotPause(active);
+    goToSegment(next);
+  }, [goToSegment, onSequenceEnd]);
 
-    const nextSegment = segmentsRef.current[next];
-    const nextIsYouTube = getSegmentEngine(nextSegment.video_url) === 'youtube';
-    const activeSlotState = slots.current[active];
+  const handleContinue = useCallback(() => {
+    setAwaitingContinue(false);
+    advancingRef.current = true;
+    goToSegment(currentIndexRef.current + 1);
+  }, [goToSegment]);
 
-    if (nextIsYouTube && activeSlotState.engine === 'youtube' && activeSlotState.yt?.loadVideoById) {
-      // Reusing the warm player beats building a new iframe, which matters most on iOS.
-      const videoId = getYouTubeId(extractVideoUrl(nextSegment.video_url));
-      if (videoId) {
-        try {
-          activeSlotState.segmentIndex = next;
-          activeSlotState.buffered = false;
-          applyVolumeTo(active);
-          activeSlotState.yt.loadVideoById({ videoId, startSeconds: segmentStart(nextSegment) });
-          setCurrentIndex(next);
-          currentIndexRef.current = next;
-          advancingRef.current = false;
-          return;
-        } catch { /* fall through to a fresh mount */ }
-      }
-    }
-
-    await mountSegment(other, next, true);
-    setActiveSlot(other);
-    activeSlotRef.current = other;
-    setCurrentIndex(next);
-    currentIndexRef.current = next;
-    teardownSlot(active);
-    advancingRef.current = false;
-  }, [allowPrebuffer, applyVolumeTo, mountSegment, onSequenceEnd, teardownSlot]);
+  /* --------------------------------------------------------- the tick loop */
 
   useEffect(() => {
-    if (!hasStarted || hasEnded || error) return;
+    if (!hasStarted || hasEnded || error || awaitingContinue) return;
 
     tickRef.current = setInterval(() => {
       const active = activeSlotRef.current;
@@ -457,7 +477,6 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       const time = slotTime(active);
       if (time === null) return;
 
-      // Skip sections first — a skip can land us past the end time.
       for (const skip of segment.skip_sections) {
         if (time >= skip.from && time < skip.to) {
           slotSeek(active, skip.to);
@@ -469,12 +488,13 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       const end = segment.end_time ?? (sourceDuration ? sourceDuration - 0.35 : undefined);
 
       if (end !== undefined && time >= end) {
-        advance();
+        reachedEndOfSegment();
         return;
       }
 
-      // Warm the next segment while this one is still playing.
-      if (allowPrebuffer && end !== undefined && end - time <= PREBUFFER_LEAD_SECONDS) {
+      // Start the next segment loading as early as possible. Waiting until the end
+      // is near leaves no lead time at all on short clips.
+      if (allowPrebuffer && Date.now() - activeStartedAt.current > PREBUFFER_AFTER_MS) {
         const nextIndex = index + 1;
         const other = (active === 0 ? 1 : 0) as SlotKey;
         if (nextIndex < segmentsRef.current.length && slots.current[other].segmentIndex !== nextIndex) {
@@ -486,10 +506,10 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     return () => {
       if (tickRef.current) clearInterval(tickRef.current);
     };
-  }, [hasStarted, hasEnded, error, advance, allowPrebuffer, mountSegment]);
+  }, [hasStarted, hasEnded, error, awaitingContinue, reachedEndOfSegment, allowPrebuffer, mountSegment]);
 
-  // Direct video files report their own state — the YouTube path gets this from
-  // onStateChange, and without it the loading veil would never lift on an MP4.
+  /* ------------------------------------------ direct-file state reporting */
+
   useEffect(() => {
     const handlers: Array<() => void> = [];
     ([0, 1] as SlotKey[]).forEach((key) => {
@@ -497,10 +517,10 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       if (!video) return;
 
       const onEnded = () => {
-        if (activeSlotRef.current === key && hasStarted && !hasEnded) advance();
+        if (activeSlotRef.current === key && hasStarted && !hasEnded) reachedEndOfSegment();
       };
       const onPlaying = () => {
-        if (activeSlotRef.current !== key) return; // the standby slot is only buffering
+        if (activeSlotRef.current !== key || !slots.current[key].activate) return;
         setIsPlaying(true);
         setIsLoading(false);
         setIsBridging(false);
@@ -524,23 +544,43 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       });
     });
     return () => handlers.forEach((off) => off());
-  }, [advance, hasStarted, hasEnded]);
+  }, [reachedEndOfSegment, hasStarted, hasEnded, handleFatal]);
 
   /* ------------------------------------------------------------- lifecycle */
+
+  const destroyEverything = useCallback(() => {
+    ([0, 1] as SlotKey[]).forEach((key) => {
+      const player = ytPlayers.current[key];
+      if (player?.destroy) {
+        try { player.destroy(); } catch { /* already gone */ }
+      }
+      ytPlayers.current[key] = null;
+      ytReady.current[key] = false;
+      pendingMount.current[key] = null;
+      const host = ytHosts.current[key];
+      if (host?.parentNode) host.parentNode.removeChild(host);
+      ytHosts.current[key] = null;
+
+      const video = videoRefs.current[key];
+      if (video) {
+        try { video.pause(); video.removeAttribute('src'); video.load(); } catch { /* detached */ }
+      }
+      slots.current[key] = emptySlot();
+    });
+    setSlotEngines([null, null]);
+  }, []);
 
   useEffect(() => {
     return () => {
       if (tickRef.current) clearInterval(tickRef.current);
-      teardownSlot(0);
-      teardownSlot(1);
+      destroyEverything();
     };
-  }, [teardownSlot]);
+  }, [destroyEverything]);
 
-  // Reset when the sequence itself changes (builder preview edits).
+  // Rebuild when the sequence itself changes (builder preview edits).
   const signature = segments.map((s) => `${s.video_url}|${s.start_time ?? ''}|${s.end_time ?? ''}`).join('~');
   useEffect(() => {
-    teardownSlot(0);
-    teardownSlot(1);
+    destroyEverything();
     startedRef.current = false;
     setActiveSlot(0);
     activeSlotRef.current = 0;
@@ -548,10 +588,13 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     currentIndexRef.current = 0;
     setHasStarted(false);
     setHasEnded(false);
+    setAwaitingContinue(false);
     setIsPlaying(false);
+    setIsLoading(false);
+    setIsBridging(false);
     setError(null);
     setTotalDuration(0);
-  }, [signature, teardownSlot]);
+  }, [signature, destroyEverything]);
 
   /* --------------------------------------------------------------- controls */
 
@@ -560,36 +603,29 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     startedRef.current = true;
     setIsLoading(true);
     setHasStarted(true);
-    // Safety net: never leave the viewer staring at a black veil if a player
-    // goes quiet without reporting an error.
-    window.setTimeout(() => { setIsLoading(false); setIsBridging(false); }, 10000);
+    activeStartedAt.current = Date.now();
+    window.setTimeout(() => { setIsLoading(false); setIsBridging(false); }, 12000);
     await mountSegment(0, 0, true);
     setActiveSlot(0);
     activeSlotRef.current = 0;
-    if (allowPrebuffer && segmentsRef.current.length > 1) {
-      // Give the first segment a head start on the network before warming the second.
-      window.setTimeout(() => {
-        if (currentIndexRef.current === 0) mountSegment(1, 1, false);
-      }, 2500);
-    }
-  }, [allowPrebuffer, mountSegment]);
+  }, [mountSegment]);
+
+  const restart = useCallback(() => {
+    destroyEverything();
+    startedRef.current = false;
+    setActiveSlot(0);
+    activeSlotRef.current = 0;
+    setCurrentIndex(0);
+    currentIndexRef.current = 0;
+    setHasEnded(false);
+    setAwaitingContinue(false);
+    window.setTimeout(() => start(), 0);
+  }, [destroyEverything, start]);
 
   const handlePlayPause = useCallback(() => {
-    if (hasEnded) {
-      // Replay from the top.
-      teardownSlot(0);
-      teardownSlot(1);
-      startedRef.current = false;
-      setHasEnded(false);
-      setCurrentIndex(0);
-      currentIndexRef.current = 0;
-      start();
-      return;
-    }
-    if (!hasStarted) {
-      start();
-      return;
-    }
+    if (hasEnded) { restart(); return; }
+    if (awaitingContinue) { handleContinue(); return; }
+    if (!hasStarted) { start(); return; }
     if (isPlaying) {
       slotPause(activeSlotRef.current);
       setIsPlaying(false);
@@ -597,12 +633,11 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       slotPlay(activeSlotRef.current);
       setIsPlaying(true);
     }
-  }, [hasEnded, hasStarted, isPlaying, start, teardownSlot]);
+  }, [hasEnded, awaitingContinue, hasStarted, isPlaying, restart, handleContinue, start]);
 
   const handleVolumeToggle = useCallback(() => {
-    const next = !mutedRef.current;
-    mutedRef.current = next;
-    setIsMuted(next);
+    mutedRef.current = !mutedRef.current;
+    setIsMuted(mutedRef.current);
     applyVolumeTo(activeSlotRef.current);
   }, [applyVolumeTo]);
 
@@ -623,13 +658,12 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     }
   }, []);
 
-  // Total run time for the fake progress bar, once every segment reports a length.
   useEffect(() => {
     if (!fakeProgressEnabled || !hasStarted) return;
-    const known = segments.reduce((sum, s) => {
-      if (s.end_time !== undefined) return sum + (s.end_time - (s.start_time ?? 0));
-      return sum;
-    }, 0);
+    const known = segments.reduce(
+      (sum, s) => (s.end_time !== undefined ? sum + (s.end_time - (s.start_time ?? 0)) : sum),
+      0
+    );
     if (known > 0) setTotalDuration(known);
   }, [fakeProgressEnabled, hasStarted, segments]);
 
@@ -678,34 +712,38 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
             </div>
           ))}
 
-          {/* Covers a handoff we could not pre-buffer, so the swap reads as intentional. */}
+          {/* Hides YouTube's own spinner and branding during a load we could not hide. */}
           {(isLoading || isBridging) && (
             <div className="absolute inset-0 z-[5] bg-black flex items-center justify-center">
               <Loader2 className="w-10 h-10 text-white/80 animate-spin" />
             </div>
           )}
 
-          {/* Big play button before first start, and replay at the end. */}
+          {awaitingContinue && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70">
+              <button
+                onClick={handleContinue}
+                className="px-8 py-4 rounded-lg font-semibold text-lg shadow-xl transition-transform duration-200 hover:scale-105"
+                style={{ backgroundColor: continueButtonBgColor, color: continueButtonTextColor }}
+              >
+                {continueButtonText}
+              </button>
+            </div>
+          )}
+
           {(!hasStarted || hasEnded) && !isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30">
               <button
                 onClick={handlePlayPause}
                 className="rounded-full shadow-xl transition-transform duration-200 hover:scale-110 flex items-center justify-center"
-                style={{
-                  width: playButtonSize,
-                  height: playButtonSize,
-                  backgroundColor: playButtonColor,
-                }}
+                style={{ width: playButtonSize, height: playButtonSize, backgroundColor: playButtonColor }}
                 aria-label={hasEnded ? 'Replay' : 'Play'}
               >
                 {hasEnded ? (
                   <RotateCcw className="text-white" style={{ width: playButtonSize * 0.4, height: playButtonSize * 0.4 }} />
                 ) : (
-                  <Play
-                    className="text-white ml-1"
-                    fill="currentColor"
-                    style={{ width: playButtonSize * 0.4, height: playButtonSize * 0.4 }}
-                  />
+                  <Play className="text-white ml-1" fill="currentColor"
+                    style={{ width: playButtonSize * 0.4, height: playButtonSize * 0.4 }} />
                 )}
               </button>
             </div>
@@ -723,12 +761,7 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
                     {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                   </Button>
                   <div className="w-20">
-                    <Slider
-                      value={[isMuted ? 0 : volume]}
-                      onValueChange={handleVolumeChange}
-                      max={100}
-                      step={1}
-                    />
+                    <Slider value={[isMuted ? 0 : volume]} onValueChange={handleVolumeChange} max={100} step={1} />
                   </div>
                 </div>
 

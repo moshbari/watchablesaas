@@ -38,6 +38,8 @@ interface Page {
   headline: string;
   sub_headline?: string;
   video_url?: string;
+  between_videos_mode?: string;
+  continue_button_text?: string;
   video_type: string;
   button_text?: string;
   button_url?: string;
@@ -184,7 +186,9 @@ const PageBuilder = () => {
       fake_progress_enabled: true,
       fake_progress_color: '#ef4444',
       fake_progress_thickness: 8,
-      mobile_fullscreen_enabled: true
+      mobile_fullscreen_enabled: true,
+      between_videos_mode: 'auto',
+      continue_button_text: 'Continue Watching'
     });
   // The page's videos, in the order they play. One entry behaves exactly as the
   // single-video page builder always did.
@@ -354,10 +358,17 @@ const PageBuilder = () => {
       // page without the sequence rather than failing outright — the first video
       // still lands in the original columns.
       const missingVideosColumn =
-        result.error && /videos/i.test(result.error.message) && /column|schema/i.test(result.error.message);
+        result.error
+        && /videos|between_videos_mode|continue_button_text/i.test(result.error.message)
+        && /column|schema/i.test(result.error.message);
 
       if (missingVideosColumn) {
-        const { videos: _dropped, ...withoutSequence } = pageData;
+        const {
+          videos: _dropped,
+          between_videos_mode: _mode,
+          continue_button_text: _continueText,
+          ...withoutSequence
+        } = pageData;
         result = await savePage(withoutSequence as typeof pageData);
         if (!result.error && sequence.length > 1) {
           toast({
@@ -473,7 +484,9 @@ const PageBuilder = () => {
       fake_progress_enabled: true,
       fake_progress_color: '#ef4444',
       fake_progress_thickness: 8,
-      mobile_fullscreen_enabled: true
+      mobile_fullscreen_enabled: true,
+      between_videos_mode: 'auto',
+      continue_button_text: 'Continue Watching'
     });
     setVideoItems([emptyEditorVideo()]);
     setButtonDelayInputs({
@@ -534,7 +547,9 @@ const PageBuilder = () => {
       fake_progress_enabled: page.fake_progress_enabled ?? true,
       fake_progress_color: page.fake_progress_color || '#ef4444',
       fake_progress_thickness: page.fake_progress_thickness || 4,
-      mobile_fullscreen_enabled: page.mobile_fullscreen_enabled ?? true
+      mobile_fullscreen_enabled: page.mobile_fullscreen_enabled ?? true,
+      between_videos_mode: page.between_videos_mode || 'auto',
+      continue_button_text: page.continue_button_text || 'Continue Watching'
     });
 
     // Pages saved before multi-video fall back to their single-video columns.
@@ -732,6 +747,10 @@ const PageBuilder = () => {
                               <div className="max-w-2xl mx-auto my-4">
                                 <PageVideo
                                   segments={previewSegments}
+                                  mode={formData.between_videos_mode === 'button' ? 'button' : 'auto'}
+                                  continueButtonText={formData.continue_button_text}
+                                  continueButtonBgColor={formData.button_bg_color}
+                                  continueButtonTextColor={formData.button_text_color}
                                   onError={() => {}}
                                   playButtonColor="#ff0000"
                                   playButtonSize={64}
@@ -993,6 +1012,47 @@ const PageBuilder = () => {
                   <Separator />
 
                   <VideoSequenceEditor videos={videoItems} onChange={handleVideosChange} />
+
+                  {previewSegments.length > 1 && (
+                    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
+                      <Label className="text-sm font-medium">Between Videos</Label>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="space-y-1">
+                          <p className="text-sm">Wait for a "Continue" click</p>
+                          <p className="text-xs text-muted-foreground">
+                            Off: videos chain straight through. On: playback holds on the last frame
+                            until the viewer clicks, which also makes the next video start instantly
+                            on phones.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={formData.between_videos_mode === 'button'}
+                          onCheckedChange={(checked) => setFormData(prev => ({
+                            ...prev,
+                            between_videos_mode: checked ? 'button' : 'auto'
+                          }))}
+                        />
+                      </div>
+
+                      {formData.between_videos_mode === 'button' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="continue_button_text" className="text-sm text-muted-foreground">
+                            Button Text
+                          </Label>
+                          <Input
+                            id="continue_button_text"
+                            value={formData.continue_button_text}
+                            onChange={(e) => setFormData(prev => ({ ...prev, continue_button_text: e.target.value }))}
+                            placeholder="Continue Watching"
+                            className="border-2 border-foreground/80 rounded-lg"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Uses the same colours as your call-to-action button.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <Separator />
 
@@ -1521,6 +1581,10 @@ const PageBuilder = () => {
                         <div className="max-w-2xl mx-auto my-6">
                           <PageVideo
                             segments={previewSegments}
+                            mode={formData.between_videos_mode === 'button' ? 'button' : 'auto'}
+                            continueButtonText={formData.continue_button_text}
+                            continueButtonBgColor={formData.button_bg_color}
+                            continueButtonTextColor={formData.button_text_color}
                             onError={() => {}}
                             playButtonColor="#ff0000"
                             playButtonSize={96}

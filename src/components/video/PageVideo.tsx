@@ -1,6 +1,6 @@
 import React from 'react';
 import { VideoContainer } from './VideoContainer';
-import { SequentialVideoPlayer } from './SequentialVideoPlayer';
+import { SequentialVideoPlayer, type BetweenVideosMode } from './SequentialVideoPlayer';
 import { type OverlayButtonConfig } from '../VideoOverlayButton';
 import { type VideoSegment } from '@/lib/videoSegments';
 
@@ -15,6 +15,11 @@ interface PageVideoProps {
   fakeProgressThickness?: number;
   mobileFullscreenEnabled?: boolean;
   disableResume?: boolean;
+  /** Only meaningful with more than one video. */
+  mode?: BetweenVideosMode;
+  continueButtonText?: string;
+  continueButtonBgColor?: string;
+  continueButtonTextColor?: string;
 }
 
 /**
@@ -24,7 +29,14 @@ interface PageVideoProps {
  * Google Drive and Tella support. Two or more segments switch to the sequential
  * player, which chains them back-to-back.
  */
-export const PageVideo: React.FC<PageVideoProps> = ({ segments, ...props }) => {
+export const PageVideo: React.FC<PageVideoProps> = ({
+  segments,
+  mode,
+  continueButtonText,
+  continueButtonBgColor,
+  continueButtonTextColor,
+  ...props
+}) => {
   if (segments.length === 0) return null;
 
   if (segments.length === 1) {
@@ -40,5 +52,14 @@ export const PageVideo: React.FC<PageVideoProps> = ({ segments, ...props }) => {
     );
   }
 
-  return <SequentialVideoPlayer segments={segments} {...props} />;
+  return (
+    <SequentialVideoPlayer
+      segments={segments}
+      mode={mode}
+      continueButtonText={continueButtonText}
+      continueButtonBgColor={continueButtonBgColor}
+      continueButtonTextColor={continueButtonTextColor}
+      {...props}
+    />
+  );
 };

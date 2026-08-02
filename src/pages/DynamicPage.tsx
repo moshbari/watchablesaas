@@ -62,6 +62,8 @@ interface Page {
   fake_progress_thickness?: number;
   mobile_fullscreen_enabled?: boolean;
   videos?: unknown;
+  between_videos_mode?: string;
+  continue_button_text?: string;
 }
 
 const DynamicPage = () => {
@@ -223,6 +225,10 @@ const DynamicPage = () => {
                 <div className="max-w-3xl mx-auto">
                   <PageVideo
                     segments={videoSegments}
+                    mode={page.between_videos_mode === 'button' ? 'button' : 'auto'}
+                    continueButtonText={page.continue_button_text || 'Continue Watching'}
+                    continueButtonBgColor={page.button_bg_color || '#3b82f6'}
+                    continueButtonTextColor={page.button_text_color || '#ffffff'}
                     onError={handleVideoError}
                     playButtonColor="#ef4444"
                     playButtonSize={120}
