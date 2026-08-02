@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { VideoPlayer } from '@/components/VideoPlayer';
+import { PageVideo } from '@/components/video/PageVideo';
+import { segmentsFromPage } from '@/lib/videoSegments';
 import { VideoActionButton } from '@/components/VideoActionButton';
 import { type OverlayButtonConfig } from '@/components/VideoOverlayButton';
 import { LeadOptinModal } from '@/components/LeadOptinModal';
@@ -60,6 +61,7 @@ interface Page {
   fake_progress_color?: string;
   fake_progress_thickness?: number;
   mobile_fullscreen_enabled?: boolean;
+  videos?: unknown;
 }
 
 const DynamicPage = () => {
@@ -70,6 +72,9 @@ const DynamicPage = () => {
   const [showLeadModal, setShowLeadModal] = useState(false);
   const [hasOptedIn, setHasOptedIn] = useState(false);
   const { toast } = useToast();
+
+  // Empty `videos` falls back to the legacy single-video columns.
+  const videoSegments = useMemo(() => (page ? segmentsFromPage(page) : []), [page]);
 
   useEffect(() => {
     if (slug) {
@@ -213,17 +218,14 @@ const DynamicPage = () => {
             </section>
 
             {/* Video Section */}
-            {page.video_url && (
+            {videoSegments.length > 0 && (
               <section className="mb-12">
                 <div className="max-w-3xl mx-auto">
-                  <VideoPlayer 
-                    src={page.video_url} 
+                  <PageVideo
+                    segments={videoSegments}
                     onError={handleVideoError}
                     playButtonColor="#ef4444"
                     playButtonSize={120}
-                    startTime={page.start_time}
-                    endTime={page.end_time}
-                    skipSections={(page as any).skip_sections || []}
                     fakeProgressEnabled={page.fake_progress_enabled ?? true}
                     fakeProgressColor={page.fake_progress_color || '#ef4444'}
                     fakeProgressThickness={page.fake_progress_thickness || 4}
@@ -308,12 +310,12 @@ const DynamicPage = () => {
             "name": page.title,
             "description": page.sub_headline || page.headline,
             "url": `${window.location.origin}/${page.slug}`,
-            ...(page.video_url && {
+            ...(videoSegments.length > 0 && {
               "video": {
                 "@type": "VideoObject",
                 "name": page.title,
                 "description": page.sub_headline || page.headline,
-                "contentUrl": page.video_url
+                "contentUrl": videoSegments[0].video_url
               }
             })
           })}

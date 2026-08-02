@@ -582,6 +582,7 @@ export type Database = {
           user_id: string
           video_type: string
           video_url: string | null
+          videos: Json
         }
         Insert: {
           button_bg_color?: string | null
@@ -637,6 +638,7 @@ export type Database = {
           user_id: string
           video_type?: string
           video_url?: string | null
+          videos?: Json
         }
         Update: {
           button_bg_color?: string | null
@@ -692,6 +694,7 @@ export type Database = {
           user_id?: string
           video_type?: string
           video_url?: string | null
+          videos?: Json
         }
         Relationships: []
       }

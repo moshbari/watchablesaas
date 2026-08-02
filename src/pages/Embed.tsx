@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { VideoPlayer } from '@/components/VideoPlayer';
+import { PageVideo } from '@/components/video/PageVideo';
+import { normaliseSegment, playableSegments, type VideoSegment } from '@/lib/videoSegments';
 import { VideoActionButton } from '@/components/VideoActionButton';
 import { type OverlayButtonConfig } from '@/components/VideoOverlayButton';
 import { type SkipSection } from '@/components/video/useVideoState';
@@ -10,6 +11,7 @@ const Embed = () => {
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const [endTime, setEndTime] = useState<number | undefined>(undefined);
   const [skipSections, setSkipSections] = useState<SkipSection[]>([]);
+  const [sequence, setSequence] = useState<VideoSegment[]>([]);
   const [playButtonColor, setPlayButtonColor] = useState('#ff0000');
   const [playButtonSize, setPlayButtonSize] = useState(96);
   const [overlayButtonConfig, setOverlayButtonConfig] = useState<OverlayButtonConfig>({
@@ -38,6 +40,20 @@ const Embed = () => {
     const buttonUrl = urlParams.get('buttonUrl');
     const buttonEnabled = urlParams.get('buttonEnabled');
     
+    // A multi-video embed carries the whole sequence as JSON; a single-video embed
+    // keeps using the original flat params so existing embed codes never break.
+    const videosParam = urlParams.get('videos');
+    if (videosParam) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(videosParam));
+        if (Array.isArray(parsed)) {
+          setSequence(playableSegments(parsed).map(normaliseSegment));
+        }
+      } catch (e) {
+        console.log('Failed to parse video sequence:', e);
+      }
+    }
+
     if (videoParam) {
       setCurrentVideo(decodeURIComponent(videoParam));
     }
@@ -86,7 +102,20 @@ const Embed = () => {
     });
   };
 
-  if (!currentVideo) {
+  const segments: VideoSegment[] = sequence.length > 0
+    ? sequence
+    : currentVideo
+      ? [normaliseSegment({
+          id: 'embed',
+          video_url: currentVideo,
+          video_type: 'youtube',
+          start_time: startTime,
+          end_time: endTime,
+          skip_sections: skipSections,
+        })]
+      : [];
+
+  if (segments.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">No video specified</div>
@@ -96,14 +125,11 @@ const Embed = () => {
 
   return (
     <div className="min-h-screen bg-background" style={{ margin: 0, padding: 0 }}>
-      <VideoPlayer 
-        src={currentVideo} 
+      <PageVideo
+        segments={segments}
         onError={handleVideoError}
         playButtonColor={playButtonColor}
         playButtonSize={playButtonSize}
-        startTime={startTime}
-        endTime={endTime}
-        skipSections={skipSections}
       />
       
       {/* Action Button Below Video */}

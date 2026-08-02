@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,8 +13,17 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useCampaignLimits } from '@/hooks/useCampaignLimits';
 import { UpgradeModal } from '@/components/UpgradeModal';
-import { VideoPlayer } from '@/components/VideoPlayer';
+import { PageVideo } from '@/components/video/PageVideo';
+import { VideoSequenceEditor } from '@/components/video/VideoSequenceEditor';
 import { validateVideoUrl } from '@/lib/videoUtils';
+import { segmentsFromPage, type VideoSegment } from '@/lib/videoSegments';
+import {
+  editorVideoToSegment,
+  segmentToEditorVideo,
+  emptyEditorVideo,
+  timeToSeconds,
+  type EditorVideo,
+} from '@/lib/videoTimeFields';
 import { HeadlineTemplateSelector } from '@/components/HeadlineTemplateSelector';
 import { AIHeadlineGenerator } from '@/components/AIHeadlineGenerator';
 import { AIPageGenerator } from '@/components/AIPageGenerator';
@@ -176,32 +186,31 @@ const PageBuilder = () => {
       fake_progress_thickness: 8,
       mobile_fullscreen_enabled: true
     });
-  const [timeInputs, setTimeInputs] = useState({
-    startHour: '',
-    startMinute: '',
-    startSecond: '',
-    endHour: '',
-    endMinute: '',
-    endSecond: ''
-  });
-  const [skipSections, setSkipSections] = useState<Array<{
-    fromHour: string; fromMinute: string; fromSecond: string;
-    toHour: string; toMinute: string; toSecond: string;
-  }>>([]);
+  // The page's videos, in the order they play. One entry behaves exactly as the
+  // single-video page builder always did.
+  const [videoItems, setVideoItems] = useState<EditorVideo[]>([emptyEditorVideo()]);
 
-  const addSkipSection = () => {
-    setSkipSections(prev => [...prev, {
-      fromHour: '', fromMinute: '', fromSecond: '',
-      toHour: '', toMinute: '', toSecond: ''
-    }]);
+  // formData.video_url mirrors the first video so the rest of the form
+  // (fake progress bar, preview, embed code) keeps working unchanged.
+  const handleVideosChange = (videos: EditorVideo[]) => {
+    setVideoItems(videos);
+    setFormData(prev => ({ ...prev, video_url: videos[0]?.video_url || '' }));
   };
 
-  const removeSkipSection = (index: number) => {
-    setSkipSections(prev => prev.filter((_, i) => i !== index));
-  };
+  // Everything valid in the list, so the preview chains them just like the live page.
+  const previewSegments = useMemo(
+    () => videoItems
+      .filter(v => v.video_url.trim() && validateVideoUrl(v.video_url).isValid)
+      .map(editorVideoToSegment),
+    [videoItems]
+  );
 
-  const updateSkipSection = (index: number, field: string, value: string) => {
-    setSkipSections(prev => prev.map((s, i) => i === index ? { ...s, [field]: value } : s));
+  const patchFirstVideo = (patch: Partial<EditorVideo>) => {
+    setVideoItems(prev => {
+      const next = prev.length > 0 ? [...prev] : [emptyEditorVideo()];
+      next[0] = { ...next[0], ...patch };
+      return next;
+    });
   };
   const [buttonDelayInputs, setButtonDelayInputs] = useState({
     hours: '0',
@@ -280,35 +289,34 @@ const PageBuilder = () => {
         throw new Error('Slug, title, and headline are required');
       }
 
-      // Validate video URL if provided
-      if (formData.video_url) {
-        const validation = validateVideoUrl(formData.video_url);
+      // Validate every video in the sequence before saving any of it.
+      const filledVideos = videoItems.filter(v => v.video_url.trim());
+      const multiple = filledVideos.length > 1;
+
+      filledVideos.forEach((video, index) => {
+        const label = multiple ? `Video ${index + 1}: ` : '';
+
+        const validation = validateVideoUrl(video.video_url);
         if (!validation.isValid) {
-          throw new Error('Invalid video URL');
+          throw new Error(`${label}invalid video URL`);
         }
-        setFormData(prev => ({
-          ...prev,
-          video_type: validation.type === 'youtube' ? 'youtube' : 'direct'
-        }));
-      }
 
-      // Convert time inputs to seconds
-      const { startHour, startMinute, startSecond, endHour, endMinute, endSecond } = timeInputs;
-      let startTime: number | undefined;
-      let endTime: number | undefined;
-
-      if (startHour || startMinute || startSecond) {
-        startTime = timeToSeconds(startHour, startMinute, startSecond);
-      }
-
-      if (endHour || endMinute || endSecond) {
-        endTime = timeToSeconds(endHour, endMinute, endSecond);
-        
-        // Validate end time is after start time
-        if (startTime && endTime <= startTime) {
-          throw new Error('End time must be after start time');
+        const hasStart = !!(video.startHour || video.startMinute || video.startSecond);
+        const hasEnd = !!(video.endHour || video.endMinute || video.endSecond);
+        if (hasStart && hasEnd) {
+          const from = timeToSeconds(video.startHour, video.startMinute, video.startSecond);
+          const to = timeToSeconds(video.endHour, video.endMinute, video.endSecond);
+          if (to <= from) {
+            throw new Error(`${label}end time must be after start time`);
+          }
         }
-      }
+      });
+
+      const sequence: VideoSegment[] = filledVideos.map(editorVideoToSegment);
+      const firstVideo = sequence[0];
+      const firstType = firstVideo
+        ? (validateVideoUrl(firstVideo.video_url).type === 'youtube' ? 'youtube' : 'direct')
+        : formData.video_type;
 
       // Format slug
       const slug = formData.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
@@ -319,47 +327,55 @@ const PageBuilder = () => {
         (parseInt(buttonDelayInputs.minutes) || 0) * 60 +
         (parseInt(buttonDelayInputs.seconds) || 0);
 
-      // Convert skip sections to seconds
-      const skipSectionsData = skipSections
-        .filter(s => (s.fromHour || s.fromMinute || s.fromSecond) && (s.toHour || s.toMinute || s.toSecond))
-        .map(s => ({
-          from: timeToSeconds(s.fromHour, s.fromMinute, s.fromSecond),
-          to: timeToSeconds(s.toHour, s.toMinute, s.toSecond)
-        }))
-        .filter(s => s.to > s.from);
-
       const pageData = {
         ...formData,
         slug,
         button_delay: buttonDelaySeconds,
-        start_time: startTime,
-        end_time: endTime,
-        skip_sections: skipSectionsData,
+        videos: sequence as unknown as Json,
+        // The first video also fills the original columns, so anything still reading
+        // them (older embeds, the static page pusher, SEO tags) keeps working.
+        video_url: firstVideo?.video_url || '',
+        video_type: firstType,
+        start_time: firstVideo?.start_time ?? null,
+        end_time: firstVideo?.end_time ?? null,
+        skip_sections: (firstVideo?.skip_sections ?? []) as unknown as Json,
         user_id: (await supabase.auth.getUser()).data.user?.id
       };
 
-      let result;
-      if (editingPage) {
-        result = await supabase
-          .from('pages')
-          .update(pageData)
-          .eq('id', editingPage.id)
-          .select()
-          .single();
-      } else {
-        result = await supabase
-          .from('pages')
-          .insert([pageData])
-          .select()
-          .single();
+      const savePage = async (data: typeof pageData) => (
+        editingPage
+          ? await supabase.from('pages').update(data).eq('id', editingPage.id).select().single()
+          : await supabase.from('pages').insert([data]).select().single()
+      );
+
+      let result = await savePage(pageData);
+
+      // If the database has not had the multi-video migration applied yet, save the
+      // page without the sequence rather than failing outright — the first video
+      // still lands in the original columns.
+      const missingVideosColumn =
+        result.error && /videos/i.test(result.error.message) && /column|schema/i.test(result.error.message);
+
+      if (missingVideosColumn) {
+        const { videos: _dropped, ...withoutSequence } = pageData;
+        result = await savePage(withoutSequence as typeof pageData);
+        if (!result.error && sequence.length > 1) {
+          toast({
+            title: 'Saved without the extra videos',
+            description: 'The database is missing the multi-video update, so only the first video was saved.',
+            variant: 'destructive',
+          });
+        }
       }
 
       if (result.error) throw result.error;
 
-      toast({
-        title: "Success",
-        description: `Page ${editingPage ? 'updated' : 'created'} successfully`,
-      });
+      if (!missingVideosColumn) {
+        toast({
+          title: "Success",
+          description: `Page ${editingPage ? 'updated' : 'created'} successfully`,
+        });
+      }
 
       // If page is published, open it in a new tab
       if (formData.is_published) {
@@ -459,15 +475,7 @@ const PageBuilder = () => {
       fake_progress_thickness: 8,
       mobile_fullscreen_enabled: true
     });
-    setTimeInputs({
-      startHour: '',
-      startMinute: '',
-      startSecond: '',
-      endHour: '',
-      endMinute: '',
-      endSecond: ''
-    });
-    setSkipSections([]);
+    setVideoItems([emptyEditorVideo()]);
     setButtonDelayInputs({
       hours: '0',
       minutes: '0',
@@ -529,39 +537,9 @@ const PageBuilder = () => {
       mobile_fullscreen_enabled: page.mobile_fullscreen_enabled ?? true
     });
 
-    // Set time inputs based on existing times
-    if (page.start_time) {
-      const startTime = secondsToTime(page.start_time);
-      setTimeInputs(prev => ({
-        ...prev,
-        startHour: startTime.hours,
-        startMinute: startTime.minutes,
-        startSecond: startTime.seconds
-      }));
-    }
-    if (page.end_time) {
-      const endTime = secondsToTime(page.end_time);
-      setTimeInputs(prev => ({
-        ...prev,
-        endHour: endTime.hours,
-        endMinute: endTime.minutes,
-      endSecond: endTime.seconds
-      }));
-    }
-
-    // Load skip sections
-    if ((page as any).skip_sections && Array.isArray((page as any).skip_sections)) {
-      setSkipSections((page as any).skip_sections.map((s: any) => {
-        const from = secondsToTime(s.from);
-        const to = secondsToTime(s.to);
-        return {
-          fromHour: from.hours, fromMinute: from.minutes, fromSecond: from.seconds,
-          toHour: to.hours, toMinute: to.minutes, toSecond: to.seconds
-        };
-      }));
-    } else {
-      setSkipSections([]);
-    }
+    // Pages saved before multi-video fall back to their single-video columns.
+    const existing = segmentsFromPage(page as any).map(segmentToEditorVideo);
+    setVideoItems(existing.length > 0 ? existing : [emptyEditorVideo()]);
 
     // Set button delay inputs based on existing button delay
     const buttonDelayTime = secondsToTime(page.button_delay || 5);
@@ -653,22 +631,34 @@ const PageBuilder = () => {
     }
 
     // Handle video time range separately
+    if (config.video_url !== undefined) {
+      patchFirstVideo({ video_url: config.video_url });
+    }
+
     if (config.start_time_hours !== undefined || config.start_time_minutes !== undefined || config.start_time_seconds !== undefined) {
-      setTimeInputs(prev => ({
-        ...prev,
-        startHour: config.start_time_hours !== undefined ? config.start_time_hours.toString() : prev.startHour,
-        startMinute: config.start_time_minutes !== undefined ? config.start_time_minutes.toString() : prev.startMinute,
-        startSecond: config.start_time_seconds !== undefined ? config.start_time_seconds.toString() : prev.startSecond,
-      }));
+      setVideoItems(prev => {
+        const next = prev.length > 0 ? [...prev] : [emptyEditorVideo()];
+        next[0] = {
+          ...next[0],
+          startHour: config.start_time_hours !== undefined ? config.start_time_hours.toString() : next[0].startHour,
+          startMinute: config.start_time_minutes !== undefined ? config.start_time_minutes.toString() : next[0].startMinute,
+          startSecond: config.start_time_seconds !== undefined ? config.start_time_seconds.toString() : next[0].startSecond,
+        };
+        return next;
+      });
     }
 
     if (config.end_time_hours !== undefined || config.end_time_minutes !== undefined || config.end_time_seconds !== undefined) {
-      setTimeInputs(prev => ({
-        ...prev,
-        endHour: config.end_time_hours !== undefined ? config.end_time_hours.toString() : prev.endHour,
-        endMinute: config.end_time_minutes !== undefined ? config.end_time_minutes.toString() : prev.endMinute,
-        endSecond: config.end_time_seconds !== undefined ? config.end_time_seconds.toString() : prev.endSecond,
-      }));
+      setVideoItems(prev => {
+        const next = prev.length > 0 ? [...prev] : [emptyEditorVideo()];
+        next[0] = {
+          ...next[0],
+          endHour: config.end_time_hours !== undefined ? config.end_time_hours.toString() : next[0].endHour,
+          endMinute: config.end_time_minutes !== undefined ? config.end_time_minutes.toString() : next[0].endMinute,
+          endSecond: config.end_time_seconds !== undefined ? config.end_time_seconds.toString() : next[0].endSecond,
+        };
+        return next;
+      });
     }
   };
 
@@ -738,10 +728,10 @@ const PageBuilder = () => {
                               </p>
                             )}
 
-                            {previewVideo && (
+                            {previewSegments.length > 0 && (
                               <div className="max-w-2xl mx-auto my-4">
-                                <VideoPlayer 
-                                  src={previewVideo}
+                                <PageVideo
+                                  segments={previewSegments}
                                   onError={() => {}}
                                   playButtonColor="#ff0000"
                                   playButtonSize={64}
@@ -1002,177 +992,7 @@ const PageBuilder = () => {
 
                   <Separator />
 
-                  <div>
-                    <Label htmlFor="video_url">Video URL (Optional)</Label>
-                    <InputWithClipboard
-                      id="video_url"
-                      value={formData.video_url}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, video_url: value }))}
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      className="border-2 border-foreground/80 rounded-lg"
-                    />
-                  </div>
-
-                  {/* Time Range Controls */}
-                  {formData.video_url && (
-                    <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
-                      <Label className="text-sm font-medium">Time Range (Optional)</Label>
-                      
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label className="text-sm text-muted-foreground">Start Time</Label>
-                          <div className="flex gap-2 items-center">
-                            <Input
-                              type="number"
-                              placeholder="HH"
-                              min="0"
-                              max="23"
-                              value={timeInputs.startHour}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startHour: e.target.value }))}
-                              className="w-20 text-center border-2 border-foreground/80 rounded-lg"
-                            />
-                            <span className="text-muted-foreground font-bold">:</span>
-                            <Input
-                              type="number"
-                              placeholder="MM"
-                              min="0"
-                              max="59"
-                              value={timeInputs.startMinute}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startMinute: e.target.value }))}
-                              className="w-20 text-center border-2 border-foreground/80 rounded-lg"
-                            />
-                            <span className="text-muted-foreground font-bold">:</span>
-                            <Input
-                              type="number"
-                              placeholder="SS"
-                              min="0"
-                              max="59"
-                              value={timeInputs.startSecond}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, startSecond: e.target.value }))}
-                              className="w-20 text-center border-2 border-foreground/80 rounded-lg"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-sm text-muted-foreground">End Time</Label>
-                          <div className="flex gap-2 items-center">
-                            <Input
-                              type="number"
-                              placeholder="HH"
-                              min="0"
-                              max="23"
-                              value={timeInputs.endHour}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endHour: e.target.value }))}
-                              className="w-20 text-center border-2 border-foreground/80 rounded-lg"
-                            />
-                            <span className="text-muted-foreground font-bold">:</span>
-                            <Input
-                              type="number"
-                              placeholder="MM"
-                              min="0"
-                              max="59"
-                              value={timeInputs.endMinute}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endMinute: e.target.value }))}
-                              className="w-20 text-center border-2 border-foreground/80 rounded-lg"
-                            />
-                            <span className="text-muted-foreground font-bold">:</span>
-                            <Input
-                              type="number"
-                              placeholder="SS"
-                              min="0"
-                              max="59"
-                              value={timeInputs.endSecond}
-                              onChange={(e) => setTimeInputs(prev => ({ ...prev, endSecond: e.target.value }))}
-                              className="w-20 text-center border-2 border-foreground/80 rounded-lg"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground">
-                        Leave empty to play the full video. End time must be after start time.
-                      </p>
-
-                      <Separator />
-
-                      {/* Skip Sections */}
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <Label className="text-sm font-medium">Skip Sections</Label>
-                          <Button type="button" variant="outline" size="sm" onClick={addSkipSection} className="gap-1">
-                            <Plus className="w-3 h-3" /> Add Skip
-                          </Button>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          Define sections to skip during playback. The player will seamlessly jump over these parts.
-                        </p>
-
-                        {skipSections.map((section, index) => (
-                          <div key={index} className="space-y-2 p-3 bg-background rounded-lg border">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-medium text-muted-foreground">Skip #{index + 1}</span>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeSkipSection(index)}
-                                className="h-6 px-2 text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">From</Label>
-                                <div className="flex gap-1 items-center">
-                                  <Input type="number" placeholder="HH" min="0" max="23"
-                                    value={section.fromHour}
-                                    onChange={(e) => updateSkipSection(index, 'fromHour', e.target.value)}
-                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
-                                  />
-                                  <span className="text-muted-foreground text-xs">:</span>
-                                  <Input type="number" placeholder="MM" min="0" max="59"
-                                    value={section.fromMinute}
-                                    onChange={(e) => updateSkipSection(index, 'fromMinute', e.target.value)}
-                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
-                                  />
-                                  <span className="text-muted-foreground text-xs">:</span>
-                                  <Input type="number" placeholder="SS" min="0" max="59"
-                                    value={section.fromSecond}
-                                    onChange={(e) => updateSkipSection(index, 'fromSecond', e.target.value)}
-                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">To</Label>
-                                <div className="flex gap-1 items-center">
-                                  <Input type="number" placeholder="HH" min="0" max="23"
-                                    value={section.toHour}
-                                    onChange={(e) => updateSkipSection(index, 'toHour', e.target.value)}
-                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
-                                  />
-                                  <span className="text-muted-foreground text-xs">:</span>
-                                  <Input type="number" placeholder="MM" min="0" max="59"
-                                    value={section.toMinute}
-                                    onChange={(e) => updateSkipSection(index, 'toMinute', e.target.value)}
-                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
-                                  />
-                                  <span className="text-muted-foreground text-xs">:</span>
-                                  <Input type="number" placeholder="SS" min="0" max="59"
-                                    value={section.toSecond}
-                                    onChange={(e) => updateSkipSection(index, 'toSecond', e.target.value)}
-                                    className="w-14 text-center text-xs border-2 border-foreground/80 rounded-lg px-1"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <VideoSequenceEditor videos={videoItems} onChange={handleVideosChange} />
 
                   <Separator />
 
@@ -1697,10 +1517,10 @@ const PageBuilder = () => {
                         </p>
                       )}
 
-                      {previewVideo && (
+                      {previewSegments.length > 0 && (
                         <div className="max-w-2xl mx-auto my-6">
-                          <VideoPlayer 
-                            src={previewVideo}
+                          <PageVideo
+                            segments={previewSegments}
                             onError={() => {}}
                             playButtonColor="#ff0000"
                             playButtonSize={96}

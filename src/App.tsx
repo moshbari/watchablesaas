@@ -11,6 +11,7 @@ import { useUpgradeToast } from "@/hooks/useUpgradeToast";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Embed from "./pages/Embed";
+import SequenceTest from "./pages/SequenceTest";
 import PageBuilder from "./pages/PageBuilder";
 import DynamicPage from "./pages/DynamicPage";
 import NotFound from "./pages/NotFound";
@@ -83,6 +84,7 @@ const AppContent = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/app" element={<Index />} />
         <Route path="/embed" element={<Embed />} />
+        <Route path="/seqtest" element={<SequenceTest />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
