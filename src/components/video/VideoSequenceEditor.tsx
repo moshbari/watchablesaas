@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Sortable from 'sortablejs';
 import { Plus, Trash2, ArrowUp, ArrowDown, AlertTriangle, ListVideo, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,21 +65,40 @@ export const VideoSequenceEditor: React.FC<VideoSequenceEditorProps> = ({ videos
     onChange(next);
   };
 
-  // Drag a video by its grip to reorder. Only the grip starts a drag, so selecting
-  // text in the boxes still works; the arrows remain for anyone who can't drag.
-  const [dragArmed, setDragArmed] = useState<number | null>(null);
-  const [dragFrom, setDragFrom] = useState<number | null>(null);
-  const [dragOver, setDragOver] = useState<number | null>(null);
+  // Press and hold a video's top bar, then drag it into place (same touch tuning
+  // as ShareZPresso's chat scrolls: a flick still scrolls the page, a hold picks
+  // the card up; a mouse drags at once). The arrows stay for anyone who can't drag.
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef(list);
+  listRef.current = list;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
-  const dropOn = (target: number) => {
-    if (dragFrom === null || dragFrom === target) return;
-    const next = [...list];
-    const [moved] = next.splice(dragFrom, 1);
-    next.splice(target, 0, moved);
-    onChange(next);
-  };
-
-  const endDrag = () => { setDragArmed(null); setDragFrom(null); setDragOver(null); };
+  useEffect(() => {
+    if (!cardsRef.current) return;
+    const sortable = Sortable.create(cardsRef.current, {
+      handle: '.video-drag-handle',
+      filter: 'button, input, a',
+      preventOnFilter: false,
+      delay: 180,
+      delayOnTouchOnly: true,
+      touchStartThreshold: 8,
+      forceFallback: true,
+      animation: 150,
+      ghostClass: 'opacity-40',
+      onEnd: (evt) => {
+        const { oldIndex, newIndex, item, from } = evt;
+        if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+        // Put the DOM back where React left it, then let React re-render the new order.
+        from.insertBefore(item, from.children[oldIndex + (oldIndex > newIndex ? 1 : 0)] ?? null);
+        const next = [...listRef.current];
+        const [moved] = next.splice(oldIndex, 1);
+        next.splice(newIndex, 0, moved);
+        onChangeRef.current(next);
+      },
+    });
+    return () => sortable.destroy();
+  }, []);
 
   const updateSkip = (videoIndex: number, skipIndex: number, field: keyof EditorSkip, value: string) => {
     const video = list[videoIndex];
@@ -111,35 +131,27 @@ export const VideoSequenceEditor: React.FC<VideoSequenceEditorProps> = ({ videos
         )}
       </div>
 
+      <div ref={cardsRef} className="space-y-4">
       {list.map((video, index) => {
         const sequencable = !video.video_url.trim() || canSequence(video.video_url);
         const showSequenceWarning = !sequencable && list.length > 1;
 
         return (
-          <div
-            key={video.id}
-            className={`space-y-4 p-4 rounded-lg border bg-background transition-shadow ${
-              dragOver === index && dragFrom !== index ? 'ring-2 ring-primary' : ''
-            } ${dragFrom === index ? 'opacity-50' : ''}`}
-            draggable={dragArmed === index}
-            onDragStart={(e) => { setDragFrom(index); e.dataTransfer.effectAllowed = 'move'; }}
-            onDragOver={(e) => { if (dragFrom !== null) { e.preventDefault(); setDragOver(index); } }}
-            onDrop={(e) => { e.preventDefault(); dropOn(index); endDrag(); }}
-            onDragEnd={endDrag}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
+          <div key={video.id} className="space-y-4 p-4 rounded-lg border bg-background">
+            <div
+              className={`flex items-center justify-between ${
+                list.length > 1 ? 'video-drag-handle cursor-grab active:cursor-grabbing -m-2 p-2 rounded-md bg-muted/60 select-none' : ''
+              }`}
+              title={list.length > 1 ? 'Press and hold, then drag to reorder' : undefined}
+            >
+              <div className="flex items-center gap-2">
                 {list.length > 1 && (
-                  <span
-                    className="cursor-grab active:cursor-grabbing text-muted-foreground touch-none"
-                    onMouseDown={() => setDragArmed(index)}
-                    onTouchStart={() => setDragArmed(index)}
-                    onMouseUp={() => setDragArmed(null)}
-                    title="Drag to reorder"
-                    aria-label="Drag to reorder"
-                  >
-                    <GripVertical className="w-4 h-4" />
-                  </span>
+                  <>
+                    <GripVertical className="w-5 h-5 text-muted-foreground" aria-hidden />
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                      {index + 1}
+                    </span>
+                  </>
                 )}
                 <Label className="text-sm font-semibold">
                   {list.length > 1 ? `Video ${index + 1}` : 'Video URL (Optional)'}
@@ -308,13 +320,15 @@ export const VideoSequenceEditor: React.FC<VideoSequenceEditorProps> = ({ videos
           </div>
         );
       })}
+      </div>
 
       <Button type="button" variant="outline" onClick={addVideo} className="w-full gap-2">
         <Plus className="w-4 h-4" /> Add Another Video
       </Button>
 
       <p className="text-xs text-muted-foreground">
-        Videos play one after another in this order, in the same player. Each one keeps its own
+        Videos play one after another in this order, in the same player. To change the order,
+        press and hold a video's numbered bar and drag it, or use the arrows. Each one keeps its own
         start time, end time and skipped sections.
       </p>
     </div>
