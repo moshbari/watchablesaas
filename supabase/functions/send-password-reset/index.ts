@@ -69,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p style="margin: 0;">This link will expire in 24 hours for security reasons.</p>
                 <p style="margin: 10px 0 0 0;">
                   Need help? Contact our support team at 
-                  <a href="mailto:engrmoshbari@gmail.com" style="color: #667eea; text-decoration: none;">engrmoshbari@gmail.com</a>
+                  <a href="mailto:mosh@99dfy.com" style="color: #667eea; text-decoration: none;">mosh@99dfy.com</a>
                 </p>
               </div>
               

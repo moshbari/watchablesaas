@@ -10,7 +10,8 @@
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 export const EMAIL_FROM = "Watchable <noreply@99dfy.com>";
-export const SUPPORT_EMAIL = "engrmoshbari@gmail.com";
+// The one 99dfy.com address that receives mail (Cloudflare Email Routing).
+export const SUPPORT_EMAIL = "mosh@99dfy.com";
 export const SITE_URL = Deno.env.get("SITE_URL") ?? "https://watchable.99dfy.com";
 
 interface Email {
