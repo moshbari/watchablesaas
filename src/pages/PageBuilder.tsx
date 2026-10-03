@@ -16,7 +16,7 @@ import { UpgradeModal } from '@/components/UpgradeModal';
 import { PageVideo } from '@/components/video/PageVideo';
 import { VideoSequenceEditor } from '@/components/video/VideoSequenceEditor';
 import { validateVideoUrl } from '@/lib/videoUtils';
-import { fetchVideoTitle } from '@/lib/videoTitle';
+import { fetchVideoTitle, FALLBACK_VIDEO_TITLE } from '@/lib/videoTitle';
 import { segmentsFromPage, type VideoSegment } from '@/lib/videoSegments';
 import {
   editorVideoToSegment,
@@ -364,12 +364,14 @@ const PageBuilder = () => {
       const sequence: VideoSegment[] = filledVideos.map(editorVideoToSegment);
       const firstVideo = sequence[0];
 
-      // Quick creation: an empty title or headline takes the video's own title.
+      // Quick creation: an empty title or headline takes the video's own title. One
+      // still holding the fallback from a lookup that failed earlier gets another try.
+      const needsVideoTitle = (value: string) => !value.trim() || value.trim() === FALLBACK_VIDEO_TITLE;
       let { title, headline } = formData;
-      if (!title.trim() || !headline.trim()) {
-        const videoTitle = (firstVideo && await fetchVideoTitle(firstVideo.video_url)) || 'Watch This Video';
-        if (!title.trim()) title = videoTitle;
-        if (!headline.trim()) headline = videoTitle;
+      if (needsVideoTitle(title) || needsVideoTitle(headline)) {
+        const videoTitle = (firstVideo && await fetchVideoTitle(firstVideo.video_url)) || FALLBACK_VIDEO_TITLE;
+        if (needsVideoTitle(title)) title = videoTitle;
+        if (needsVideoTitle(headline)) headline = videoTitle;
       }
       const firstType = firstVideo
         ? (validateVideoUrl(firstVideo.video_url).type === 'youtube' ? 'youtube' : 'direct')

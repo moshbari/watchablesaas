@@ -1,6 +1,13 @@
 import { isYouTubeUrl } from './videoUtils';
 
-const LOOKUP_TIMEOUT_MS = 5000;
+const LOOKUP_TIMEOUT_MS = 10000;
+
+/** What an empty title or headline becomes when the video's title can't be found. */
+export const FALLBACK_VIDEO_TITLE = 'Watch This Video';
+
+// One lookup per link: the builder checks a link as it's pasted, so by the time
+// the page is saved its title is usually already here.
+const cache = new Map<string, Promise<VideoCheck>>();
 
 /**
  * - `ok`: the video can be played on a page.
@@ -21,8 +28,21 @@ export interface VideoCheck {
  * directly and returns 401 exactly when the owner has disabled embedding.
  * Anything else goes through noembed (Vimeo, Wistia, …) for the title only.
  */
-export const checkVideo = async (url: string): Promise<VideoCheck> => {
+export const checkVideo = (url: string): Promise<VideoCheck> => {
   const trimmed = url.trim();
+  const cached = cache.get(trimmed);
+  if (cached) return cached;
+
+  const lookup = lookupVideo(trimmed).then(result => {
+    // A failed lookup (network trouble) shouldn't stick: let the next caller retry.
+    if (result.status === 'unknown' && !result.title) cache.delete(trimmed);
+    return result;
+  });
+  cache.set(trimmed, lookup);
+  return lookup;
+};
+
+const lookupVideo = async (trimmed: string): Promise<VideoCheck> => {
   if (!trimmed) return { status: 'unknown', title: null };
 
   const youtube = isYouTubeUrl(trimmed);
@@ -48,9 +68,9 @@ export const checkVideo = async (url: string): Promise<VideoCheck> => {
   }
 };
 
-/** The video's own title, or null when there is none to be had. */
+/** The video's own title, or null when there is none to be had. Tries twice. */
 export const fetchVideoTitle = async (url: string): Promise<string | null> =>
-  (await checkVideo(url)).title;
+  (await checkVideo(url)).title ?? (await checkVideo(url)).title;
 
 /** What to tell the page builder about a link that won't play. Null when it's fine. */
 export const videoCheckWarning = (status: VideoCheckStatus): string | null => {
