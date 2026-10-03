@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Trash2, ArrowUp, ArrowDown, AlertTriangle, ListVideo } from 'lucide-react';
+import { Plus, Trash2, ArrowUp, ArrowDown, AlertTriangle, ListVideo, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -64,6 +64,22 @@ export const VideoSequenceEditor: React.FC<VideoSequenceEditorProps> = ({ videos
     onChange(next);
   };
 
+  // Drag a video by its grip to reorder. Only the grip starts a drag, so selecting
+  // text in the boxes still works; the arrows remain for anyone who can't drag.
+  const [dragArmed, setDragArmed] = useState<number | null>(null);
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
+
+  const dropOn = (target: number) => {
+    if (dragFrom === null || dragFrom === target) return;
+    const next = [...list];
+    const [moved] = next.splice(dragFrom, 1);
+    next.splice(target, 0, moved);
+    onChange(next);
+  };
+
+  const endDrag = () => { setDragArmed(null); setDragFrom(null); setDragOver(null); };
+
   const updateSkip = (videoIndex: number, skipIndex: number, field: keyof EditorSkip, value: string) => {
     const video = list[videoIndex];
     updateVideo(videoIndex, {
@@ -100,11 +116,35 @@ export const VideoSequenceEditor: React.FC<VideoSequenceEditorProps> = ({ videos
         const showSequenceWarning = !sequencable && list.length > 1;
 
         return (
-          <div key={video.id} className="space-y-4 p-4 rounded-lg border bg-background">
+          <div
+            key={video.id}
+            className={`space-y-4 p-4 rounded-lg border bg-background transition-shadow ${
+              dragOver === index && dragFrom !== index ? 'ring-2 ring-primary' : ''
+            } ${dragFrom === index ? 'opacity-50' : ''}`}
+            draggable={dragArmed === index}
+            onDragStart={(e) => { setDragFrom(index); e.dataTransfer.effectAllowed = 'move'; }}
+            onDragOver={(e) => { if (dragFrom !== null) { e.preventDefault(); setDragOver(index); } }}
+            onDrop={(e) => { e.preventDefault(); dropOn(index); endDrag(); }}
+            onDragEnd={endDrag}
+          >
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-semibold">
-                {list.length > 1 ? `Video ${index + 1}` : 'Video URL (Optional)'}
-              </Label>
+              <div className="flex items-center gap-1.5">
+                {list.length > 1 && (
+                  <span
+                    className="cursor-grab active:cursor-grabbing text-muted-foreground touch-none"
+                    onMouseDown={() => setDragArmed(index)}
+                    onTouchStart={() => setDragArmed(index)}
+                    onMouseUp={() => setDragArmed(null)}
+                    title="Drag to reorder"
+                    aria-label="Drag to reorder"
+                  >
+                    <GripVertical className="w-4 h-4" />
+                  </span>
+                )}
+                <Label className="text-sm font-semibold">
+                  {list.length > 1 ? `Video ${index + 1}` : 'Video URL (Optional)'}
+                </Label>
+              </div>
               {list.length > 1 && (
                 <div className="flex items-center gap-1">
                   <Button

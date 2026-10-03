@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { TimeFields } from '@/components/TimeFields';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -101,13 +102,11 @@ export const VideoOverlayButton: React.FC<VideoOverlayButtonProps> = ({
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="overlay-delay">Delay (seconds)</Label>
-                    <Input
+                    <Label htmlFor="overlay-delay">Show after</Label>
+                    <TimeFields
                       id="overlay-delay"
-                      type="number"
-                      min="0"
-                      value={config.delay}
-                      onChange={(e) => updateConfig('delay', parseInt(e.target.value) || 0)}
+                      seconds={config.delay}
+                      onChange={(value) => updateConfig('delay', value)}
                     />
                   </div>
                   

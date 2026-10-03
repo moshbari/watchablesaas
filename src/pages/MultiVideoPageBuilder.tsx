@@ -417,17 +417,17 @@ const MultiVideoPageBuilder = () => {
                   <div>
                     <Label className="text-xs">Start time</Label>
                     <div className="flex gap-1">
-                      <Input placeholder="h" value={v.startHour} onChange={e => updateVideo(v.id, { startHour: e.target.value })} />
-                      <Input placeholder="m" value={v.startMinute} onChange={e => updateVideo(v.id, { startMinute: e.target.value })} />
-                      <Input placeholder="s" value={v.startSecond} onChange={e => updateVideo(v.id, { startSecond: e.target.value })} />
+                      <Input inputMode="numeric" placeholder="h" value={v.startHour} onChange={e => updateVideo(v.id, { startHour: e.target.value })} />
+                      <Input inputMode="numeric" placeholder="m" value={v.startMinute} onChange={e => updateVideo(v.id, { startMinute: e.target.value })} />
+                      <Input inputMode="numeric" placeholder="s" value={v.startSecond} onChange={e => updateVideo(v.id, { startSecond: e.target.value })} />
                     </div>
                   </div>
                   <div>
                     <Label className="text-xs">End time</Label>
                     <div className="flex gap-1">
-                      <Input placeholder="h" value={v.endHour} onChange={e => updateVideo(v.id, { endHour: e.target.value })} />
-                      <Input placeholder="m" value={v.endMinute} onChange={e => updateVideo(v.id, { endMinute: e.target.value })} />
-                      <Input placeholder="s" value={v.endSecond} onChange={e => updateVideo(v.id, { endSecond: e.target.value })} />
+                      <Input inputMode="numeric" placeholder="h" value={v.endHour} onChange={e => updateVideo(v.id, { endHour: e.target.value })} />
+                      <Input inputMode="numeric" placeholder="m" value={v.endMinute} onChange={e => updateVideo(v.id, { endMinute: e.target.value })} />
+                      <Input inputMode="numeric" placeholder="s" value={v.endSecond} onChange={e => updateVideo(v.id, { endSecond: e.target.value })} />
                     </div>
                   </div>
                 </div>
@@ -444,9 +444,9 @@ const MultiVideoPageBuilder = () => {
                       <div>
                         <Label className="text-xs">From</Label>
                         <div className="flex gap-1">
-                          <Input placeholder="h" value={s.fromHour} onChange={e => updateSkip(v.id, sIdx, 'fromHour', e.target.value)} />
-                          <Input placeholder="m" value={s.fromMinute} onChange={e => updateSkip(v.id, sIdx, 'fromMinute', e.target.value)} />
-                          <Input placeholder="s" value={s.fromSecond} onChange={e => updateSkip(v.id, sIdx, 'fromSecond', e.target.value)} />
+                          <Input inputMode="numeric" placeholder="h" value={s.fromHour} onChange={e => updateSkip(v.id, sIdx, 'fromHour', e.target.value)} />
+                          <Input inputMode="numeric" placeholder="m" value={s.fromMinute} onChange={e => updateSkip(v.id, sIdx, 'fromMinute', e.target.value)} />
+                          <Input inputMode="numeric" placeholder="s" value={s.fromSecond} onChange={e => updateSkip(v.id, sIdx, 'fromSecond', e.target.value)} />
                         </div>
                       </div>
                       <div>
@@ -457,9 +457,9 @@ const MultiVideoPageBuilder = () => {
                           </Button>
                         </div>
                         <div className="flex gap-1">
-                          <Input placeholder="h" value={s.toHour} onChange={e => updateSkip(v.id, sIdx, 'toHour', e.target.value)} />
-                          <Input placeholder="m" value={s.toMinute} onChange={e => updateSkip(v.id, sIdx, 'toMinute', e.target.value)} />
-                          <Input placeholder="s" value={s.toSecond} onChange={e => updateSkip(v.id, sIdx, 'toSecond', e.target.value)} />
+                          <Input inputMode="numeric" placeholder="h" value={s.toHour} onChange={e => updateSkip(v.id, sIdx, 'toHour', e.target.value)} />
+                          <Input inputMode="numeric" placeholder="m" value={s.toMinute} onChange={e => updateSkip(v.id, sIdx, 'toMinute', e.target.value)} />
+                          <Input inputMode="numeric" placeholder="s" value={s.toSecond} onChange={e => updateSkip(v.id, sIdx, 'toSecond', e.target.value)} />
                         </div>
                       </div>
                     </div>

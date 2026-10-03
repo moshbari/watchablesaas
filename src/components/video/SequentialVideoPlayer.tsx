@@ -29,6 +29,7 @@ const TICK_MS = 100;               // boundary resolution — a 1s poll overshoo
 const PREBUFFER_AFTER_MS = 1200;   // let the playing segment claim bandwidth first
 const BUFFER_ASSUME_MS = 6000;     // treat a silent pre-buffer as ready even if it never reports
 const FADE_MS = 180;
+const QUEUED_PLAY_GRACE_MS = 3000; // a play that hasn't started by then was refused with sound
 
 export type BetweenVideosMode = 'auto' | 'button';
 
@@ -93,6 +94,9 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   const ytPlayers = useRef<Array<any | null>>([null, null]);
   const ytHosts = useRef<Array<HTMLDivElement | null>>([null, null]);
   const ytReady = useRef<Array<boolean>>([false, false]);
+  const ytPlayerPromises = useRef<Array<Promise<any> | null>>([null, null]);
+  /** The video slot 0's player was built on at page load, still cued and untouched. */
+  const warmedVideoId = useRef<string | null>(null);
   const slots = useRef<[Slot, Slot]>([emptySlot(), emptySlot()]);
   const pendingMount = useRef<Array<(() => void) | null>>([null, null]);
 
@@ -118,6 +122,16 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [totalDuration, setTotalDuration] = useState(0);
   const [slotEngines, setSlotEngines] = useState<Array<'youtube' | 'html5' | null>>([null, null]);
+  // Until the first frame plays, viewers see the first video's thumbnail, never a black box.
+  const [firstFrameShown, setFirstFrameShown] = useState(false);
+  const [needsUnmute, setNeedsUnmute] = useState(false);
+  const firstVideoId = segments[0] && getSegmentEngine(segments[0].video_url) === 'youtube'
+    ? getYouTubeId(extractVideoUrl(segments[0].video_url))
+    : null;
+  const [posterSrc, setPosterSrc] = useState<string | null>(null);
+  useEffect(() => {
+    setPosterSrc(firstVideoId ? `https://i.ytimg.com/vi/${firstVideoId}/maxresdefault.jpg` : null);
+  }, [firstVideoId]);
 
   const segmentsRef = useRef(segments);
   segmentsRef.current = segments;
@@ -127,6 +141,12 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   activeSlotRef.current = activeSlot;
   const modeRef = useRef(mode);
   modeRef.current = mode;
+  const isPlayingRef = useRef(false);
+  isPlayingRef.current = isPlaying;
+
+  useEffect(() => {
+    if (isPlaying) setFirstFrameShown(true);
+  }, [isPlaying]);
 
   const allowPrebuffer = !isIOS;
 
@@ -218,9 +238,16 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
   /* ------------------------------------------------------- player creation */
 
   /** Creates a slot's YouTube player once; later segments reuse it. */
-  const ensureYouTubePlayer = useCallback(async (key: SlotKey, firstVideoId: string, firstStart: number) => {
-    if (ytPlayers.current[key]) return ytPlayers.current[key];
+  const ensureYouTubePlayer = useCallback((key: SlotKey, firstVideoId: string, firstStart: number) => {
+    // The page-load warm-up and a viewer's tap can both ask; build one player, not two.
+    if (!ytPlayerPromises.current[key]) {
+      ytPlayerPromises.current[key] = buildYouTubePlayer(key, firstVideoId, firstStart);
+    }
+    return ytPlayerPromises.current[key]!;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  const buildYouTubePlayer = async (key: SlotKey, firstVideoId: string, firstStart: number): Promise<any> => {
     try {
       await loadYouTubeIframeAPI();
     } catch {
@@ -296,7 +323,7 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       });
       ytPlayers.current[key] = player;
     });
-  }, [handleFatal]);
+  };
 
   /**
    * Point a slot at a segment. `activate` plays it audibly now; otherwise it loads
@@ -325,6 +352,7 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
         if (!existing) {
           // First use of this slot — the player boots straight onto this segment.
           const player = await ensureYouTubePlayer(key, videoId, start);
+          if (key === 0) warmedVideoId.current = null;
           if (!player || slots.current[key].token !== token) return;
           try {
             if (activate) {
@@ -341,8 +369,16 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
             try {
               if (activate) applyVolumeTo(key);
               else existing.mute();
-              // Reusing the warm player — no iframe rebuild, no player boot.
-              existing.loadVideoById({ videoId, startSeconds: start });
+              if (activate && warmedVideoId.current === videoId) {
+                // Built at page load and already cued on this video: a plain play
+                // runs inside the viewer's tap, which iOS needs to allow sound.
+                existing.seekTo(start, true);
+                existing.playVideo();
+              } else {
+                // Reusing the warm player — no iframe rebuild, no player boot.
+                existing.loadVideoById({ videoId, startSeconds: start });
+              }
+              if (key === 0) warmedVideoId.current = null;
             } catch { /* ignore */ }
           };
           if (ytReady.current[key]) load();
@@ -421,14 +457,23 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     slots.current[active].activate = false;
     slotPause(active);
 
-    await mountSegment(other, next, true);
-    setActiveSlot(other);
-    activeSlotRef.current = other;
+    // iOS only lets a player the viewer has already tapped start by itself, so a
+    // fresh player in the other slot would sit on YouTube's play button. Load the
+    // next video into the live player instead (same engine only: a YouTube iframe
+    // would cover an MP4 in the same slot).
+    const nextSegment = segmentsRef.current[next];
+    const sameEngine = !!nextSegment
+      && (getSegmentEngine(nextSegment.video_url) === 'youtube' ? 'youtube' : 'html5') === slots.current[active].engine;
+    const target: SlotKey = !allowPrebuffer && sameEngine ? active : other;
+
+    await mountSegment(target, next, true);
+    setActiveSlot(target);
+    activeSlotRef.current = target;
     setCurrentIndex(next);
     currentIndexRef.current = next;
     activeStartedAt.current = Date.now();
     advancingRef.current = false;
-  }, [applyVolumeTo, mountSegment]);
+  }, [applyVolumeTo, mountSegment, allowPrebuffer]);
 
   const reachedEndOfSegment = useCallback(() => {
     if (advancingRef.current) return;
@@ -556,6 +601,7 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
       }
       ytPlayers.current[key] = null;
       ytReady.current[key] = false;
+      ytPlayerPromises.current[key] = null;
       pendingMount.current[key] = null;
       const host = ytHosts.current[key];
       if (host?.parentNode) host.parentNode.removeChild(host);
@@ -594,7 +640,21 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     setIsBridging(false);
     setError(null);
     setTotalDuration(0);
+    setFirstFrameShown(false);
+    setNeedsUnmute(false);
+    warmedVideoId.current = null;
   }, [signature, destroyEverything]);
+
+  // Build the first video's player as the page opens, out of sight under the
+  // thumbnail, so tapping play starts it at once instead of booting YouTube first.
+  useEffect(() => {
+    const first = segmentsRef.current[0];
+    if (!first || getSegmentEngine(first.video_url) !== 'youtube') return;
+    const videoId = getYouTubeId(extractVideoUrl(first.video_url));
+    if (!videoId) return;
+    warmedVideoId.current = videoId;
+    void ensureYouTubePlayer(0, videoId, segmentStart(first));
+  }, [signature, ensureYouTubePlayer]);
 
   /* --------------------------------------------------------------- controls */
 
@@ -605,6 +665,21 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     setHasStarted(true);
     activeStartedAt.current = Date.now();
     window.setTimeout(() => { setIsLoading(false); setIsBridging(false); }, 12000);
+    // If the tap landed before the player was ready, iOS may refuse to start it
+    // with sound afterwards. Muted is always allowed, so the video still moves.
+    window.setTimeout(() => {
+      if (isPlayingRef.current || currentIndexRef.current !== 0) return;
+      const key = activeSlotRef.current;
+      const player = ytPlayers.current[key];
+      if (slots.current[key].engine !== 'youtube' || !player) return;
+      try {
+        mutedRef.current = true;
+        setIsMuted(true);
+        player.mute();
+        player.playVideo();
+        setNeedsUnmute(true);
+      } catch { /* player busy */ }
+    }, QUEUED_PLAY_GRACE_MS);
     await mountSegment(0, 0, true);
     setActiveSlot(0);
     activeSlotRef.current = 0;
@@ -635,7 +710,15 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
     }
   }, [hasEnded, awaitingContinue, hasStarted, isPlaying, restart, handleContinue, start]);
 
+  const handleUnmute = useCallback(() => {
+    mutedRef.current = false;
+    setIsMuted(false);
+    setNeedsUnmute(false);
+    applyVolumeTo(activeSlotRef.current);
+  }, [applyVolumeTo]);
+
   const handleVolumeToggle = useCallback(() => {
+    setNeedsUnmute(false);
     mutedRef.current = !mutedRef.current;
     setIsMuted(mutedRef.current);
     applyVolumeTo(activeSlotRef.current);
@@ -712,9 +795,32 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
             </div>
           ))}
 
+          {!firstFrameShown && posterSrc && (
+            <img
+              src={posterSrc}
+              alt=""
+              className="absolute inset-0 z-[3] w-full h-full object-cover bg-black"
+              // maxresdefault doesn't exist for every video; hqdefault always does
+              onError={() => setPosterSrc(firstVideoId ? `https://i.ytimg.com/vi/${firstVideoId}/hqdefault.jpg` : null)}
+            />
+          )}
+
+          {needsUnmute && (
+            <button
+              onClick={handleUnmute}
+              className="absolute top-3 left-3 z-30 flex items-center gap-2 rounded-full bg-black/75 px-4 py-2 text-sm font-medium text-white shadow-lg"
+            >
+              <VolumeX className="w-4 h-4" />
+              Tap for sound
+            </button>
+          )}
+
           {/* Hides YouTube's own spinner and branding during a load we could not hide. */}
           {(isLoading || isBridging) && (
-            <div className="absolute inset-0 z-[5] bg-black flex items-center justify-center">
+            <div className={cn(
+              'absolute inset-0 z-[5] flex items-center justify-center',
+              firstFrameShown || !posterSrc ? 'bg-black' : 'bg-black/40'
+            )}>
               <Loader2 className="w-10 h-10 text-white/80 animate-spin" />
             </div>
           )}
