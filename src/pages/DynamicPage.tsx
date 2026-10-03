@@ -9,6 +9,7 @@ import { LeadOptinModal } from '@/components/LeadOptinModal';
 import { useToast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
 import { formatText } from '@/lib/textFormatting';
+import { LEGAL } from '@/lib/legal';
 
 interface Page {
   id: string;
@@ -258,7 +259,7 @@ const DynamicPage = () => {
                   
                   <div className="flex justify-center flex-wrap gap-x-4 gap-y-2 text-sm">
                     <a 
-                      href={page.privacy_policy_url || 'https://winarzapps.com/privacy-policy/'} 
+                      href={page.privacy_policy_url || LEGAL.privacyUrl} 
                       className="text-blue-600 hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -267,7 +268,7 @@ const DynamicPage = () => {
                     </a>
                     <span className="text-gray-400 hidden sm:inline">|</span>
                     <a 
-                      href={page.terms_conditions_url || 'https://winarzapps.com/terms-of-service/'} 
+                      href={page.terms_conditions_url || LEGAL.termsUrl} 
                       className="text-blue-600 hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -276,7 +277,7 @@ const DynamicPage = () => {
                     </a>
                     <span className="text-gray-400 hidden sm:inline">|</span>
                     <a 
-                      href={page.earnings_disclaimer_url || 'https://winarzapps.com/earning-disclaimer'} 
+                      href={page.earnings_disclaimer_url || LEGAL.earningsDisclaimerUrl} 
                       className="text-blue-600 hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"

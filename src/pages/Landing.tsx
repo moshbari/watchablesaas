@@ -11,6 +11,7 @@ import testimonialSarah from '@/assets/testimonial-sarah.jpg';
 import testimonialMarcus from '@/assets/testimonial-marcus.jpg';
 import testimonialDavid from '@/assets/testimonial-david.jpg';
 import testimonialJennifer from '@/assets/testimonial-jennifer.jpg';
+import { LEGAL } from '@/lib/legal';
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255)
@@ -712,10 +713,9 @@ export default function Landing() {
             <div className="landing-footer-section">
               <h4>Legal</h4>
               <ul className="landing-footer-links">
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Service</a></li>
-                <li><a href="#">Refund Policy</a></li>
-                <li><a href="#">Security</a></li>
+                <li><a href={LEGAL.termsUrl} target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a></li>
+                <li><a href={LEGAL.privacyUrl} target="_blank" rel="noopener noreferrer">Privacy Policy</a></li>
+                <li><a href={LEGAL.earningsDisclaimerUrl} target="_blank" rel="noopener noreferrer">Earnings Disclaimer</a></li>
               </ul>
             </div>
 

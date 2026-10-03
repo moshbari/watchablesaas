@@ -31,6 +31,7 @@ import { AIPageGenerator } from '@/components/AIPageGenerator';
 import { TimedButton } from '@/components/TimedButton';
 import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
 import { InputWithClipboard, TextareaWithClipboard } from '@/components/InputWithClipboard';
+import { LEGAL } from '@/lib/legal';
 
 interface Page {
   id: string;
@@ -212,9 +213,9 @@ const PageBuilder = () => {
     lead_optin_description: 'Enter your information to watch this exclusive video',
     footer_enabled: true,
     copyright_text: '2026 Mosh Bari - Copyright© 2026. All Rights Reserved.',
-    privacy_policy_url: 'https://winarzapps.com/privacy-policy/',
-    terms_conditions_url: 'https://winarzapps.com/terms-of-service/',
-    earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
+    privacy_policy_url: LEGAL.privacyUrl,
+    terms_conditions_url: LEGAL.termsUrl,
+    earnings_disclaimer_url: LEGAL.earningsDisclaimerUrl,
     legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
     earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
       start_time: undefined,
@@ -608,9 +609,9 @@ const PageBuilder = () => {
       lead_optin_description: 'Enter your information to watch this exclusive video',
       footer_enabled: true,
       copyright_text: '2026 Mosh Bari - Copyright© 2026. All Rights Reserved.',
-      privacy_policy_url: 'https://winarzapps.com/privacy-policy/',
-      terms_conditions_url: 'https://winarzapps.com/terms-of-service/',
-      earnings_disclaimer_url: 'https://winarzapps.com/earning-disclaimer',
+      privacy_policy_url: LEGAL.privacyUrl,
+      terms_conditions_url: LEGAL.termsUrl,
+      earnings_disclaimer_url: LEGAL.earningsDisclaimerUrl,
       legal_disclaimer_text: 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
       earnings_disclaimer_text: '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
       start_time: undefined,
@@ -671,9 +672,9 @@ const PageBuilder = () => {
       lead_optin_description: page.lead_optin_description || 'Enter your information to watch this exclusive video',
       footer_enabled: page.footer_enabled ?? true,
       copyright_text: page.copyright_text || '2026 Mosh Bari - Copyright© 2026. All Rights Reserved.',
-      privacy_policy_url: page.privacy_policy_url || 'https://winarzapps.com/privacy-policy/',
-      terms_conditions_url: page.terms_conditions_url || 'https://winarzapps.com/terms-of-service/',
-      earnings_disclaimer_url: page.earnings_disclaimer_url || 'https://winarzapps.com/earning-disclaimer',
+      privacy_policy_url: page.privacy_policy_url || LEGAL.privacyUrl,
+      terms_conditions_url: page.terms_conditions_url || LEGAL.termsUrl,
+      earnings_disclaimer_url: page.earnings_disclaimer_url || LEGAL.earningsDisclaimerUrl,
       legal_disclaimer_text: page.legal_disclaimer_text || 'This site is not a part of the Facebook website or Facebook Inc. Additionally, This site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.',
       earnings_disclaimer_text: page.earnings_disclaimer_text || '*Earnings and income representations made by Mosh Bari, Mosh Bari\'s agency, and Mosh Bari\'s agency and their advertisers/sponsors (collectively, "Mosh Bari\'s agency") are aspirational statements only of your earnings potential. These results are not typical and results will vary. The results on this page are OUR results and from years of testing. We can in NO way guarantee you will get similar results.',
       start_time: page.start_time,
@@ -1609,7 +1610,7 @@ const PageBuilder = () => {
                               id="privacy_policy_url"
                               value={formData.privacy_policy_url}
                               onChange={(e) => setFormData(prev => ({ ...prev, privacy_policy_url: e.target.value }))}
-                              placeholder="https://winarzapps.com/privacy-policy/"
+                              placeholder={LEGAL.privacyUrl}
                               type="url"
                               className="border-2 border-foreground/80 rounded-lg"
                             />
@@ -1621,7 +1622,7 @@ const PageBuilder = () => {
                               id="terms_conditions_url"
                               value={formData.terms_conditions_url}
                               onChange={(e) => setFormData(prev => ({ ...prev, terms_conditions_url: e.target.value }))}
-                              placeholder="https://winarzapps.com/terms-of-service/"
+                              placeholder={LEGAL.termsUrl}
                               type="url"
                               className="border-2 border-foreground/80 rounded-lg"
                             />
@@ -1633,7 +1634,7 @@ const PageBuilder = () => {
                               id="earnings_disclaimer_url"
                               value={formData.earnings_disclaimer_url}
                               onChange={(e) => setFormData(prev => ({ ...prev, earnings_disclaimer_url: e.target.value }))}
-                              placeholder="https://winarzapps.com/earning-disclaimer"
+                              placeholder={LEGAL.earningsDisclaimerUrl}
                               type="url"
                               className="border-2 border-foreground/80 rounded-lg"
                             />
