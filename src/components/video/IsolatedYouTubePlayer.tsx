@@ -3,7 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { type SkipSection } from './useVideoState';
-import { loadYouTubeIframeAPI } from '@/lib/youtubeApi';
+import { loadYouTubeIframeAPI, youTubeErrorMessage } from '@/lib/youtubeApi';
 
 // If a play queued before the player was ready hasn't started by then, the browser
 // refused to start it with sound — fall back to muted so the video still moves.
@@ -134,7 +134,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
               console.error('Isolated YouTube player error:', event.data);
               pendingPlayRef.current = false;
               setIsWaitingToPlay(false);
-              onError?.('YouTube video failed to load.');
+              onError?.(youTubeErrorMessage(event.data));
             }
           }
         });

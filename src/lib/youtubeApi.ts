@@ -46,3 +46,17 @@ export const loadYouTubeIframeAPI = (): Promise<void> => {
 
   return apiPromise;
 };
+
+/** Turns a YouTube player error code into something a visitor can act on. */
+export const youTubeErrorMessage = (code: number): string => {
+  switch (code) {
+    case 101:
+    case 150:
+    case 152:
+      return "This video's owner doesn't allow it to be played outside YouTube.";
+    case 100:
+      return 'This video is private or has been removed.';
+    default:
+      return 'YouTube video failed to load.';
+  }
+};

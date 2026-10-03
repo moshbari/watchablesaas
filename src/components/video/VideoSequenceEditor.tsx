@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, ArrowUp, ArrowDown, AlertTriangle, ListVideo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { InputWithClipboard } from '@/components/InputWithClipboard';
 import { canSequence } from '@/lib/videoSegments';
+import { checkVideo, videoCheckWarning, type VideoCheckStatus } from '@/lib/videoTitle';
 import {
   emptyEditorSkip,
   emptyEditorVideo,
@@ -27,6 +28,22 @@ const smallTimeFieldClass = 'w-14 text-center text-xs border-2 border-foreground
  */
 export const VideoSequenceEditor: React.FC<VideoSequenceEditorProps> = ({ videos, onChange }) => {
   const list = videos.length > 0 ? videos : [emptyEditorVideo()];
+
+  // Ask YouTube about each link as it's pasted, so a video that won't play on a
+  // page (embedding off, private, deleted) is caught here, not by a visitor.
+  const [checks, setChecks] = useState<Record<string, VideoCheckStatus>>({});
+  const urlsKey = list.map(v => v.video_url.trim()).join('\n');
+  useEffect(() => {
+    let cancelled = false;
+    const pending = urlsKey.split('\n').filter(url => url && !(url in checks));
+    if (pending.length === 0) return;
+    const timer = setTimeout(async () => {
+      const results = await Promise.all(pending.map(async url => [url, (await checkVideo(url)).status] as const));
+      if (!cancelled) setChecks(prev => ({ ...prev, ...Object.fromEntries(results) }));
+    }, 500);
+    return () => { cancelled = true; clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlsKey]);
 
   const updateVideo = (index: number, patch: Partial<EditorVideo>) => {
     onChange(list.map((v, i) => (i === index ? { ...v, ...patch } : v)));
@@ -120,6 +137,13 @@ export const VideoSequenceEditor: React.FC<VideoSequenceEditorProps> = ({ videos
               placeholder="https://www.youtube.com/watch?v=..."
               className="border-2 border-foreground/80 rounded-lg"
             />
+
+            {videoCheckWarning(checks[video.video_url.trim()]) && (
+              <div className="flex gap-2 p-3 rounded-lg border border-red-300 bg-red-50 text-red-900">
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                <p className="text-sm font-medium">{videoCheckWarning(checks[video.video_url.trim()])}</p>
+              </div>
+            )}
 
             {showSequenceWarning && (
               <div className="flex gap-2 p-3 rounded-lg border border-amber-300 bg-amber-50 text-amber-900">

@@ -3,7 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, RotateCcw } from 'luc
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { loadYouTubeIframeAPI } from '@/lib/youtubeApi';
+import { loadYouTubeIframeAPI, youTubeErrorMessage } from '@/lib/youtubeApi';
 import { extractVideoUrl, getYouTubeId } from '@/lib/videoUtils';
 import { getSegmentEngine, type VideoSegment } from '@/lib/videoSegments';
 import { OverlayButton, type OverlayButtonConfig } from '../VideoOverlayButton';
@@ -289,8 +289,8 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
               }
             }
           },
-          onError: () => {
-            if (activeSlotRef.current === key) handleFatal('This video could not be played.');
+          onError: (event: { data: number }) => {
+            if (activeSlotRef.current === key) handleFatal(youTubeErrorMessage(event.data));
           },
         },
       });
