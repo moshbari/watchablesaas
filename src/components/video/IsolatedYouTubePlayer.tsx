@@ -3,6 +3,11 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { type SkipSection } from './useVideoState';
+import { loadYouTubeIframeAPI } from '@/lib/youtubeApi';
+
+// If a play queued before the player was ready hasn't started by then, the browser
+// refused to start it with sound — fall back to muted so the video still moves.
+const QUEUED_PLAY_GRACE_MS = 2500;
 
 interface IsolatedYouTubePlayerProps {
   videoId: string;
@@ -42,13 +47,20 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
 }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // The YouTube player boots in the background; viewers never wait on it. Until the
+  // first frame plays they see the video's thumbnail and our play button.
+  const [isReady, setIsReady] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [isWaitingToPlay, setIsWaitingToPlay] = useState(false);
+  const [needsUnmute, setNeedsUnmute] = useState(false);
+  const [posterSrc, setPosterSrc] = useState(`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`);
+  const pendingPlayRef = useRef(false);
+  const queuedPlayTimeoutRef = useRef<NodeJS.Timeout>();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(80);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const progressIntervalRef = useRef<NodeJS.Timeout>();
-  const initializeTimeoutRef = useRef<NodeJS.Timeout>();
   
   // Detect iOS - fullscreen won't work on iOS Safari for YouTube (platform limitation)
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -86,7 +98,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
           events: {
             onReady: () => {
               console.log('Isolated YouTube player ready');
-              setIsLoading(false);
+              setIsReady(true);
               if (ytPlayerRef.current) {
                 ytPlayerRef.current.setVolume(volume);
                 
@@ -98,6 +110,9 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
                     : duration - (startTime || 0);
                   onDurationChange(effectiveDuration);
                 }
+
+                // The viewer tapped play while we were still booting.
+                if (pendingPlayRef.current) playQueued();
               }
             },
             onStateChange: (event: any) => {
@@ -107,6 +122,9 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
               setIsPlaying(playing);
               
               if (playing) {
+                pendingPlayRef.current = false;
+                setHasStarted(true);
+                setIsWaitingToPlay(false);
                 startProgressTracking();
               } else {
                 stopProgressTracking();
@@ -114,68 +132,32 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
             },
             onError: (event: any) => {
               console.error('Isolated YouTube player error:', event.data);
-              setIsLoading(false);
+              pendingPlayRef.current = false;
+              setIsWaitingToPlay(false);
               onError?.('YouTube video failed to load.');
             }
           }
         });
       } catch (error) {
         console.error('Error creating isolated YouTube player:', error);
-        setIsLoading(false);
         onError?.('Failed to initialize YouTube player.');
       }
     };
 
-    const loadAPI = () => {
-      if (window.YT && window.YT.Player) {
-        // Add small delay to prevent conflicts
-        initializeTimeoutRef.current = setTimeout(initializePlayer, 100);
-        return;
-      }
-
-      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-        const script = document.createElement('script');
-        script.src = 'https://www.youtube.com/iframe_api';
-        script.async = true;
-        document.head.appendChild(script);
-      }
-
-      // Chain the global callback so multiple instances mounting in parallel
-      // all get notified (each one calling this would otherwise overwrite the previous).
-      const previousCallback = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => {
-        if (typeof previousCallback === 'function') {
-          try { previousCallback(); } catch (e) { console.log('prev YT cb error', e); }
-        }
-        if (isComponentMounted) {
-          initializeTimeoutRef.current = setTimeout(initializePlayer, 100);
-        }
-      };
-
-      // Safety net: poll for the API in case the global callback was overwritten
-      // by another instance mounting in parallel.
-      const pollStart = Date.now();
-      const poll = setInterval(() => {
-        if (!isComponentMounted || ytPlayerRef.current) {
-          clearInterval(poll);
-          return;
-        }
-        if (window.YT && window.YT.Player) {
-          clearInterval(poll);
-          initializeTimeoutRef.current = setTimeout(initializePlayer, 100);
-        } else if (Date.now() - pollStart > 15000) {
-          clearInterval(poll);
-        }
-      }, 200);
-    };
-
-    loadAPI();
+    // index.html starts fetching the API before the app bundle has even loaded,
+    // so by now this usually resolves immediately.
+    loadYouTubeIframeAPI()
+      .then(initializePlayer)
+      .catch((error) => {
+        console.error(error);
+        if (isComponentMounted) onError?.('YouTube video failed to load.');
+      });
 
     return () => {
       isComponentMounted = false;
       stopProgressTracking();
-      if (initializeTimeoutRef.current) {
-        clearTimeout(initializeTimeoutRef.current);
+      if (queuedPlayTimeoutRef.current) {
+        clearTimeout(queuedPlayTimeoutRef.current);
       }
       if (ytPlayerRef.current && ytPlayerRef.current.destroy) {
         console.log('Destroying isolated YouTube player');
@@ -191,7 +173,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
 
   // Handle seeking when shouldSeekTo changes
   useEffect(() => {
-    if (shouldSeekTo !== undefined && ytPlayerRef.current && !isLoading) {
+    if (shouldSeekTo !== undefined && ytPlayerRef.current && isReady) {
       try {
         console.log('🎬 Seeking to saved time:', shouldSeekTo);
         ytPlayerRef.current.seekTo(shouldSeekTo, true);
@@ -203,7 +185,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
         onSeekComplete?.();
       }
     }
-  }, [shouldSeekTo, isLoading, onSeekComplete]);
+  }, [shouldSeekTo, isReady, onSeekComplete]);
 
   const startProgressTracking = () => {
     if (progressIntervalRef.current) return;
@@ -244,34 +226,82 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
     }
   };
 
-  const handlePlay = () => {
-    if (!ytPlayerRef.current) return;
-    
-    try {
-      if (isPlaying) {
-        ytPlayerRef.current.pauseVideo();
-      } else {
-        // Check if we need to seek to start time
-        const currentTime = ytPlayerRef.current.getCurrentTime();
-        const duration = ytPlayerRef.current.getDuration();
-        
-        // If video is at the beginning (0-5 seconds) or has ended, seek to start time
-        if ((currentTime < 5 || 
-             (endTime && currentTime >= endTime) ||
-             currentTime >= duration - 2) && 
-            startTime) {
-          ytPlayerRef.current.seekTo(startTime, true);
-        }
-        
-        ytPlayerRef.current.playVideo();
+  /** Plays a tap that arrived before the player was ready. */
+  const playQueued = () => {
+    startPlayback();
+    queuedPlayTimeoutRef.current = setTimeout(() => {
+      const player = ytPlayerRef.current;
+      if (!pendingPlayRef.current || !player) return;
+      // Too long after the tap for the browser to count it — muted is always allowed.
+      console.log('Queued play blocked, starting muted');
+      try {
+        player.mute();
+        player.playVideo();
+        setIsMuted(true);
+        setNeedsUnmute(true);
+      } catch (error) {
+        console.error('Error starting muted playback:', error);
       }
+    }, QUEUED_PLAY_GRACE_MS);
+  };
+
+  const handlePlay = () => {
+    if (!ytPlayerRef.current || !isReady) {
+      // Still booting: remember the tap and start the moment it's ready.
+      pendingPlayRef.current = true;
+      setIsWaitingToPlay(true);
+      return;
+    }
+
+    if (isPlaying) {
+      try {
+        ytPlayerRef.current.pauseVideo();
+      } catch (error) {
+        console.error('Error controlling playback:', error);
+      }
+      return;
+    }
+
+    startPlayback();
+  };
+
+  const startPlayback = () => {
+    if (!ytPlayerRef.current) return;
+
+    try {
+      // Check if we need to seek to start time
+      const currentTime = ytPlayerRef.current.getCurrentTime();
+      const duration = ytPlayerRef.current.getDuration();
+      
+      // If video is at the beginning (0-5 seconds) or has ended, seek to start time
+      if ((currentTime < 5 || 
+           (endTime && currentTime >= endTime) ||
+           currentTime >= duration - 2) && 
+          startTime) {
+        ytPlayerRef.current.seekTo(startTime, true);
+      }
+      
+      ytPlayerRef.current.playVideo();
     } catch (error) {
       console.error('Error controlling playback:', error);
     }
   };
 
+  const handleUnmute = () => {
+    if (!ytPlayerRef.current) return;
+    try {
+      ytPlayerRef.current.unMute();
+      ytPlayerRef.current.setVolume(volume);
+      setIsMuted(false);
+      setNeedsUnmute(false);
+    } catch (error) {
+      console.error('Error unmuting:', error);
+    }
+  };
+
   const handleVolumeToggle = () => {
     if (!ytPlayerRef.current) return;
+    setNeedsUnmute(false);
     
     try {
       if (isMuted) {
@@ -317,23 +347,36 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
       {/* YouTube Player Container */}
       <div ref={playerRef} className="w-full h-full" />
 
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-player-overlay flex items-center justify-center">
-          <Loader2 className="w-12 h-12 text-player-accent animate-spin" />
-        </div>
+      {/* Thumbnail until the first frame plays — shows instantly, covers the player booting */}
+      {!hasStarted && (
+        <img
+          src={posterSrc}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover bg-black"
+          // maxresdefault doesn't exist for every video; hqdefault always does
+          onError={() => setPosterSrc(`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`)}
+        />
+      )}
+
+      {needsUnmute && (
+        <button
+          onClick={handleUnmute}
+          className="absolute top-3 left-3 z-10 flex items-center gap-2 rounded-full bg-black/75 px-4 py-2 text-sm font-medium text-white shadow-lg"
+        >
+          <VolumeX className="w-4 h-4" />
+          Tap for sound
+        </button>
       )}
 
       {/* Custom Controls */}
       {showControls && (
         <div className="absolute inset-0 transition-opacity duration-300">
           {/* Center Play Button */}
-          {!isPlaying && !isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center">
+          {!isPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center cursor-pointer" onClick={handlePlay}>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handlePlay}
                 className="rounded-full border-0 shadow-xl transition-all duration-200 hover:scale-110 p-0"
                 style={{
                   width: `${playButtonSize}px`,
@@ -341,14 +384,24 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
                   backgroundColor: playButtonColor,
                 }}
               >
-                <Play 
-                  className="text-white ml-1" 
-                  fill="currentColor" 
-                  style={{ 
-                    width: `${playButtonSize * 0.4}px`, 
-                    height: `${playButtonSize * 0.4}px` 
-                  }}
-                />
+                {isWaitingToPlay ? (
+                  <Loader2
+                    className="text-white animate-spin"
+                    style={{
+                      width: `${playButtonSize * 0.4}px`,
+                      height: `${playButtonSize * 0.4}px`
+                    }}
+                  />
+                ) : (
+                  <Play 
+                    className="text-white ml-1" 
+                    fill="currentColor" 
+                    style={{ 
+                      width: `${playButtonSize * 0.4}px`, 
+                      height: `${playButtonSize * 0.4}px` 
+                    }}
+                  />
+                )}
               </Button>
             </div>
           )}

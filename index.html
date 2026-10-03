@@ -18,6 +18,12 @@
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     
     <link rel="canonical" href="/" />
+
+    <!-- Warm up YouTube while the app bundle downloads, so a page's video is ready
+         by the time someone taps play instead of starting from cold. -->
+    <link rel="preconnect" href="https://www.youtube.com" />
+    <link rel="preconnect" href="https://i.ytimg.com" />
+    <script async src="https://www.youtube.com/iframe_api"></script>
   </head>
 
   <body>
