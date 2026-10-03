@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-
-const MANDRILL_API_KEY = Deno.env.get("MANDRILL_API_KEY");
+import { sendEmail } from "../_shared/email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,11 +22,10 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { email, confirmationLink, name }: SignupConfirmationRequest = await req.json();
 
-    // Mandrill API payload
-    const mandrillPayload = {
-      key: MANDRILL_API_KEY,
-      message: {
-        html: `
+    const id = await sendEmail({
+      to: email,
+      subject: "Welcome to Watchable - Confirm your email",
+      html: `
           <!DOCTYPE html>
           <html>
             <head>
@@ -72,7 +70,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p style="margin: 0;">This confirmation link will expire in 24 hours.</p>
                 <p style="margin: 10px 0 0 0;">
                   Need help? Contact our support team at 
-                  <a href="mailto:support@watchable.moshbari.com" style="color: #667eea; text-decoration: none;">support@watchable.moshbari.com</a>
+                  <a href="mailto:engrmoshbari@gmail.com" style="color: #667eea; text-decoration: none;">engrmoshbari@gmail.com</a>
                 </p>
               </div>
               
@@ -82,60 +80,14 @@ const handler = async (req: Request): Promise<Response> => {
             </body>
           </html>
         `,
-        subject: "Welcome to Watchable - Confirm your email",
-        from_email: "noreply@watchable.moshbari.com",
-        from_name: "Watchable",
-        to: [
-          {
-            email: email,
-            type: "to"
-          }
-        ],
-        headers: {
-          "Reply-To": "support@watchable.moshbari.com"
-        },
-        important: false,
-        track_opens: true,
-        track_clicks: true,
-        auto_text: true,
-        auto_html: false,
-        inline_css: false,
-        url_strip_qs: false,
-        preserve_recipients: false,
-        view_content_link: null,
-        tracking_domain: null,
-        signing_domain: null,
-        return_path_domain: null
-      }
-    };
-
-    // Send email via Mandrill API
-    const response = await fetch("https://mandrillapp.com/api/1.0/messages/send.json", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(mandrillPayload)
+      text: `Welcome to Watchable${name ? `, ${name}` : ""}!\n\nConfirm your email address to finish setting up your account:\n${confirmationLink}\n\nQuestions? Reply to this email.`,
     });
 
-    const emailResponse = await response.json();
-    
-    if (!response.ok || emailResponse[0]?.status === "rejected") {
-      throw new Error(`Mandrill API error: ${JSON.stringify(emailResponse)}`);
-    }
+    console.log("Signup confirmation email sent via Resend:", id);
 
-    console.log("Signup confirmation email sent successfully via Mandrill:", emailResponse);
-
-    return new Response(JSON.stringify({
-      success: true,
-      message: `Signup confirmation email sent to ${email}`,
-      result: emailResponse
-    }), {
+    return new Response(JSON.stringify({ success: true, id }), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
     console.error("Error in send-signup-confirmation function:", error);

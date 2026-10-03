@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { supabase } from "../_shared/supabase.ts";
+import { SITE_URL } from "../_shared/email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,7 +26,8 @@ const handler = async (req: Request): Promise<Response> => {
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: `${Deno.env.get('SUPABASE_URL')}/auth/callback`
+        // The website's reset page, not the database's own address.
+        redirectTo: `${SITE_URL}/reset-password`
       }
     });
 
