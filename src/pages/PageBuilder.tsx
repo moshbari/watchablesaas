@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
@@ -16,6 +16,7 @@ import { UpgradeModal } from '@/components/UpgradeModal';
 import { PageVideo } from '@/components/video/PageVideo';
 import { VideoSequenceEditor } from '@/components/video/VideoSequenceEditor';
 import { validateVideoUrl } from '@/lib/videoUtils';
+import { fetchVideoTitle } from '@/lib/videoTitle';
 import { segmentsFromPage, type VideoSegment } from '@/lib/videoSegments';
 import {
   editorVideoToSegment,
@@ -86,6 +87,38 @@ interface Page {
   created_at: string;
 }
 
+/**
+ * Unsaved builder work, kept in this browser so a reload, a closed tab or a stray
+ * back gesture never costs someone the page they were building. One draft per
+ * page being edited, plus one for a brand-new page.
+ */
+interface BuilderDraft {
+  formData: Record<string, unknown>;
+  videoItems: EditorVideo[];
+  buttonDelayInputs: { hours: string; minutes: string; seconds: string };
+}
+
+const draftKeyFor = (pageId?: string) => `watchable:page-draft:${pageId ?? 'new'}`;
+
+const readDraft = (key: string): BuilderDraft | null => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const draft = JSON.parse(raw);
+    return draft?.formData && Array.isArray(draft.videoItems) && draft.buttonDelayInputs ? draft : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeDraft = (key: string, draft: BuilderDraft) => {
+  try { localStorage.setItem(key, JSON.stringify(draft)); } catch { /* storage full or blocked */ }
+};
+
+const clearDraft = (key: string) => {
+  try { localStorage.removeItem(key); } catch { /* storage blocked */ }
+};
+
 const PageBuilder = () => {
   const location = useLocation();
   const isStudioRoute = location.pathname === '/studio';
@@ -99,6 +132,8 @@ const PageBuilder = () => {
     if (location.pathname === '/studio') {
       setIsCreating(true);
     } else if (location.pathname === '/page-builder' || location.pathname === '/page-editor') {
+      // Browser back / swipe back out of the builder.
+      autoSaveOnLeaveRef.current();
       setIsCreating(false);
     }
   }, [location.pathname]);
@@ -140,16 +175,17 @@ const PageBuilder = () => {
   
   const [formData, setFormData] = useState({
     slug: generateDefaultSlug(),
-    title: "Let's Do This Habibi",
-    headline: 'How [Target Audience] [Achieve Desired Result] In [Time Frame] Without [Common Obstacle]',
-    sub_headline: 'The proven [Number]-step system that [Specific Benefit] - even if [Common Objection]',
+    // Left empty on purpose: saving with them empty fills them from the video's title.
+    title: '',
+    headline: '',
+    sub_headline: '',
     video_url: '',
     video_type: 'youtube',
     button_text: 'Click Here To Secure Your Spot Now',
     button_url: 'https://ultimateonlinemastery.org/',
     button_delay: 5,
     button_enabled: false,
-    is_published: false,
+    is_published: true,
       headline_font_size: 30,
       headline_color: '#0064c2',
       sub_headline_font_size: 18,
@@ -285,12 +321,21 @@ const PageBuilder = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    await persistPage('manual');
+  };
+
+  /**
+   * Saves the page. 'manual' is the Save button; 'auto' is the safety net when
+   * someone leaves the builder without saving — it saves quietly and stays put.
+   * Returns whether the page was saved.
+   */
+  const persistPage = async (mode: 'manual' | 'auto'): Promise<boolean> => {
+    const isAuto = mode === 'auto';
+    if (!isAuto) setLoading(true);
 
     try {
-      // Validate required fields
-      if (!formData.slug || !formData.title || !formData.headline) {
-        throw new Error('Slug, title, and headline are required');
+      if (!formData.slug) {
+        throw new Error('The URL slug is required');
       }
 
       // Validate every video in the sequence before saving any of it.
@@ -318,6 +363,14 @@ const PageBuilder = () => {
 
       const sequence: VideoSegment[] = filledVideos.map(editorVideoToSegment);
       const firstVideo = sequence[0];
+
+      // Quick creation: an empty title or headline takes the video's own title.
+      let { title, headline } = formData;
+      if (!title.trim() || !headline.trim()) {
+        const videoTitle = (firstVideo && await fetchVideoTitle(firstVideo.video_url)) || 'Watch This Video';
+        if (!title.trim()) title = videoTitle;
+        if (!headline.trim()) headline = videoTitle;
+      }
       const firstType = firstVideo
         ? (validateVideoUrl(firstVideo.video_url).type === 'youtube' ? 'youtube' : 'direct')
         : formData.video_type;
@@ -333,6 +386,8 @@ const PageBuilder = () => {
 
       const pageData = {
         ...formData,
+        title,
+        headline,
         slug,
         button_delay: buttonDelaySeconds,
         videos: sequence as unknown as Json,
@@ -381,6 +436,20 @@ const PageBuilder = () => {
 
       if (result.error) throw result.error;
 
+      savedRef.current = true;
+      clearDraft(draftKey);
+
+      if (isAuto) {
+        toast({
+          title: 'Your page was saved',
+          description: formData.is_published
+            ? `You left before saving, so we saved and published it at /${slug}.`
+            : 'You left before saving, so we saved it for you.',
+        });
+        fetchPages();
+        return true;
+      }
+
       if (!missingVideosColumn) {
         toast({
           title: "Success",
@@ -398,16 +467,79 @@ const PageBuilder = () => {
       resetForm();
       navigate('/page-builder');
       fetchPages();
+      return true;
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: isAuto ? "Couldn't save your page" : "Error",
+        description: isAuto
+          ? `${error.message}. Your work is kept — open the page builder again to finish it.`
+          : error.message,
         variant: "destructive",
       });
+      return false;
     } finally {
-      setLoading(false);
+      if (!isAuto) setLoading(false);
     }
   };
+
+  // ── Never lose a half-built page ───────────────────────────────────────────
+  // Every change is kept as a draft in this browser, and leaving the builder any
+  // way other than Save (back button, swipe back, another menu item) saves it.
+  const isBuilderOpen = isCreating || !!editingPage;
+  const draftKey = draftKeyFor(editingPage?.id);
+  const snapshot = JSON.stringify({ formData, videoItems, buttonDelayInputs });
+  const baselineRef = useRef<string | null>(null);
+  const savedRef = useRef(false);
+  const autoSavingRef = useRef(false);
+
+  // Capture the starting point when the builder opens, then bring back any draft.
+  useEffect(() => {
+    if (!isBuilderOpen) {
+      baselineRef.current = null;
+      return;
+    }
+    baselineRef.current = snapshot;
+    savedRef.current = false;
+    autoSavingRef.current = false;
+
+    const draft = readDraft(draftKey);
+    if (draft) {
+      setFormData(prev => ({ ...prev, ...draft.formData }));
+      setVideoItems(draft.videoItems);
+      setButtonDelayInputs(draft.buttonDelayInputs);
+      toast({
+        title: 'Welcome back',
+        description: 'We brought back the page you were working on.',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBuilderOpen, editingPage?.id]);
+
+  const isDirty = isBuilderOpen && !savedRef.current
+    && baselineRef.current !== null && snapshot !== baselineRef.current;
+  const hasVideo = videoItems.some(v => v.video_url.trim());
+
+  useEffect(() => {
+    if (!isBuilderOpen || baselineRef.current === null) return;
+    if (isDirty) {
+      writeDraft(draftKey, { formData, videoItems, buttonDelayInputs });
+    } else {
+      clearDraft(draftKey);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snapshot]);
+
+  /** Saves on the way out if there's unsaved work worth keeping. */
+  const autoSaveOnLeave = () => {
+    if (!isDirty || savedRef.current || !hasVideo || autoSavingRef.current) return;
+    autoSavingRef.current = true;
+    void persistPage('auto');
+  };
+
+  // Leaving to another part of the app unmounts the builder: save on the way out.
+  const autoSaveOnLeaveRef = useRef(autoSaveOnLeave);
+  autoSaveOnLeaveRef.current = autoSaveOnLeave;
+  useEffect(() => () => autoSaveOnLeaveRef.current(), []);
 
   const handleDelete = async (pageId: string) => {
     if (!confirm('Are you sure you want to delete this page?')) return;
@@ -438,16 +570,16 @@ const PageBuilder = () => {
   const resetForm = () => {
     setFormData({
       slug: generateDefaultSlug(),
-      title: "Let's Do This Habibi",
-      headline: 'How [Target Audience] [Achieve Desired Result] In [Time Frame] Without [Common Obstacle]',
-      sub_headline: 'The proven [Number]-step system that [Specific Benefit] - even if [Common Objection]',
+      title: '',
+      headline: '',
+      sub_headline: '',
       video_url: '',
       video_type: 'youtube',
       button_text: 'Click Here To Secure Your Spot Now',
       button_url: 'https://ultimateonlinemastery.org/',
       button_delay: 5,
       button_enabled: false,
-      is_published: false,
+      is_published: true,
       headline_font_size: 30,
       headline_color: '#0064c2',
       sub_headline_font_size: 18,
@@ -699,6 +831,7 @@ const PageBuilder = () => {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold">{editingPage ? 'Edit Page' : 'Create New Page'}</h1>
             <Button variant="outline" onClick={() => { 
+              autoSaveOnLeave();
               setIsCreating(false); 
               setEditingPage(null); 
               resetForm(); 
@@ -803,8 +936,7 @@ const PageBuilder = () => {
                             : prev.slug
                         }));
                       }}
-                      placeholder="My Landing Page"
-                      required
+                      placeholder="Leave empty to use the video's title"
                       className="border-2 border-foreground/80 rounded-lg"
                     />
                   </div>
@@ -852,8 +984,7 @@ const PageBuilder = () => {
                       id="headline"
                       value={formData.headline}
                       onValueChange={(value) => setFormData(prev => ({ ...prev, headline: value }))}
-                      placeholder="Transform Your Business Today"
-                      required
+                      placeholder="Leave empty to use the video's title"
                       rows={2}
                       className="border-2 border-foreground/80 rounded-lg"
                     />
