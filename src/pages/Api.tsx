@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Eye, EyeOff, RefreshCw, Key } from "lucide-react";
 
-const ENDPOINT = "https://kjabpmcsiluvtxmbbfbg.supabase.co/functions/v1/push-static-page";
+const ENDPOINT = "https://sb-watchable.99dfy.com/functions/v1/push-static-page";
 
 function generateToken() {
   const bytes = new Uint8Array(32);

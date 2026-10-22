@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, ExternalLink, Edit, Share2 } from 'lucide-react';
 
-const SHARE_BASE = 'https://kjabpmcsiluvtxmbbfbg.supabase.co/functions/v1/static-page-share';
+const SHARE_BASE = 'https://sb-watchable.99dfy.com/functions/v1/static-page-share';
 const shareLink = (slug: string) => `${SHARE_BASE}/${encodeURIComponent(slug)}`;
 import { complementaryColor, type ComplementaryMode } from '@/lib/colorUtils';
 

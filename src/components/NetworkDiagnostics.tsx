@@ -24,11 +24,11 @@ export const NetworkDiagnostics: React.FC = () => {
     const timeoutId = setTimeout(() => controller.abort(), 10000);
     
     try {
-      const response = await fetch('https://kjabpmcsiluvtxmbbfbg.supabase.co/rest/v1/', {
+      const response = await fetch('https://sb-watchable.99dfy.com/rest/v1/', {
         method: 'HEAD',
         signal: controller.signal,
         headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqYWJwbWNzaWx1dnR4bWJiZmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTcwOTgsImV4cCI6MjA3MDQ5MzA5OH0.KFx4TVE4Nc0NtDiTMC3rwTXadD9maygfri_L-0qRhME'
+          'apikey': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc5MjU4ODg2MCwiZXhwIjo0OTQ4MjYyNDYwLCJyb2xlIjoiYW5vbiJ9.9sHYqsko5W0YV3fMRq3c9cjS19cxj5YOyRe8dSJguzk'
         }
       });
       clearTimeout(timeoutId);
@@ -51,7 +51,7 @@ export const NetworkDiagnostics: React.FC = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      await fetch('https://kjabpmcsiluvtxmbbfbg.supabase.co/favicon.ico', {
+      await fetch('https://sb-watchable.99dfy.com/favicon.ico', {
         method: 'HEAD',
         mode: 'no-cors',
         signal: controller.signal
@@ -119,7 +119,7 @@ export const NetworkDiagnostics: React.FC = () => {
         <div className="space-y-3">
           {[
             { key: 'internet', name: 'General Internet Connectivity' },
-            { key: 'dns', name: 'DNS Resolution (kjabpmcsiluvtxmbbfbg.supabase.co)' },
+            { key: 'dns', name: 'DNS Resolution (sb-watchable.99dfy.com)' },
             { key: 'supabase', name: 'Supabase API Connectivity' }
           ].map(({ key, name }) => (
             <div key={key} className="flex items-center justify-between p-3 border rounded-lg">
@@ -146,7 +146,7 @@ export const NetworkDiagnostics: React.FC = () => {
             <li>If DNS fails: Check your server's DNS settings or try different DNS servers (8.8.8.8, 1.1.1.1)</li>
             <li>If Supabase fails but internet works: Your hosting provider might block supabase.co</li>
             <li>Check your hosting provider's firewall settings</li>
-            <li>Try accessing https://kjabpmcsiluvtxmbbfbg.supabase.co directly from your server</li>
+            <li>Try accessing https://sb-watchable.99dfy.com directly from your server</li>
           </ul>
         </div>
       </CardContent>

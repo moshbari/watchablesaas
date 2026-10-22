@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Log connection attempt for debugging
       console.log("Attempting to sign in...", { 
-        supabaseUrl: "https://kjabpmcsiluvtxmbbfbg.supabase.co",
+        supabaseUrl: "https://sb-watchable.99dfy.com",
         userAgent: navigator.userAgent,
         location: window.location.href,
         origin: window.location.origin
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         message: e?.message,
         stack: e?.stack,
         name: e?.name,
-        supabaseUrl: "https://kjabpmcsiluvtxmbbfbg.supabase.co",
+        supabaseUrl: "https://sb-watchable.99dfy.com",
         currentOrigin: window.location.origin
       });
       
