@@ -15,10 +15,16 @@ R=$(curl -s "$B/dns_records?name=watchable.99dfy.com" "${H[@]}" | python3 -c "im
 
 echo "2/3 turning on the orange cloud…"
 curl -s -X PATCH "$B/dns_records/$R" "${H[@]}" -d '{"proxied":true}' >/dev/null
-sleep 30
+sleep 10
 
 echo "3/3 checking the live site…"
-IP=$(dig +short watchable.99dfy.com @1.1.1.1 | head -1)
+# ask Cloudflare's own nameserver (public resolvers keep the old address for ~5 min)
+for i in $(seq 1 20); do
+  IP=$(dig +short watchable.99dfy.com @dave.ns.cloudflare.com | head -1)
+  [ -n "$IP" ] && [ "$IP" != "185.158.133.1" ] && break
+  sleep 3
+done
+echo "   testing through Cloudflare address $IP"
 RV=(--resolve "watchable.99dfy.com:443:$IP")
 ok=1
 for p in / /letstalk /login /og/letstalk.jpg; do
