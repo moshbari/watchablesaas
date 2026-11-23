@@ -93,6 +93,7 @@ const AppContent = () => {
         <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="/admin" element={<RequireRole allow={["admin"]}><Admin /></RequireRole>} />
         <Route path="/page-builder" element={<RequireAuth><PageBuilder /></RequireAuth>} />
+        <Route path="/page-builder/:pageId" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/page-editor" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/studio" element={<RequireAuth><PageBuilder /></RequireAuth>} />
         <Route path="/leads" element={<RequireAuth><Leads /></RequireAuth>} />

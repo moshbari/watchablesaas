@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
@@ -104,6 +104,8 @@ interface BuilderDraft {
   buttonDelayInputs: { hours: string; minutes: string; seconds: string };
 }
 
+const pageTabName = (id: string) => `watchable-page-${id}`;
+
 const draftKeyFor = (pageId?: string) => `watchable:page-draft:${pageId ?? 'new'}`;
 
 const readDraft = (key: string): BuilderDraft | null => {
@@ -128,21 +130,49 @@ const clearDraft = (key: string) => {
 const PageBuilder = () => {
   const location = useLocation();
   const isStudioRoute = location.pathname === '/studio';
+  // Every saved page has its own editor address: /page-builder/<page id>
+  const { pageId } = useParams<{ pageId?: string }>();
+  const [savedVersion, setSavedVersion] = useState(0);
   const [pages, setPages] = useState<Page[]>([]);
   const [isCreating, setIsCreating] = useState(isStudioRoute);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
-  // Update isCreating when route changes
+  // The address decides what's on screen: /studio = new page,
+  // /page-builder/<id> = that page's editor, /page-builder = the list.
   useEffect(() => {
+    if (pageId) {
+      if (editingPage?.id === pageId) return;
+      let cancelled = false;
+      (async () => {
+        const known = pages.find(p => p.id === pageId);
+        const { data, error } = known
+          ? { data: known, error: null }
+          : await supabase.from('pages').select('*').eq('id', pageId).maybeSingle();
+        if (cancelled) return;
+        if (error || !data) {
+          toast({ title: "Page not found", description: "It may have been deleted.", variant: "destructive" });
+          navigate('/page-builder', { replace: true });
+          return;
+        }
+        loadIntoEditor(data as unknown as Page);
+      })();
+      return () => { cancelled = true; };
+    }
     if (location.pathname === '/studio') {
+      if (editingPage) { setEditingPage(null); resetForm(); }
       setIsCreating(true);
     } else if (location.pathname === '/page-builder' || location.pathname === '/page-editor') {
       // Browser back / swipe back out of the builder.
       autoSaveOnLeaveRef.current();
-      setIsCreating(false);
+      if (isCreating || editingPage) {
+        setIsCreating(false);
+        setEditingPage(null);
+        resetForm();
+      }
     }
-  }, [location.pathname]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, pageId]);
   
   // Generate default slug with Dubai date and time
   const generateDefaultSlug = () => {
@@ -482,15 +512,19 @@ const PageBuilder = () => {
         });
       }
 
-      // If page is published, open it in a new tab
-      if (formData.is_published) {
-        window.open(`/${slug}`, '_blank');
+      // Stay in the editor. A new page moves to its own editor address.
+      const saved = result.data as unknown as Page;
+      const wasNew = !editingPage;
+      setFormData(prev => ({ ...prev, slug, title, headline }));
+      setEditingPage(saved);
+      setSavedVersion(v => v + 1);
+      if (wasNew) navigate(`/page-builder/${saved.id}`, { replace: true });
+
+      // Published → show it in its own tab (the same tab each save, so tabs don't pile up)
+      if (saved.is_published) {
+        window.open(`/${saved.slug}`, pageTabName(saved.id));
       }
 
-      setIsCreating(false);
-      setEditingPage(null);
-      resetForm();
-      navigate('/page-builder');
       fetchPages();
       return true;
     } catch (error: any) {
@@ -538,7 +572,7 @@ const PageBuilder = () => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBuilderOpen, editingPage?.id]);
+  }, [isBuilderOpen, editingPage?.id, savedVersion]);
 
   const isDirty = isBuilderOpen && !savedRef.current
     && baselineRef.current !== null && snapshot !== baselineRef.current;
@@ -657,7 +691,9 @@ const PageBuilder = () => {
     setPreviewVideo(null);
   };
 
-  const handleEdit = (page: Page) => {
+  const handleEdit = (page: Page) => navigate(`/page-builder/${page.id}`);
+
+  const loadIntoEditor = (page: Page) => {
     setEditingPage(page);
     setFormData({
       slug: page.slug,
@@ -855,21 +891,35 @@ const PageBuilder = () => {
     }
   }, [formData.video_url]);
 
+  // Opens the saved, published page in its own tab (reused on every click and save).
+  const openPageLink = editingPage?.is_published ? (
+    <Button asChild variant="outline" className="flex items-center gap-2">
+      <a href={`/${editingPage.slug}`} target={pageTabName(editingPage.id)} rel="opener">
+        <ExternalLink className="h-4 w-4" />
+        Open Page
+      </a>
+    </Button>
+  ) : null;
+
+  if (pageId && !editingPage) {
+    return <div className="min-h-screen bg-background p-6 text-center text-muted-foreground">Opening the page editor…</div>;
+  }
+
   if (isCreating || editingPage) {
     return (
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold">{editingPage ? 'Edit Page' : 'Create New Page'}</h1>
-            <Button variant="outline" onClick={() => { 
-              autoSaveOnLeave();
-              setIsCreating(false); 
-              setEditingPage(null); 
-              resetForm(); 
-              navigate('/page-builder');
-            }}>
-              Back to Pages
-            </Button>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {openPageLink}
+              <Button variant="outline" onClick={() => {
+                autoSaveOnLeave();
+                navigate('/page-builder');
+              }}>
+                Back to Pages
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1729,6 +1779,7 @@ const PageBuilder = () => {
                   <Button type="submit" disabled={loading} className="w-full">
                     {loading ? 'Saving...' : (editingPage ? 'Update Page' : 'Create Page')}
                   </Button>
+                  {openPageLink && <div className="[&>a]:w-full">{openPageLink}</div>}
                 </form>
               </CardContent>
             </Card>
