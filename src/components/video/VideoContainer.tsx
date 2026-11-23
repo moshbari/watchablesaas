@@ -71,8 +71,16 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   // Tella: where the phone/browser can play Tella's stream itself, play it in our own
   // <video> so ONE tap starts it (a tap inside Tella's embedded player can't be relied on
   // on iPhones and in-app browsers). Otherwise, or if the stream fails, use Tella's player.
+  // Only Apple's player (iPhone/iPad, Safari, in-app browsers on iPhone) plays Tella's
+  // stream reliably; Chrome says "maybe" but fails on its separate audio track.
   const canNativeHls = useMemo(() => {
-    try { return !!document.createElement('video').canPlayType('application/vnd.apple.mpegurl'); } catch { return false; }
+    try {
+      const ua = navigator.userAgent;
+      const apple = /iPhone|iPad|iPod/.test(ua)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        || (/Safari\//.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|Android/.test(ua));
+      return apple && !!document.createElement('video').canPlayType('application/vnd.apple.mpegurl');
+    } catch { return false; }
   }, []);
   const [tellaStream, setTellaStream] = useState<string | null | 'failed'>(isTellaLink && canNativeHls ? null : 'failed');
   useEffect(() => {
