@@ -584,6 +584,9 @@ export type Database = {
           video_url: string | null
           between_videos_mode: string
           continue_button_text: string
+          faq_enabled: boolean
+          faq_title: string | null
+          faqs: Json
           videos: Json
         }
         Insert: {
@@ -642,6 +645,9 @@ export type Database = {
           video_url?: string | null
           between_videos_mode?: string
           continue_button_text?: string
+          faq_enabled?: boolean
+          faq_title?: string | null
+          faqs?: Json
           videos?: Json
         }
         Update: {
@@ -700,6 +706,9 @@ export type Database = {
           video_url?: string | null
           between_videos_mode?: string
           continue_button_text?: string
+          faq_enabled?: boolean
+          faq_title?: string | null
+          faqs?: Json
           videos?: Json
         }
         Relationships: []

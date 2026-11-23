@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
 import { formatText } from '@/lib/textFormatting';
 import { LEGAL } from '@/lib/legal';
+import { FaqSection, faqJsonLd } from '@/components/faq/FaqSection';
 
 interface Page {
   id: string;
@@ -50,6 +51,9 @@ interface Page {
   lead_optin_headline?: string;
   lead_optin_description?: string;
   footer_enabled?: boolean;
+  faq_enabled?: boolean;
+  faq_title?: string;
+  faqs?: unknown;
   copyright_text?: string;
   privacy_policy_url?: string;
   terms_conditions_url?: string;
@@ -178,6 +182,9 @@ const DynamicPage = () => {
         <meta name="twitter:title" content={page.title} />
         <meta name="twitter:description" content={page.sub_headline || page.headline} />
         <link rel="canonical" href={`${window.location.origin}/${page.slug}`} />
+        {page.faq_enabled && faqJsonLd(page.faqs) && (
+          <script type="application/ld+json">{JSON.stringify(faqJsonLd(page.faqs))}</script>
+        )}
       </Helmet>
 
       <div className="min-h-screen bg-white relative">
@@ -247,6 +254,16 @@ const DynamicPage = () => {
               <section>
                 <VideoActionButton config={overlayButtonConfig} />
               </section>
+            )}
+
+            {/* FAQ Section */}
+            {page.faq_enabled && (
+              <FaqSection
+                items={page.faqs}
+                title={page.faq_title}
+                headingColor={page.headline_color || '#0064c2'}
+                accentColor={page.button_bg_color || '#007bc7'}
+              />
             )}
 
             {/* Footer Section */}

@@ -32,6 +32,8 @@ import { TimedButton } from '@/components/TimedButton';
 import { Plus, Eye, Edit, Trash2, ExternalLink, ArrowRight } from 'lucide-react';
 import { InputWithClipboard, TextareaWithClipboard } from '@/components/InputWithClipboard';
 import { LEGAL } from '@/lib/legal';
+import { FaqSection, type FaqItem } from '@/components/faq/FaqSection';
+import { FaqEditor } from '@/components/faq/FaqEditor';
 
 interface Page {
   id: string;
@@ -85,6 +87,9 @@ interface Page {
   fake_progress_color?: string;
   fake_progress_thickness?: number;
   mobile_fullscreen_enabled?: boolean;
+  faq_enabled?: boolean;
+  faq_title?: string;
+  faqs?: FaqItem[];
   created_at: string;
 }
 
@@ -225,7 +230,10 @@ const PageBuilder = () => {
       fake_progress_thickness: 8,
       mobile_fullscreen_enabled: true,
       between_videos_mode: 'auto',
-      continue_button_text: 'Continue Watching'
+      continue_button_text: 'Continue Watching',
+      faq_enabled: false,
+      faq_title: '',
+      faqs: [] as FaqItem[]
     });
   // The page's videos, in the order they play. One entry behaves exactly as the
   // single-video page builder always did.
@@ -310,7 +318,7 @@ const PageBuilder = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPages(data || []);
+      setPages((data || []) as unknown as Page[]);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -394,6 +402,7 @@ const PageBuilder = () => {
         slug,
         button_delay: buttonDelaySeconds,
         videos: sequence as unknown as Json,
+        faqs: (formData.faqs ?? []) as unknown as Json,
         // The first video also fills the original columns, so anything still reading
         // them (older embeds, the static page pusher, SEO tags) keeps working.
         video_url: firstVideo?.video_url || '',
@@ -621,7 +630,10 @@ const PageBuilder = () => {
       fake_progress_thickness: 8,
       mobile_fullscreen_enabled: true,
       between_videos_mode: 'auto',
-      continue_button_text: 'Continue Watching'
+      continue_button_text: 'Continue Watching',
+      faq_enabled: false,
+      faq_title: '',
+      faqs: [] as FaqItem[]
     });
     setVideoItems([emptyEditorVideo()]);
     setButtonDelayInputs({
@@ -684,7 +696,10 @@ const PageBuilder = () => {
       fake_progress_thickness: page.fake_progress_thickness || 4,
       mobile_fullscreen_enabled: page.mobile_fullscreen_enabled ?? true,
       between_videos_mode: page.between_videos_mode || 'auto',
-      continue_button_text: page.continue_button_text || 'Continue Watching'
+      continue_button_text: page.continue_button_text || 'Continue Watching',
+      faq_enabled: page.faq_enabled ?? false,
+      faq_title: page.faq_title || '',
+      faqs: Array.isArray(page.faqs) ? page.faqs : []
     });
 
     // Pages saved before multi-video fall back to their single-video columns.
@@ -915,6 +930,16 @@ const PageBuilder = () => {
                                   Button appears after {formData.button_delay} seconds
                                 </p>
                               </div>
+                            )}
+
+                            {formData.faq_enabled && (
+                              <FaqSection
+                                compact
+                                items={formData.faqs}
+                                title={formData.faq_title}
+                                headingColor={formData.headline_color}
+                                accentColor={formData.button_bg_color}
+                              />
                             )}
                           </div>
                         </div>
@@ -1580,6 +1605,15 @@ const PageBuilder = () => {
 
                   <Separator />
 
+                  <FaqEditor
+                    enabled={!!formData.faq_enabled}
+                    title={formData.faq_title || ''}
+                    items={formData.faqs || []}
+                    onChange={(patch) => setFormData(prev => ({ ...prev, ...patch }))}
+                  />
+
+                  <Separator />
+
                   <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
                     <div className="flex items-center space-x-2">
                       <Switch
@@ -1748,6 +1782,16 @@ const PageBuilder = () => {
                             Button appears after {formData.button_delay} seconds
                           </p>
                         </div>
+                      )}
+
+                      {formData.faq_enabled && (
+                        <FaqSection
+                          compact
+                          items={formData.faqs}
+                          title={formData.faq_title}
+                          headingColor={formData.headline_color}
+                          accentColor={formData.button_bg_color}
+                        />
                       )}
 
                       {formData.footer_enabled && (
