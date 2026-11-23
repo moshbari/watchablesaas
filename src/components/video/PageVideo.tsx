@@ -20,6 +20,8 @@ interface PageVideoProps {
   continueButtonText?: string;
   continueButtonBgColor?: string;
   continueButtonTextColor?: string;
+  /** the video's picture, shown while Tella / Google Drive players load */
+  posterUrl?: string;
 }
 
 /**
@@ -35,6 +37,7 @@ export const PageVideo: React.FC<PageVideoProps> = ({
   continueButtonText,
   continueButtonBgColor,
   continueButtonTextColor,
+  posterUrl,
   ...props
 }) => {
   if (segments.length === 0) return null;
@@ -47,6 +50,7 @@ export const PageVideo: React.FC<PageVideoProps> = ({
         startTime={only.start_time}
         endTime={only.end_time}
         skipSections={only.skip_sections}
+        posterUrl={posterUrl}
         {...props}
       />
     );

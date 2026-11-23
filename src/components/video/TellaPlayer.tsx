@@ -6,23 +6,30 @@ interface TellaPlayerProps {
   onError?: (error: string) => void;
   playButtonColor?: string;
   playButtonSize?: number;
+  /** the video's picture, shown while Tella's player loads */
+  posterUrl?: string;
 }
 
 export const TellaPlayer: React.FC<TellaPlayerProps> = ({
   videoId,
   onError,
   playButtonColor = '#ff0000',
-  playButtonSize = 96
+  playButtonSize = 96,
+  posterUrl
 }) => {
   const [hasStarted, setHasStarted] = useState(false);
+  const [frameLoaded, setFrameLoaded] = useState(false);
+  const [posterOk, setPosterOk] = useState(true);
+  const showPoster = !!posterUrl && posterOk && !(hasStarted && frameLoaded);
 
   const handlePlayClick = () => {
     setHasStarted(true);
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
       <iframe
+        onLoad={() => setFrameLoaded(true)}
         src={`https://www.tella.tv/video/${videoId}/embed?b=0&title=0&a=0&loop=0&t=0&muted=0&wt=0`}
         className="w-full h-full"
         allow="autoplay; encrypted-media; fullscreen"
@@ -37,6 +44,16 @@ export const TellaPlayer: React.FC<TellaPlayerProps> = ({
         }}
       />
       
+      {/* The video's own picture until Tella has loaded, so the box is never empty grey */}
+      {showPoster && (
+        <img
+          src={posterUrl}
+          alt=""
+          onError={() => setPosterOk(false)}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 15, pointerEvents: 'none' }}
+        />
+      )}
+
       {/* Custom Play Button Overlay - shown until user starts video */}
       {!hasStarted && (
         <div

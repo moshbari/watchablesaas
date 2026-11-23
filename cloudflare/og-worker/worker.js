@@ -34,7 +34,7 @@ export default {
     if (parts[0] === "og") {
       const multi = parts[1] === "mv";
       const slug = decodeURIComponent((multi ? parts[2] : parts[1]) || "").replace(/\.jpg$/i, "");
-      return ogImage(env, ctx, slug, multi, url.searchParams.get("v"));
+      return ogImage(env, ctx, slug, multi, url.searchParams.get("v"), url.searchParams.has("poster"));
     }
 
     // ---- which page is this? ------------------------------------------------
@@ -215,8 +215,10 @@ function imageResponse(body, type) {
   });
 }
 
-async function ogImage(env, ctx, slug, multi, vParam) {
-  if (!slug) return Response.redirect(DEFAULT_IMAGE, 302);
+async function ogImage(env, ctx, slug, multi, vParam, poster) {
+  // the page's own video player asks with ?poster: no picture → 404, never the default share image
+  const miss = () => poster ? new Response(null, { status: 404 }) : Response.redirect(DEFAULT_IMAGE, 302);
+  if (!slug) return miss();
   const v = (vParam || "").replace(/\D/g, "").slice(0, 14);
 
   // fast path: already built
@@ -227,7 +229,7 @@ async function ogImage(env, ctx, slug, multi, vParam) {
 
   let page = null;
   try { page = await loadPage(env, slug, multi); } catch (_) {}
-  if (!page) return Response.redirect(DEFAULT_IMAGE, 302);
+  if (!page) return miss();
   const realV = (page.updated_at || "").replace(/\D/g, "").slice(0, 14);
   const key = imageKey(page.slug, multi, realV);
 
@@ -236,7 +238,7 @@ async function ogImage(env, ctx, slug, multi, vParam) {
 
   let img = null;
   try { img = await buildImage(page); } catch (_) {}
-  if (!img) return Response.redirect(DEFAULT_IMAGE, 302);
+  if (!img) return miss();
   ctx.waitUntil(env.OG.put(key, img.bytes, { metadata: { type: img.type, w: img.w, h: img.h }, expirationTtl: 60 * 60 * 24 * 90 }));
   return imageResponse(img.bytes, img.type);
 }

@@ -15,6 +15,7 @@ import { FaqSection, faqJsonLd } from '@/components/faq/FaqSection';
 interface Page {
   id: string;
   slug: string;
+  updated_at?: string;
   title: string;
   headline: string;
   sub_headline?: string;
@@ -233,6 +234,7 @@ const DynamicPage = () => {
                 <div className="max-w-3xl mx-auto">
                   <PageVideo
                     segments={videoSegments}
+                    posterUrl={`/og/${encodeURIComponent(page.slug)}.jpg?v=${String(page.updated_at || '').replace(/\D/g, '').slice(0, 14)}&poster=1`}
                     mode={page.between_videos_mode === 'button' ? 'button' : 'auto'}
                     continueButtonText={page.continue_button_text || 'Continue Watching'}
                     continueButtonBgColor={page.button_bg_color || '#3b82f6'}

@@ -1,15 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface GoogleDrivePlayerProps {
   fileId: string;
   onError?: (error: string) => void;
+  /** the video's picture, shown while Drive's player loads */
+  posterUrl?: string;
 }
 
 export const GoogleDrivePlayer: React.FC<GoogleDrivePlayerProps> = ({
   fileId,
-  onError
+  onError,
+  posterUrl
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [frameLoaded, setFrameLoaded] = useState(false);
+  const [posterOk, setPosterOk] = useState(true);
 
   useEffect(() => {
     const handleIframeError = () => {
@@ -24,8 +29,10 @@ export const GoogleDrivePlayer: React.FC<GoogleDrivePlayerProps> = ({
   }, [onError]);
 
   return (
+    <>
     <iframe
       ref={iframeRef}
+      onLoad={() => setTimeout(() => setFrameLoaded(true), 600)}
       src={`https://drive.google.com/file/d/${fileId}/preview`}
       className="w-full h-full"
       allow="autoplay; encrypted-media"
@@ -39,5 +46,14 @@ export const GoogleDrivePlayer: React.FC<GoogleDrivePlayerProps> = ({
         height: '100%'
       }}
     />
+    {posterUrl && posterOk && !frameLoaded && (
+      <img
+        src={posterUrl}
+        alt=""
+        onError={() => setPosterOk(false)}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', backgroundColor: '#000', pointerEvents: 'none' }}
+      />
+    )}
+    </>
   );
 };

@@ -29,6 +29,8 @@ interface VideoContainerProps {
   fakeProgressThickness?: number;
   mobileFullscreenEnabled?: boolean;
   disableResume?: boolean;
+  /** the video's picture (Tella / Google Drive), shown while their player loads */
+  posterUrl?: string;
 }
 
 export const VideoContainer: React.FC<VideoContainerProps> = ({ 
@@ -44,7 +46,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   fakeProgressColor = '#ef4444',
   fakeProgressThickness = 4,
   mobileFullscreenEnabled = true,
-  disableResume = false
+  disableResume = false,
+  posterUrl
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -332,11 +335,13 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           <GoogleDrivePlayer
             fileId={googleDriveId}
             onError={onError}
+            posterUrl={posterUrl}
           />
         ) : isTella && tellaId ? (
           <TellaPlayer
             videoId={tellaId}
             onError={onError}
+            posterUrl={posterUrl}
             playButtonColor={playButtonColor}
             playButtonSize={playButtonSize}
           />
