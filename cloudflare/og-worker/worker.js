@@ -34,7 +34,7 @@ export default {
     if (parts[0] === "og") {
       const multi = parts[1] === "mv";
       const slug = decodeURIComponent((multi ? parts[2] : parts[1]) || "").replace(/\.jpg$/i, "");
-      return ogImage(request, env, ctx, slug, multi);
+      return ogImage(env, ctx, slug, multi, url.searchParams.get("v"));
     }
 
     // ---- which page is this? ------------------------------------------------
@@ -56,6 +56,7 @@ export default {
     const title = clean(page.headline) || clean(page.title) || "Watch this video";
     const desc = clean(page.sub_headline) || "Tap to watch the video.";
     const pageUrl = `${url.origin}${url.pathname}`;
+    ctx.waitUntil(ensureImage(env, page, multi, v).catch(() => {}));
 
     const set = {
       "og:title": title, "og:description": desc, "og:image": image,
@@ -106,8 +107,14 @@ async function passThrough(request, env) {
   const target = new URL(url.pathname + url.search, env.FALLBACK_ORIGIN);
   const headers = new Headers(request.headers);
   headers.delete("host");
+  // hashed build files never change → keep them at Cloudflare's edge; pages stay fresh
+  const cf = url.pathname.startsWith("/assets/")
+    ? { cacheEverything: true, cacheTtl: 31536000 }
+    : /\.(png|ico|svg|jpg|webp|txt)$/i.test(url.pathname)
+      ? { cacheEverything: true, cacheTtl: 3600 }
+      : undefined;
   const res = await fetch(target, {
-    method: request.method, headers, redirect: "manual",
+    method: request.method, headers, redirect: "manual", cf,
     body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
   });
   // keep visitors on watchable.99dfy.com if Lovable ever redirects
@@ -142,34 +149,62 @@ function videoUrls(page) {
   return list;
 }
 
-async function ogImage(request, env, ctx, slug, multi) {
-  const cache = caches.default;
-  const key = new Request(new URL(request.url).toString(), { method: "GET" });
-  const hit = await cache.match(key);
-  if (hit) return hit;
+// Pictures are built once per page version and kept in KV (global), so WhatsApp —
+// which gives up after a few seconds — always gets them instantly.
+function imageKey(slug, multi, v) {
+  return `${multi ? "mv/" : ""}${slug}:${v || "0"}`;
+}
 
-  let img = null;
-  try {
-    const page = slug ? await loadPage(env, slug, multi) : null;
-    if (page) {
-      for (const u of videoUrls(page)) {
-        img = await thumbnailFor(u);
-        if (img) break;
-      }
-    }
-  } catch (_) { /* fallback below */ }
+async function buildImage(page) {
+  for (const u of videoUrls(page)) {
+    const img = await thumbnailFor(u);
+    if (img) return { bytes: await img.arrayBuffer(), type: img.headers.get("content-type") || "image/jpeg" };
+  }
+  return null;
+}
 
-  if (!img) return Response.redirect(DEFAULT_IMAGE, 302);
+async function ensureImage(env, page, multi, v) {
+  const key = imageKey(page.slug, multi, v);
+  const have = await env.OG.get(key, { type: "stream" });
+  if (have) { await have.cancel(); return; }
+  const img = await buildImage(page);
+  if (img) await env.OG.put(key, img.bytes, { metadata: { type: img.type }, expirationTtl: 60 * 60 * 24 * 90 });
+}
 
-  const out = new Response(img.body, {
+function imageResponse(body, type) {
+  return new Response(body, {
     headers: {
-      "content-type": img.headers.get("content-type") || "image/jpeg",
-      "cache-control": "public, max-age=86400",
+      "content-type": type || "image/jpeg",
+      "cache-control": "public, max-age=31536000, immutable",
       "access-control-allow-origin": "*",
     },
   });
-  ctx.waitUntil(cache.put(key, out.clone()));
-  return out;
+}
+
+async function ogImage(env, ctx, slug, multi, vParam) {
+  if (!slug) return Response.redirect(DEFAULT_IMAGE, 302);
+  const v = (vParam || "").replace(/\D/g, "").slice(0, 14);
+
+  // fast path: already built
+  if (v) {
+    const hit = await env.OG.getWithMetadata(imageKey(slug, multi, v), { type: "stream" });
+    if (hit.value) return imageResponse(hit.value, hit.metadata && hit.metadata.type);
+  }
+
+  let page = null;
+  try { page = await loadPage(env, slug, multi); } catch (_) {}
+  if (!page) return Response.redirect(DEFAULT_IMAGE, 302);
+  const realV = (page.updated_at || "").replace(/\D/g, "").slice(0, 14);
+  const key = imageKey(page.slug, multi, realV);
+
+  const hit = await env.OG.getWithMetadata(key, { type: "stream" });
+  if (hit.value) return imageResponse(hit.value, hit.metadata && hit.metadata.type);
+
+  let img = null;
+  try { img = await buildImage(page); } catch (_) {}
+  if (!img) return Response.redirect(DEFAULT_IMAGE, 302);
+  ctx.waitUntil(env.OG.put(key, img.bytes, { metadata: { type: img.type }, expirationTtl: 60 * 60 * 24 * 90 }));
+  return imageResponse(img.bytes, img.type);
 }
 
 async function getImage(src) {
