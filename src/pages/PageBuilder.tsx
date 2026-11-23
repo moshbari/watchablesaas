@@ -1686,7 +1686,8 @@ const PageBuilder = () => {
               </CardContent>
             </Card>
 
-            <div className="space-y-4 hidden lg:block">
+            {/* Desktop preview stays in view while the form scrolls (mobile has its own inline preview) */}
+            <div className="space-y-4 hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
               <Card>
                 <CardHeader>
                   <CardTitle>Preview</CardTitle>
