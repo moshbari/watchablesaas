@@ -1,5 +1,6 @@
 import React, { useRef, useMemo, useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 import { VideoControls } from './VideoControls';
 import { useVideoState } from './useVideoState';
 import { useVideoEvents } from './useVideoEvents';
@@ -64,8 +65,33 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   const youtubeId = useMemo(() => isYoutube ? getYouTubeId(actualVideoUrl) : null, [isYoutube, actualVideoUrl]);
   const isGoogleDrive = useMemo(() => isGoogleDriveUrl(actualVideoUrl), [actualVideoUrl]);
   const googleDriveId = useMemo(() => isGoogleDrive ? getGoogleDriveId(actualVideoUrl) : null, [isGoogleDrive, actualVideoUrl]);
-  const isTella = useMemo(() => isTellaUrl(actualVideoUrl), [actualVideoUrl]);
-  const tellaId = useMemo(() => isTella ? getTellaId(actualVideoUrl) : null, [isTella, actualVideoUrl]);
+  const isTellaLink = useMemo(() => isTellaUrl(actualVideoUrl), [actualVideoUrl]);
+  const tellaId = useMemo(() => isTellaLink ? getTellaId(actualVideoUrl) : null, [isTellaLink, actualVideoUrl]);
+
+  // Tella: where the phone/browser can play Tella's stream itself, play it in our own
+  // <video> so ONE tap starts it (a tap inside Tella's embedded player can't be relied on
+  // on iPhones and in-app browsers). Otherwise, or if the stream fails, use Tella's player.
+  const canNativeHls = useMemo(() => {
+    try { return !!document.createElement('video').canPlayType('application/vnd.apple.mpegurl'); } catch { return false; }
+  }, []);
+  const [tellaStream, setTellaStream] = useState<string | null | 'failed'>(isTellaLink && canNativeHls ? null : 'failed');
+  useEffect(() => {
+    if (!isTellaLink || !tellaId || !canNativeHls) { setTellaStream('failed'); return; }
+    let cancelled = false;
+    setTellaStream(null);
+    const timeout = setTimeout(() => { if (!cancelled) { cancelled = true; setTellaStream('failed'); } }, 4000);
+    fetch(`/tella-stream/${encodeURIComponent(tellaId)}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: { hls?: string } | null) => { if (!cancelled) setTellaStream(d?.hls || 'failed'); })
+      .catch(() => { if (!cancelled) setTellaStream('failed'); })
+      .finally(() => { cancelled = true; clearTimeout(timeout); });
+    return () => { cancelled = true; clearTimeout(timeout); };
+  }, [isTellaLink, tellaId, canNativeHls]);
+  const tellaNative = isTellaLink && !!tellaStream && tellaStream !== 'failed';
+  const tellaPending = isTellaLink && tellaStream === null;
+  // From here on, "isTella" means "use Tella's own embedded player".
+  const isTella = isTellaLink && !tellaNative;
+  const videoSrc = tellaNative ? (tellaStream as string) : actualVideoUrl;
 
   const {
     state,
@@ -215,6 +241,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     const handlePlaying = () => setPlaying(true);
     const handlePause = () => setPlaying(false);
     const handleError = () => {
+      if (tellaNative) { setTellaStream('failed'); return; } // fall back to Tella's own player
       const error = 'Failed to load video. Please check the URL and try again.';
       setError(error);
       onError?.(error);
@@ -280,7 +307,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       video.removeEventListener('error', handleError);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [saveProgress, onError, isYoutube, isGoogleDrive, isTella, startTime, endTime, skipSections, hasInitialized, setLoading, setPlaying, setError]);
+  }, [saveProgress, onError, isYoutube, isGoogleDrive, isTella, tellaNative, startTime, endTime, skipSections, hasInitialized, setLoading, setPlaying, setError]);
 
   // Initialize volume for HTML5 videos
   useEffect(() => {
@@ -337,6 +364,16 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onError={onError}
             posterUrl={posterUrl}
           />
+        ) : tellaPending ? (
+          // finding Tella's stream (a moment): show the video's picture, not an empty box
+          <div className="absolute inset-0 bg-black">
+            {posterUrl && <img src={posterUrl} alt="" className="w-full h-full object-cover" />}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <div className="flex items-center justify-center rounded-full" style={{ width: playButtonSize, height: playButtonSize, backgroundColor: playButtonColor }}>
+                <Loader2 className="text-white animate-spin" style={{ width: playButtonSize * 0.4, height: playButtonSize * 0.4 }} />
+              </div>
+            </div>
+          </div>
         ) : isTella && tellaId ? (
           <TellaPlayer
             videoId={tellaId}
@@ -349,8 +386,9 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           <>
             <video
               ref={videoRef}
-              src={actualVideoUrl}
-              className="w-full h-full object-contain"
+              src={videoSrc}
+              poster={tellaNative ? posterUrl : undefined}
+              className={cn("w-full h-full object-contain", tellaNative && "bg-black")}
               preload="metadata"
               playsInline
               webkit-playsinline="true"

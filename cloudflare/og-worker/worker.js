@@ -30,6 +30,11 @@ export default {
     const url = new URL(request.url);
     const parts = url.pathname.split("/").filter(Boolean);
 
+    // ---- Tella video stream, so the page can play it in the phone's own player (one tap) ----
+    if (parts[0] === "tella-stream" && parts[1]) {
+      return tellaStream(env, decodeURIComponent(parts[1]).replace(/[^A-Za-z0-9_-]/g, ""));
+    }
+
     // ---- the preview picture ------------------------------------------------
     if (parts[0] === "og") {
       const multi = parts[1] === "mv";
@@ -331,4 +336,30 @@ function clean(s) {
 }
 function attr_(s) {
   return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
+// Finds the current (signed, expiring) stream address of a public Tella video.
+// Kept for an hour; Tella's addresses stay valid for much longer than that.
+async function tellaStream(env, id) {
+  const json = (body, status, maxAge) => new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json", "cache-control": `public, max-age=${maxAge}`, "access-control-allow-origin": "*" },
+  });
+  if (!id) return json({ hls: null }, 404, 60);
+  const key = `tella-stream:${id}`;
+  const have = await env.OG.get(key);
+  if (have) return json({ hls: have }, 200, 600);
+  let hls = null;
+  try {
+    const r = await fetch(`https://www.tella.tv/video/${id}/embed?b=0&title=0&a=0&loop=0&t=0&muted=0&wt=0`, {
+      headers: { "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" },
+    });
+    if (r.ok) {
+      const m = (await r.text()).match(/https:\/\/prod-stream\.tella\.tv\/media\/manifest\.m3u8\?[^"'\\\s<>]+/);
+      if (m) hls = m[0].replace(/&amp;/g, "&");
+    }
+  } catch (_) {}
+  if (!hls) return json({ hls: null }, 404, 60);
+  await env.OG.put(key, hls, { expirationTtl: 3600 });
+  return json({ hls }, 200, 600);
 }
