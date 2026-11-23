@@ -11,6 +11,17 @@ interface TellaPlayerProps {
   posterUrl?: string;
 }
 
+// iPhone/iPad (every browser there is Safari underneath) and Mac Safari only start
+// sound on a tap made INSIDE Tella's player; a play command from our page is refused.
+const isAppleWebKit = (() => {
+  try {
+    const ua = navigator.userAgent;
+    return /iPhone|iPad|iPod/.test(ua)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      || (/Safari\//.test(ua) && !/Chrome|Chromium|Edg|OPR|Firefox|Android/.test(ua));
+  } catch { return false; }
+})();
+
 const formatTime = (s: number) => {
   const t = Math.max(0, Math.floor(s));
   const h = Math.floor(t / 3600);
@@ -47,8 +58,17 @@ export const TellaPlayer: React.FC<TellaPlayerProps> = ({
   const [posterOk, setPosterOk] = useState(true);
   const [barVisible, setBarVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [passThrough, setPassThrough] = useState(false);
+  // Apple: let the first tap fall through to Tella's own play button (right under ours)
+  const [passThrough, setPassThrough] = useState(isAppleWebKit);
   const hideTimer = useRef<ReturnType<typeof setTimeout>>();
+  // Right after a tap inside Tella's player, Tella shows its own bar for a few seconds: cover it.
+  const [coverBar, setCoverBar] = useState(false);
+  useEffect(() => {
+    if (!started) return;
+    setCoverBar(true);
+    const t = setTimeout(() => setCoverBar(false), 4000);
+    return () => clearTimeout(t);
+  }, [started]);
 
   const send = useCallback((type: string) => {
     try { iframeRef.current?.contentWindow?.postMessage({ type }, '*'); } catch { /* frame gone */ }
@@ -162,7 +182,8 @@ export const TellaPlayer: React.FC<TellaPlayerProps> = ({
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           // paused: Tella shows its own bar + buttons underneath, so dim harder
           backgroundColor: !started ? 'rgba(0, 0, 0, 0.3)' : showBigButton ? 'rgba(0, 0, 0, 0.6)' : 'transparent',
-          pointerEvents: passThrough && !started ? 'none' : 'auto',
+          // before playing: on Apple, taps go to Tella's player once it's ready
+          pointerEvents: passThrough && !started && ready ? 'none' : 'auto',
           transition: 'background-color 0.2s ease',
         }}
       >
@@ -187,11 +208,11 @@ export const TellaPlayer: React.FC<TellaPlayerProps> = ({
       {started && (
         <div
           onClick={(e) => e.stopPropagation()}
-          style={{ zIndex: 25, opacity: barVisible || !playing ? 1 : 0, minHeight: playing ? undefined : 'max(20%, 60px)' }}
+          style={{ zIndex: 25, opacity: barVisible || !playing || coverBar ? 1 : 0, minHeight: playing && !coverBar ? undefined : 'max(20%, 60px)' }}
           className={cn(
             'absolute inset-x-0 bottom-0 flex items-end gap-3 px-3 pb-2 text-white transition-opacity duration-300',
             // paused: solid, so Tella's own bar (with the total length) underneath can't show through
-            playing ? 'bg-gradient-to-t from-black/70 to-transparent pt-8' : 'bg-black'
+            playing && !coverBar ? 'bg-gradient-to-t from-black/70 to-transparent pt-8' : 'bg-black'
           )}
         >
           <button type="button" onClick={(e) => { e.stopPropagation(); togglePlay(); }} aria-label={playing ? 'Pause' : 'Play'} className="p-1">
