@@ -8,8 +8,9 @@
 // and serves that picture at a stable URL: /og/<slug>.jpg  (or /og/mv/<slug>.jpg)
 //
 // Everything else passes straight through to the Lovable site untouched.
-// If the Lovable origin refuses us through the proxy, we fall back to the
-// lovable.app copy of the same build, so the site never goes down because of this.
+// Lovable's own hosting is on Cloudflare too and swallows proxied traffic before a
+// route worker runs, so the DNS record points at a placeholder IP and this worker
+// serves everything from the lovable.app copy of the same build.
 //
 // Bindings (set at upload): SUPABASE_URL, SUPABASE_ANON_KEY, FALLBACK_ORIGIN
 
@@ -99,14 +100,24 @@ export default {
 // ---------------------------------------------------------------------------
 
 async function passThrough(request, env) {
-  try {
-    const res = await fetch(request);
-    // Lovable answers 200 for every path; anything else here means the proxy hop failed.
-    if (res.status < 400 || res.status === 404) return res;
-  } catch (_) { /* fall through */ }
+  // The DNS record points at a placeholder, so this worker IS the site:
+  // every request is served from the Lovable copy of the same build.
   const url = new URL(request.url);
-  const alt = new URL(url.pathname + url.search, env.FALLBACK_ORIGIN);
-  return fetch(new Request(alt, request));
+  const target = new URL(url.pathname + url.search, env.FALLBACK_ORIGIN);
+  const headers = new Headers(request.headers);
+  headers.delete("host");
+  const res = await fetch(target, {
+    method: request.method, headers, redirect: "manual",
+    body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body,
+  });
+  // keep visitors on watchable.99dfy.com if Lovable ever redirects
+  const loc = res.headers.get("location");
+  if (loc && loc.startsWith(env.FALLBACK_ORIGIN)) {
+    const out = new Response(res.body, res);
+    out.headers.set("location", loc.replace(env.FALLBACK_ORIGIN, url.origin));
+    return out;
+  }
+  return res;
 }
 
 async function loadPage(env, slug, multi) {
