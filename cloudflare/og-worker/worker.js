@@ -56,11 +56,14 @@ export default {
     const title = clean(page.headline) || clean(page.title) || "Watch this video";
     const desc = clean(page.sub_headline) || "Tap to watch the video.";
     const pageUrl = `${url.origin}${url.pathname}`;
-    ctx.waitUntil(ensureImage(env, page, multi, v).catch(() => {}));
+    const metaP = imageMeta(env, page, multi, v).catch(() => null);
+    const meta = await Promise.race([metaP, new Promise((r) => setTimeout(() => r(null), 4000))]);
+    if (!meta) ctx.waitUntil(metaP);
 
     const set = {
       "og:title": title, "og:description": desc, "og:image": image,
-      "og:image:secure_url": image,
+      "og:image:secure_url": image, "og:image:type": (meta && meta.type) || "image/jpeg",
+      ...(meta && meta.w ? { "og:image:width": String(meta.w), "og:image:height": String(meta.h) } : {}),
       "og:image:alt": title, "og:type": "video.other", "og:url": pageUrl,
       "og:site_name": "Watchable",
       "twitter:card": "summary_large_image", "twitter:title": title,
@@ -158,17 +161,48 @@ function imageKey(slug, multi, v) {
 async function buildImage(page) {
   for (const u of videoUrls(page)) {
     const img = await thumbnailFor(u);
-    if (img) return { bytes: await img.arrayBuffer(), type: img.headers.get("content-type") || "image/jpeg" };
+    if (img) {
+      const bytes = await img.arrayBuffer();
+      return { bytes, type: img.headers.get("content-type") || "image/jpeg", ...imageSize(new Uint8Array(bytes)) };
+    }
   }
   return null;
 }
 
-async function ensureImage(env, page, multi, v) {
+async function ensureImage(env, page, multi, v, force) {
   const key = imageKey(page.slug, multi, v);
-  const have = await env.OG.get(key, { type: "stream" });
-  if (have) { await have.cancel(); return; }
+  if (!force) {
+    const have = await env.OG.get(key, { type: "stream" });
+    if (have) { await have.cancel(); return; }
+  }
   const img = await buildImage(page);
-  if (img) await env.OG.put(key, img.bytes, { metadata: { type: img.type }, expirationTtl: 60 * 60 * 24 * 90 });
+  if (img) await env.OG.put(key, img.bytes, { metadata: { type: img.type, w: img.w, h: img.h }, expirationTtl: 60 * 60 * 24 * 90 });
+}
+
+async function imageMeta(env, page, multi, v) {
+  const key = imageKey(page.slug, multi, v);
+  let hit = await env.OG.getWithMetadata(key, { type: "stream" });
+  if (hit.value) { await hit.value.cancel(); }
+  if (hit.metadata && hit.metadata.w) return hit.metadata;
+  await ensureImage(env, page, multi, v, !!hit.value);
+  hit = await env.OG.getWithMetadata(key, { type: "stream" });
+  if (hit.value) await hit.value.cancel();
+  return hit.metadata || null;
+}
+
+// width/height from JPEG or PNG bytes (Facebook needs them to show the picture on the FIRST share)
+function imageSize(b) {
+  if (b[0] === 0x89 && b[1] === 0x50) return { w: (b[16] << 24 | b[17] << 16 | b[18] << 8 | b[19]) >>> 0, h: (b[20] << 24 | b[21] << 16 | b[22] << 8 | b[23]) >>> 0 };
+  if (b[0] === 0xff && b[1] === 0xd8) {
+    let i = 2;
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xff) { i++; continue; }
+      const m = b[i + 1], len = b[i + 2] << 8 | b[i + 3];
+      if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return { h: b[i + 5] << 8 | b[i + 6], w: b[i + 7] << 8 | b[i + 8] };
+      i += 2 + len;
+    }
+  }
+  return {};
 }
 
 function imageResponse(body, type) {
@@ -203,7 +237,7 @@ async function ogImage(env, ctx, slug, multi, vParam) {
   let img = null;
   try { img = await buildImage(page); } catch (_) {}
   if (!img) return Response.redirect(DEFAULT_IMAGE, 302);
-  ctx.waitUntil(env.OG.put(key, img.bytes, { metadata: { type: img.type }, expirationTtl: 60 * 60 * 24 * 90 }));
+  ctx.waitUntil(env.OG.put(key, img.bytes, { metadata: { type: img.type, w: img.w, h: img.h }, expirationTtl: 60 * 60 * 24 * 90 }));
   return imageResponse(img.bytes, img.type);
 }
 
