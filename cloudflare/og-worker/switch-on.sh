@@ -17,32 +17,31 @@ echo "2/3 turning on the orange cloud…"
 curl -s -X PATCH "$B/dns_records/$R" "${H[@]}" -d '{"content":"192.0.2.1","proxied":true}' >/dev/null
 sleep 10
 
-echo "3/3 checking the live site…"
-# ask Cloudflare's own nameserver (public resolvers keep the old address for ~5 min)
+echo "3/3 checking the live site (up to 4 minutes while Lovable lets go of the domain)…"
 for i in $(seq 1 20); do
   IP=$(dig +short watchable.99dfy.com @dave.ns.cloudflare.com | head -1)
   [ -n "$IP" ] && [ "$IP" != "185.158.133.1" ] && [ "$IP" != "192.0.2.1" ] && break
   sleep 3
 done
-echo "   testing through Cloudflare address $IP"
 RV=(--resolve "watchable.99dfy.com:443:$IP")
-ok=1
-for p in / /letstalk /login /assets/$(curl -s https://watchablesaas.lovable.app/ | grep -oE 'index-[A-Za-z0-9_-]+\.js' | head -1) /og/letstalk.jpg; do
-  code=$(curl -s "${RV[@]}" -o /dev/null -w "%{http_code}" "https://watchable.99dfy.com$p")
-  echo "   $p → $code"
-  [ "$code" = "200" ] || ok=0
+JS=$(curl -s https://watchablesaas.lovable.app/ | grep -oE 'index-[A-Za-z0-9_-]+\.js' | head -1)
+ok=0
+for try in $(seq 1 24); do
+  good=1
+  for p in / /letstalk /login /assets/$JS /og/letstalk.jpg; do
+    code=$(curl -s "${RV[@]}" -o /dev/null -w "%{http_code}" "https://watchable.99dfy.com$p")
+    [ "$code" = "200" ] || good=0
+  done
+  curl -s "${RV[@]}" -A "WhatsApp/2.23" https://watchable.99dfy.com/letstalk | grep -q 'og/letstalk.jpg' || good=0
+  if [ $good = 1 ]; then ok=1; break; fi
+  echo "   not yet (try $try/24)…"; sleep 10
 done
-if curl -s "${RV[@]}" -A "WhatsApp/2.23" https://watchable.99dfy.com/letstalk | grep -q 'og/letstalk.jpg'; then
-  echo "   preview tags → OK"
-else
-  echo "   preview tags → missing"; ok=0
-fi
 
 if [ $ok = 1 ]; then
   echo "✅ LIVE — every Watchable page now shares with a picture from its own video."
 else
-  echo "⚠️ something failed — switching back to how it was…"
+  echo "⚠️ didn't come up — switching the record back to Lovable…"
   curl -s -X PATCH "$B/dns_records/$R" "${H[@]}" -d '{"content":"185.158.133.1","proxied":false}' >/dev/null
   [ -n "$ROUTE" ] && curl -s -X DELETE "$B/workers/routes/$ROUTE" "${H[@]}" >/dev/null
-  echo "↩️ restored. Site is back to normal."
+  echo "↩️ restored. If you removed the domain in Lovable, add watchable.99dfy.com back there."
 fi
