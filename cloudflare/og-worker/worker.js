@@ -176,7 +176,23 @@ async function ensureImage(env, page, multi, v, force) {
     if (have) { await have.cancel(); return; }
   }
   const img = await buildImage(page);
-  if (img) await env.OG.put(key, img.bytes, { metadata: { type: img.type, w: img.w, h: img.h }, expirationTtl: 60 * 60 * 24 * 90 });
+  if (img) await env.OG.put(key, img.bytes, { metadata: { type: img.type, w: img.w, h: img.h, at: Date.now() }, expirationTtl: 60 * 60 * 24 * 90 });
+}
+
+// The video's own picture can change without the page changing (e.g. renaming the
+// video in Tella bakes the new name into its picture), so a stored picture older
+// than an hour is rebuilt in the background while the stored one is served.
+const REFRESH_MS = 60 * 60 * 1000;
+function isStale(meta) {
+  return !meta || !meta.at || Date.now() - meta.at > REFRESH_MS;
+}
+async function refreshImage(env, slug, multi) {
+  try {
+    const page = await loadPage(env, slug, multi);
+    if (!page) return;
+    const v = (page.updated_at || "").replace(/\D/g, "").slice(0, 14);
+    await ensureImage(env, page, multi, v, true);
+  } catch (_) {}
 }
 
 async function imageMeta(env, page, multi, v) {
@@ -209,7 +225,7 @@ function imageResponse(body, type) {
   return new Response(body, {
     headers: {
       "content-type": type || "image/jpeg",
-      "cache-control": "public, max-age=31536000, immutable",
+      "cache-control": "public, max-age=1800",
       "access-control-allow-origin": "*",
     },
   });
@@ -224,7 +240,10 @@ async function ogImage(env, ctx, slug, multi, vParam, poster) {
   // fast path: already built
   if (v) {
     const hit = await env.OG.getWithMetadata(imageKey(slug, multi, v), { type: "stream" });
-    if (hit.value) return imageResponse(hit.value, hit.metadata && hit.metadata.type);
+    if (hit.value) {
+      if (isStale(hit.metadata)) ctx.waitUntil(refreshImage(env, slug, multi));
+      return imageResponse(hit.value, hit.metadata && hit.metadata.type);
+    }
   }
 
   let page = null;
@@ -234,12 +253,15 @@ async function ogImage(env, ctx, slug, multi, vParam, poster) {
   const key = imageKey(page.slug, multi, realV);
 
   const hit = await env.OG.getWithMetadata(key, { type: "stream" });
-  if (hit.value) return imageResponse(hit.value, hit.metadata && hit.metadata.type);
+  if (hit.value) {
+    if (isStale(hit.metadata)) ctx.waitUntil(ensureImage(env, page, multi, realV, true).catch(() => {}));
+    return imageResponse(hit.value, hit.metadata && hit.metadata.type);
+  }
 
   let img = null;
   try { img = await buildImage(page); } catch (_) {}
   if (!img) return miss();
-  ctx.waitUntil(env.OG.put(key, img.bytes, { metadata: { type: img.type, w: img.w, h: img.h }, expirationTtl: 60 * 60 * 24 * 90 }));
+  ctx.waitUntil(env.OG.put(key, img.bytes, { metadata: { type: img.type, w: img.w, h: img.h, at: Date.now() }, expirationTtl: 60 * 60 * 24 * 90 }));
   return imageResponse(img.bytes, img.type);
 }
 
