@@ -421,6 +421,19 @@ const PageBuilder = () => {
 
       let result = await savePage(pageData);
 
+      // FAQ columns not in the database yet → save everything else rather than fail.
+      if (result.error && /faq/i.test(result.error.message) && /column|schema/i.test(result.error.message)) {
+        const { faq_enabled: _fe, faq_title: _ft, faqs: _fq, ...withoutFaq } = pageData;
+        result = await savePage(withoutFaq as typeof pageData);
+        if (!result.error && formData.faq_enabled) {
+          toast({
+            title: 'Saved without the FAQ',
+            description: 'The database is missing the FAQ update, so the questions were not saved yet.',
+            variant: 'destructive',
+          });
+        }
+      }
+
       // If the database has not had the multi-video migration applied yet, save the
       // page without the sequence rather than failing outright — the first video
       // still lands in the original columns.
