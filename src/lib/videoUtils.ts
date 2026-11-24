@@ -63,12 +63,13 @@ export const getGoogleDriveId = (url: string): string | null => {
 };
 
 export const isTellaUrl = (url: string): boolean => {
-  return /(?:tella\.tv\/video\/)/.test(url);
+  // Tella links come as tella.tv/video/... and (newer) tella.com/video/...
+  return /tella\.(?:tv|com)\/video\//i.test(url);
 };
 
 export const getTellaId = (url: string): string | null => {
-  // Matches tella.tv/video/VIDEO_ID or tella.tv/video/VIDEO_ID/embed
-  const regExp = /tella\.tv\/video\/([^/]+)/;
+  // Matches tella.tv|tella.com /video/VIDEO_ID (optionally /embed, ?query, #hash)
+  const regExp = /tella\.(?:tv|com)\/video\/([^/?#]+)/i;
   const match = url.match(regExp);
   return match ? match[1] : null;
 };
