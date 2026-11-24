@@ -114,7 +114,7 @@ export const FaqEditor = ({ enabled, title, items, onChange }: FaqEditorProps) =
                   <InputWithClipboard
                     id={`faq-v-${faq.id}`}
                     value={faq.video_url || ''}
-                    placeholder="YouTube, Google Drive, Tella or video file link"
+                    placeholder="YouTube, Vimeo, Loom, Google Drive, Tella or video file link"
                     onValueChange={(value) => update(faq.id, { video_url: value })}
                   />
                 </div>

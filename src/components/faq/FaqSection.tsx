@@ -1,7 +1,7 @@
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { VideoContainer } from '@/components/video/VideoContainer';
+import { FaqVideo } from './FaqVideo';
 
 /** which comes first when an answer has both text and a video */
 export type FaqOrder = 'text_first' | 'video_first';
@@ -120,16 +120,8 @@ export const FaqSection = ({
                     </div>
                   )}
                   {faq.video_url && (
-                    <div className="overflow-hidden rounded-xl">
-                      {/* only mounted while the question is open, so closing it stops the video */}
-                      <VideoContainer
-                        src={faq.video_url}
-                        disableResume
-                        fakeProgressEnabled={false}
-                        playButtonColor={accentColor}
-                        playButtonSize={compact ? 56 : 80}
-                      />
-                    </div>
+                    // only mounted while the question is open, so closing it stops the video
+                    <FaqVideo url={faq.video_url} />
                   )}
                 </div>
               </AccordionPrimitive.Content>
