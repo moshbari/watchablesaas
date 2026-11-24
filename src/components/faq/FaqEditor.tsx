@@ -1,5 +1,7 @@
 import { ArrowDown, ArrowUp, HelpCircle, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { InputWithClipboard } from '@/components/InputWithClipboard';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -10,6 +12,8 @@ export const newFaqItem = (): FaqItem => ({
   id: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `faq-${Date.now()}-${Math.random()}`,
   question: '',
   answer: '',
+  video_url: '',
+  order: 'text_first',
 });
 
 interface FaqEditorProps {
@@ -96,7 +100,7 @@ export const FaqEditor = ({ enabled, title, items, onChange }: FaqEditorProps) =
                   />
                 </div>
                 <div>
-                  <Label htmlFor={`faq-a-${faq.id}`} className="text-sm">Answer</Label>
+                  <Label htmlFor={`faq-a-${faq.id}`} className="text-sm">Answer text <span className="font-normal text-muted-foreground">(optional)</span></Label>
                   <Textarea
                     id={`faq-a-${faq.id}`}
                     value={faq.answer}
@@ -105,6 +109,40 @@ export const FaqEditor = ({ enabled, title, items, onChange }: FaqEditorProps) =
                     onChange={(e) => update(faq.id, { answer: e.target.value })}
                   />
                 </div>
+                <div>
+                  <Label htmlFor={`faq-v-${faq.id}`} className="text-sm">Answer video <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                  <InputWithClipboard
+                    id={`faq-v-${faq.id}`}
+                    value={faq.video_url || ''}
+                    placeholder="YouTube, Google Drive, Tella or video file link"
+                    onValueChange={(value) => update(faq.id, { video_url: value })}
+                  />
+                </div>
+                {faq.answer.trim() && (faq.video_url || '').trim() && (
+                  <div className="space-y-1.5">
+                    <Label className="text-sm">What shows first?</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {([
+                        ['text_first', 'Text, then video'],
+                        ['video_first', 'Video, then text'],
+                      ] as const).map(([value, label]) => {
+                        const active = (faq.order || 'text_first') === value;
+                        return (
+                          <Button
+                            key={value}
+                            type="button"
+                            size="sm"
+                            variant={active ? 'default' : 'outline'}
+                            className={cn('w-full', active && 'shadow-sm')}
+                            onClick={() => update(faq.id, { order: value })}
+                          >
+                            {label}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -113,7 +151,7 @@ export const FaqEditor = ({ enabled, title, items, onChange }: FaqEditorProps) =
             <Plus className="mr-2 h-4 w-4" /> Add Question
           </Button>
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <HelpCircle className="h-3.5 w-3.5" /> Empty questions are skipped, so you can leave spare rows.
+            <HelpCircle className="h-3.5 w-3.5" /> Empty questions are skipped, so you can leave spare rows. An answer can be text, a video, or both.
           </p>
         </div>
       )}

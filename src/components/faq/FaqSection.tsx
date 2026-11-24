@@ -1,11 +1,18 @@
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { VideoContainer } from '@/components/video/VideoContainer';
+
+/** which comes first when an answer has both text and a video */
+export type FaqOrder = 'text_first' | 'video_first';
 
 export interface FaqItem {
   id: string;
   question: string;
   answer: string;
+  /** optional video in the answer: YouTube, Google Drive, Tella or a video file link */
+  video_url?: string;
+  order?: FaqOrder;
 }
 
 export const DEFAULT_FAQ_TITLE = 'Frequently Asked Questions';
@@ -14,7 +21,13 @@ export const DEFAULT_FAQ_TITLE = 'Frequently Asked Questions';
 export const visibleFaqs = (items: unknown): FaqItem[] =>
   (Array.isArray(items) ? items : [])
     .filter((f): f is FaqItem => !!f && typeof f === 'object' && typeof (f as FaqItem).question === 'string')
-    .map((f) => ({ ...f, question: f.question.trim(), answer: (f.answer || '').trim() }))
+    .map((f) => ({
+      ...f,
+      question: f.question.trim(),
+      answer: (f.answer || '').trim(),
+      video_url: (typeof f.video_url === 'string' ? f.video_url : '').trim(),
+      order: f.order === 'video_first' ? 'video_first' : 'text_first',
+    }) as FaqItem)
     .filter((f) => f.question.length > 0);
 
 interface FaqSectionProps {
@@ -86,16 +99,38 @@ export const FaqSection = ({
                 </span>
               </AccordionPrimitive.Trigger>
             </AccordionPrimitive.Header>
-            {faq.answer && (
+            {(faq.answer || faq.video_url) && (
               <AccordionPrimitive.Content className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                 <div
                   className={cn(
-                    'whitespace-pre-line border-l-[3px] text-gray-600',
-                    compact ? 'mx-4 mb-4 pl-3 text-xs leading-relaxed' : 'mx-5 mb-5 pl-4 text-base leading-relaxed sm:mx-6 sm:mb-6',
+                    'flex gap-4',
+                    faq.order === 'video_first' ? 'flex-col-reverse' : 'flex-col',
+                    compact ? 'mx-4 mb-4 gap-3' : 'mx-5 mb-5 sm:mx-6 sm:mb-6',
                   )}
-                  style={{ borderColor: accentColor }}
                 >
-                  {faq.answer}
+                  {faq.answer && (
+                    <div
+                      className={cn(
+                        'whitespace-pre-line border-l-[3px] text-gray-600',
+                        compact ? 'pl-3 text-xs leading-relaxed' : 'pl-4 text-base leading-relaxed',
+                      )}
+                      style={{ borderColor: accentColor }}
+                    >
+                      {faq.answer}
+                    </div>
+                  )}
+                  {faq.video_url && (
+                    <div className="overflow-hidden rounded-xl">
+                      {/* only mounted while the question is open, so closing it stops the video */}
+                      <VideoContainer
+                        src={faq.video_url}
+                        disableResume
+                        fakeProgressEnabled={false}
+                        playButtonColor={accentColor}
+                        playButtonSize={compact ? 56 : 80}
+                      />
+                    </div>
+                  )}
                 </div>
               </AccordionPrimitive.Content>
             )}
