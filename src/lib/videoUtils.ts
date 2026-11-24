@@ -101,3 +101,28 @@ export const validateVideoUrl = (url: string): { isValid: boolean; type: 'youtub
     return { isValid: false, type: 'unknown' };
   }
 };
+
+/**
+ * The start point written into a video link, in seconds, the way YouTube reads it:
+ * ?t=163, ?t=163s, ?t=2m43s, ?t=1h2m3s, ?start=163, or #t=163. Undefined when there is none.
+ */
+export const getUrlStartTime = (url: string): number | undefined => {
+  try {
+    const u = new URL(url);
+    const hash = new URLSearchParams(u.hash.replace(/^#/, ''));
+    const raw = u.searchParams.get('t') ?? u.searchParams.get('start') ?? hash.get('t');
+    if (!raw) return undefined;
+    const value = raw.trim().toLowerCase();
+    let seconds: number;
+    if (/^\d+(\.\d+)?s?$/.test(value)) {
+      seconds = parseFloat(value);
+    } else {
+      const m = value.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/);
+      if (!m || !(m[1] || m[2] || m[3])) return undefined;
+      seconds = Number(m[1] || 0) * 3600 + Number(m[2] || 0) * 60 + Number(m[3] || 0);
+    }
+    return seconds > 0 ? seconds : undefined;
+  } catch {
+    return undefined;
+  }
+};

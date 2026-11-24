@@ -9,7 +9,7 @@ import { TellaPlayer } from './TellaPlayer';
 import { ResumeModal } from '../ResumeModal';
 import { OverlayButton, type OverlayButtonConfig } from '../VideoOverlayButton';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
-import { extractVideoUrl, isYouTubeUrl, getYouTubeId, isGoogleDriveUrl, getGoogleDriveId, isTellaUrl, getTellaId } from '@/lib/videoUtils';
+import { extractVideoUrl, isYouTubeUrl, getYouTubeId, isGoogleDriveUrl, getGoogleDriveId, isTellaUrl, getTellaId, getUrlStartTime } from '@/lib/videoUtils';
 import { FakeProgressBar } from './FakeProgressBar';
 
 import { type SkipSection } from './useVideoState';
@@ -39,7 +39,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   playButtonColor = '#ff0000', 
   playButtonSize = 96,
   overlayButtonConfig,
-  startTime,
+  startTime: startTimeProp,
   endTime,
   skipSections = [],
   fakeProgressEnabled = false,
@@ -56,6 +56,13 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   
   // Extract the actual video URL (handles URLs with video parameters)
   const actualVideoUrl = useMemo(() => extractVideoUrl(src), [src]);
+
+  // A start time typed in the builder wins; otherwise use the one in the link itself
+  // (e.g. YouTube's ...&t=163s), so the video opens where the link points, like on YouTube.
+  const startTime = useMemo(
+    () => (startTimeProp && startTimeProp > 0 ? startTimeProp : getUrlStartTime(src)),
+    [startTimeProp, src],
+  );
   
   const { savedProgress, saveProgress, clearProgress, showResumeModal, setShowResumeModal } = useVideoProgress(actualVideoUrl);
   
