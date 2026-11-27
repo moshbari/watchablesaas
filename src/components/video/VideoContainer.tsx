@@ -53,6 +53,9 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [videoDuration, setVideoDuration] = useState<number>(0);
+  // Whether the video is really playing, for the fake progress bar (YouTube/Tella tell us; Drive can't).
+  const [embedPlaying, setEmbedPlaying] = useState(false);
+  const [drivePlaying, setDrivePlaying] = useState(false);
   
   // Extract the actual video URL (handles URLs with video parameters)
   const actualVideoUrl = useMemo(() => extractVideoUrl(src), [src]);
@@ -205,6 +208,18 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     isYoutube: isYoutube || isGoogleDrive || isTella
   });
 
+  // Google Drive's player can't tell us it's playing. A tap into it moves focus off our page
+  // into its frame: take that as "pressed play" for the fake progress bar.
+  useEffect(() => {
+    if (!isGoogleDrive || !fakeProgressEnabled) return;
+    const onBlur = () => setTimeout(() => {
+      const el = document.activeElement;
+      if (el && containerRef.current?.contains(el)) setDrivePlaying(true);
+    }, 0);
+    window.addEventListener('blur', onBlur);
+    return () => window.removeEventListener('blur', onBlur);
+  }, [isGoogleDrive, fakeProgressEnabled]);
+
   // Fullscreen change listener
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -342,6 +357,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onSeekComplete={() => setShouldSeekTo(undefined)}
             onDurationChange={setVideoDuration}
             mobileFullscreenEnabled={mobileFullscreenEnabled}
+            onPlayingChange={setEmbedPlaying}
           />
         ) : isGoogleDrive && googleDriveId ? (
           <GoogleDrivePlayer
@@ -356,6 +372,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             posterUrl={posterUrl}
             playButtonColor={playButtonColor}
             playButtonSize={playButtonSize}
+            onPlayingChange={setEmbedPlaying}
           />
         ) : (
           <>
@@ -396,7 +413,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
         <div className="relative w-full" style={{ marginTop: `-${fakeProgressThickness || 8}px` }}>
           <FakeProgressBar
             videoDuration={videoDuration || 100}
-            isPlaying={state.isPlaying}
+            isPlaying={isYoutube || isTella ? embedPlaying : isGoogleDrive ? drivePlaying : state.isPlaying}
             color={fakeProgressColor}
             thickness={fakeProgressThickness}
           />

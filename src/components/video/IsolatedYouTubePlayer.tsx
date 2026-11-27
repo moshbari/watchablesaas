@@ -22,6 +22,8 @@ interface IsolatedYouTubePlayerProps {
   onSeekComplete?: () => void;
   onDurationChange?: (duration: number) => void;
   mobileFullscreenEnabled?: boolean;
+  /** told whenever the video starts or stops playing (drives the fake progress bar) */
+  onPlayingChange?: (playing: boolean) => void;
 }
 
 declare global {
@@ -43,7 +45,8 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   shouldSeekTo,
   onSeekComplete,
   onDurationChange,
-  mobileFullscreenEnabled = true
+  mobileFullscreenEnabled = true,
+  onPlayingChange
 }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
@@ -57,6 +60,7 @@ export const IsolatedYouTubePlayer: React.FC<IsolatedYouTubePlayerProps> = ({
   const pendingPlayRef = useRef(false);
   const queuedPlayTimeoutRef = useRef<NodeJS.Timeout>();
   const [isPlaying, setIsPlaying] = useState(false);
+  useEffect(() => { onPlayingChange?.(isPlaying); }, [isPlaying, onPlayingChange]);
   const [volume, setVolume] = useState(80);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);

@@ -9,6 +9,8 @@ interface TellaPlayerProps {
   playButtonSize?: number;
   /** the video's picture, shown until the video is actually playing */
   posterUrl?: string;
+  /** told whenever the video starts or stops playing (drives the fake progress bar) */
+  onPlayingChange?: (playing: boolean) => void;
 }
 
 // iPhone/iPad (every browser there is Safari underneath) and Mac Safari only start
@@ -45,13 +47,15 @@ export const TellaPlayer: React.FC<TellaPlayerProps> = ({
   videoId,
   playButtonColor = '#ff0000',
   playButtonSize = 96,
-  posterUrl
+  posterUrl,
+  onPlayingChange
 }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [ready, setReady] = useState(false);
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
+  useEffect(() => { onPlayingChange?.(playing); }, [playing, onPlayingChange]);
   const [wantPlay, setWantPlay] = useState(false);
   const [time, setTime] = useState(0);
   const [muted, setMuted] = useState(false);

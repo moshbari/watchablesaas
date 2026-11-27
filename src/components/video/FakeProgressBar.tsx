@@ -8,6 +8,16 @@ interface FakeProgressBarProps {
   onComplete?: () => void;
 }
 
+// The fake "this video is short" bar: races to 75% in the first 30% of the time, then crawls
+// through the last 25%. It stays hidden until the video first starts playing (not on page load)
+// and only moves while the video is playing.
+const calculateProgress = (elapsedMs: number, videoDuration: number): number => {
+  if (videoDuration <= 0) return 0;
+  const t = elapsedMs / (videoDuration * 1000);
+  const eased = t < 0.3 ? t * 2.5 : 0.75 + (t - 0.3) * 0.357;
+  return Math.min(eased * 100, 100);
+};
+
 export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   videoDuration,
   isPlaying,
@@ -16,94 +26,41 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   onComplete
 }) => {
   const [progress, setProgress] = useState(0);
-  const startTimeRef = useRef<number | null>(null);
-  const pausedTimeRef = useRef<number>(0);
-  const animationFrameRef = useRef<number>();
-  const lastDurationRef = useRef<number>(0);
+  const [started, setStarted] = useState(false);
+  const elapsedRef = useRef(0); // ms of playing time so far
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
-  // Debug logging
+  // A new video (new length) starts the bar over, hidden again until it plays.
   useEffect(() => {
-    console.log('🎯 FakeProgressBar state:', { 
-      videoDuration, 
-      isPlaying,
-      progress
-    });
-  }, [videoDuration, isPlaying, progress]);
-
-  useEffect(() => {
-    // Start automatically when video duration is set (fake bar for psychological effect)
-    // Only skip if duration is invalid or hasn't changed
-    if (videoDuration <= 0) {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      return;
-    }
-
-    // If duration changed, reset and restart
-    if (videoDuration !== lastDurationRef.current) {
-      lastDurationRef.current = videoDuration;
-      setProgress(0);
-      startTimeRef.current = null;
-      pausedTimeRef.current = 0;
-      console.log('🎯 Starting fake progress animation for duration:', videoDuration);
-    }
-
-    // Calculate progress using an easing function that creates the illusion of speed
-    const calculateProgress = (elapsedTime: number): number => {
-      if (videoDuration <= 0) return 0;
-      
-      const normalizedTime = elapsedTime / (videoDuration * 1000); // Convert to 0-1 range
-      
-      // Easing function: starts fast (cubic easing), then slows down dramatically
-      // This creates the psychological effect of a fast, small video
-      const eased = normalizedTime < 0.3 
-        ? normalizedTime * 2.5 // First 30% of time, progress 75% faster
-        : 0.75 + (normalizedTime - 0.3) * 0.357; // Remaining 70% of time fills last 25%
-      
-      return Math.min(eased * 100, 100);
-    };
-
-    const animate = (currentTime: number) => {
-      if (startTimeRef.current === null) {
-        startTimeRef.current = currentTime - pausedTimeRef.current;
-      }
-
-      const elapsedTime = currentTime - startTimeRef.current;
-      const newProgress = calculateProgress(elapsedTime);
-      
-      setProgress(newProgress);
-
-      if (newProgress < 100) {
-        animationFrameRef.current = requestAnimationFrame(animate);
-      } else {
-        onComplete?.();
-      }
-    };
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (startTimeRef.current !== null) {
-        pausedTimeRef.current = performance.now() - startTimeRef.current;
-      }
-    };
-  }, [isPlaying, videoDuration, onComplete]);
-
-  // Reset when video duration changes
-  useEffect(() => {
+    elapsedRef.current = 0;
     setProgress(0);
-    startTimeRef.current = null;
-    pausedTimeRef.current = 0;
+    setStarted(false);
   }, [videoDuration]);
 
+  useEffect(() => {
+    if (!isPlaying || videoDuration <= 0) return;
+    setStarted(true);
+    let raf = 0;
+    let last: number | null = null;
+    const animate = (now: number) => {
+      if (last !== null) elapsedRef.current += now - last;
+      last = now;
+      const p = calculateProgress(elapsedRef.current, videoDuration);
+      setProgress(p);
+      if (p < 100) raf = requestAnimationFrame(animate);
+      else onCompleteRef.current?.();
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [isPlaying, videoDuration]);
+
+  if (!started) return null;
+
   return (
-    <div 
+    <div
       className="w-full pointer-events-none overflow-hidden"
-      style={{ 
+      style={{
         height: `${thickness}px`,
         backgroundColor: 'rgba(255, 255, 255, 0.15)',
         borderRadius: '0 0 8px 8px',
@@ -112,7 +69,7 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
         display: 'block'
       }}
     >
-      <div 
+      <div
         className="h-full"
         style={{
           width: `${progress || 1}%`,
