@@ -150,7 +150,7 @@ const DynamicMultiVideoPage = () => {
                   href={page.button_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105"
+                  className="inline-block max-w-full whitespace-normal break-words text-center px-8 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105"
                   style={{
                     backgroundColor: page.button_bg_color || '#007bc7',
                     color: page.button_text_color || '#ffffff',
