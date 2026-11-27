@@ -892,7 +892,7 @@ export const SequentialVideoPlayer: React.FC<SequentialVideoPlayerProps> = ({
         {fakeProgressEnabled && (
           <div className="relative w-full" style={{ marginTop: `-${fakeProgressThickness || 8}px` }}>
             <FakeProgressBar
-              videoDuration={totalDuration || 100}
+              videoDuration={totalDuration}
               isPlaying={isPlaying}
               color={fakeProgressColor}
               thickness={fakeProgressThickness}

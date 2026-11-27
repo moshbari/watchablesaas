@@ -56,6 +56,8 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
   // Whether the video is really playing, for the fake progress bar (YouTube/Tella tell us; Drive can't).
   const [embedPlaying, setEmbedPlaying] = useState(false);
   const [drivePlaying, setDrivePlaying] = useState(false);
+  // Real position (seconds after the start time) for the fake bar, so it ends exactly with the video.
+  const [position, setPosition] = useState<number | undefined>(undefined);
   
   // Extract the actual video URL (handles URLs with video parameters)
   const actualVideoUrl = useMemo(() => extractVideoUrl(src), [src]);
@@ -249,6 +251,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
 
     // Progress saving, end time checking, and skip sections
     const handleTimeUpdate = () => {
+      setPosition(video.currentTime - (startTime || 0));
       if (video.currentTime > 0) {
         // Check if we've reached the end time
         if (endTime && video.currentTime >= endTime) {
@@ -352,7 +355,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             startTime={startTime}
             endTime={endTime}
             skipSections={skipSections}
-            onProgressUpdate={saveProgress}
+            onProgressUpdate={(t) => { saveProgress(t); setPosition(t - (startTime || 0)); }}
             shouldSeekTo={state.shouldSeekTo}
             onSeekComplete={() => setShouldSeekTo(undefined)}
             onDurationChange={setVideoDuration}
@@ -412,8 +415,9 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
       {fakeProgressEnabled && (
         <div className="relative w-full" style={{ marginTop: `-${fakeProgressThickness || 8}px` }}>
           <FakeProgressBar
-            videoDuration={videoDuration || 100}
+            videoDuration={videoDuration}
             isPlaying={isYoutube || isTella ? embedPlaying : isGoogleDrive ? drivePlaying : state.isPlaying}
+            currentTime={isYoutube || (!isGoogleDrive && !isTella) ? position : undefined}
             color={fakeProgressColor}
             thickness={fakeProgressThickness}
           />

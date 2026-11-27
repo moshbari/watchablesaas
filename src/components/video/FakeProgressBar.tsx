@@ -1,59 +1,78 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 interface FakeProgressBarProps {
-  videoDuration: number; // in seconds
+  videoDuration: number; // in seconds (0 = not known yet)
   isPlaying: boolean;
+  /** the video's real position in seconds, when the player reports it (YouTube, uploaded files) */
+  currentTime?: number;
   color?: string;
   thickness?: number;
   onComplete?: () => void;
 }
 
-// The fake "this video is short" bar: races to 75% in the first 30% of the time, then crawls
-// through the last 25%. It stays hidden until the video first starts playing (not on page load)
-// and only moves while the video is playing.
-const calculateProgress = (elapsedMs: number, videoDuration: number): number => {
-  if (videoDuration <= 0) return 0;
-  const t = elapsedMs / (videoDuration * 1000);
-  const eased = t < 0.3 ? t * 2.5 : 0.75 + (t - 0.3) * 0.357;
-  return Math.min(eased * 100, 100);
-};
+/*
+ * The fake "this video is short" bar. It runs AHEAD of the video, then slows down so gradually nobody
+ * notices, and finishes exactly when the video does — never before (viewers would stop trusting us).
+ * Curve: ln(1 + 4t) / ln 5 → starts ~2.5× video speed, ~68% at the video's halfway point, ~0.5× speed
+ * at the end, smooth all the way. Same curve as Forge's Video block.
+ *
+ * When the player reports its real position, the bar follows it (pausing, skipping and buffering
+ * can't make it run off). When it can't (Google Drive, Tella, the multi-video player), the bar counts
+ * play time and stops at 97% so it can't claim the end before the video gets there.
+ * Hidden until the video first starts playing.
+ */
+const A = 4;
+export const fakeCurve = (t: number) => Math.log(1 + A * Math.min(Math.max(t, 0), 1)) / Math.log(1 + A);
 
 export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
   videoDuration,
   isPlaying,
+  currentTime,
   color = '#ef4444',
   thickness = 8,
   onComplete
 }) => {
   const [progress, setProgress] = useState(0);
   const [started, setStarted] = useState(false);
-  const elapsedRef = useRef(0); // ms of playing time so far
+  const elapsedRef = useRef(0); // ms of play, for players that don't report a position
+  const reportRef = useRef<{ t: number; at: number } | null>(null);
+  const playingRef = useRef(isPlaying);
+  playingRef.current = isPlaying;
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
-  // A new video (new length) starts the bar over, hidden again until it plays.
   useEffect(() => {
-    elapsedRef.current = 0;
-    setProgress(0);
-    setStarted(false);
-  }, [videoDuration]);
+    if (typeof currentTime === 'number') reportRef.current = { t: currentTime, at: performance.now() };
+  }, [currentTime]);
 
   useEffect(() => {
-    if (!isPlaying || videoDuration <= 0) return;
-    setStarted(true);
+    if (isPlaying) setStarted(true);
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (!started) return;
     let raf = 0;
-    let last: number | null = null;
+    let last = 0;
+    let done = false;
     const animate = (now: number) => {
-      if (last !== null) elapsedRef.current += now - last;
+      const r = reportRef.current;
+      let p: number;
+      if (r && videoDuration > 0) {
+        // Players report about once a second: glide in between, never more than 1.5s past the last report.
+        const ahead = playingRef.current ? Math.min((now - r.at) / 1000, 1.5) : 0;
+        p = fakeCurve((r.t + ahead) / videoDuration);
+      } else {
+        if (playingRef.current && last) elapsedRef.current += now - last;
+        p = Math.min(0.97, fakeCurve(elapsedRef.current / ((videoDuration > 0 ? videoDuration : 100) * 1000)));
+      }
       last = now;
-      const p = calculateProgress(elapsedRef.current, videoDuration);
-      setProgress(p);
-      if (p < 100) raf = requestAnimationFrame(animate);
-      else onCompleteRef.current?.();
+      setProgress(p * 100);
+      if (p >= 1 && !done) { done = true; onCompleteRef.current?.(); }
+      raf = requestAnimationFrame(animate);
     };
     raf = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(raf);
-  }, [isPlaying, videoDuration]);
+  }, [started, videoDuration]);
 
   if (!started) return null;
 
@@ -70,6 +89,7 @@ export const FakeProgressBar: React.FC<FakeProgressBarProps> = ({
       }}
     >
       <div
+        data-fake-bar
         className="h-full"
         style={{
           width: `${progress || 1}%`,
